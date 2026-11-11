@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perlinette</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='7' r='6' fill='%23E8A498'/%3E%3Ccircle cx='7' cy='16' r='6' fill='%23E9C704'/%3E%3Ccircle cx='25' cy='16' r='6' fill='%2349AE89'/%3E%3Ccircle cx='16' cy='25' r='6' fill='%236e2f5c'/%3E%3C/svg%3E">
+</head>
+<body>
+<div id="app">
+  <header class="barre">
+    <strong class="marque"><span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="7" r="6" fill="#E8A498"/><circle cx="7" cy="16" r="6" fill="#E9C704"/><circle cx="25" cy="16" r="6" fill="#49AE89"/><circle cx="16" cy="25" r="6" fill="#6e2f5c"/><g fill="#fffdf9"><circle cx="16" cy="7" r="2"/><circle cx="7" cy="16" r="2"/><circle cx="25" cy="16" r="2"/><circle cx="16" cy="25" r="2"/></g></svg></span>Perlinette</strong>
+    <button id="nomProjet" class="nom-projet" title="Renommer le motif"></button>
+    <nav>
+      <div class="menu">
+        <button id="btnFichier" aria-haspopup="true" aria-expanded="false">Fichier ▾</button>
+        <div class="menu-liste" id="menuFichier" hidden>
+          <button data-action="nouveau">Nouveau motif</button>
+          <button data-action="ouvrir">Ouvrir…</button>
+          <button data-action="enregistrer">Enregistrer <small>Ctrl+S</small></button>
+          <hr>
+          <button data-action="exporter">Exporter un fichier <small>(sauvegarde)</small></button>
+          <button data-action="importerFichier">Importer un fichier…</button>
+          <button data-action="png">Enregistrer en image PNG</button>
+        </div>
+      </div>
+      <span class="sep"></span>
+      <button data-action="modeles" title="Des motifs prêts à l'emploi">Modèles</button>
+      <button data-action="mot" title="Lettres, accents et chiffres, sur le moins de plaques possible">Écrire une phrase</button>
+      <button data-action="image" title="Transformer une image en motif">Importer une image</button>
+      <span class="sep"></span>
+      <button data-action="plaque" title="Changer de plaque, assembler plusieurs plaques">Plaques</button>
+      <button data-action="couleurs" title="Nuancier du motif, mes perles, couleurs des lettres">Couleurs</button>
+    </nav>
+    <span class="espace"></span>
+    <button id="btnEnfant" class="enfant-bouton" title="Version simplifiée pour les enfants">🧒 Mode enfant</button>
+    <button data-action="aide" class="rond" title="Gestes et raccourcis">?</button>
+    <button data-action="imprimer" class="principal">Imprimer (A4 taille réelle)</button>
+  </header>
+
+  <aside class="outils">
+    <div class="couleur-active" id="couleurActive" title="Couleur en cours — choisis-en une dans la liste à droite"></div>
+    <div class="grille-outils">
+      <button class="outil actif" data-outil="crayon" title="Crayon (C)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M16.5 3.5l4 4L9 19l-5 1 1-5z"/><path d="M16.5 3.5l4 4L9 19l-5 1 1-5zM14 6l4 4M5 15l4 4"/></svg><span>Crayon</span></button>
+      <button class="outil" data-outil="gomme" title="Gomme (E) — ou clic droit"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M9.5 20L4 14.5 13.5 5 19 10.5z"/><path d="M9.5 20L4 14.5 13.5 5 19 10.5zM7 11.5l5.5 5.5M9.5 20H20"/></svg><span>Gomme</span></button>
+      <button class="outil" data-outil="remplir" title="Remplissage (F)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M5 11l6-6 7 7-6 6z"/><path d="M5 11l6-6 7 7-6 6zM5 11h13M9 3l2 2M19.5 15.5s2 2.4 2 3.7a2 2 0 0 1-4 0c0-1.3 2-3.7 2-3.7z"/></svg><span>Remplir</span></button>
+      <button class="outil" data-outil="pipette" title="Pipette (I)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M16 3.5a2.5 2.5 0 0 1 3.5 3.5L17 9.5 14.5 7z"/><path d="M16 3.5a2.5 2.5 0 0 1 3.5 3.5L17 9.5 14.5 7zM13 5.5l5.5 5.5M15.5 8L6 17.5V20h2.5L18 10.5M4 20.5h.01"/></svg><span>Pipette</span></button>
+      <button class="outil" data-outil="remplacer" title="Remplacer cette couleur partout (R)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M3 9a4 4 0 1 0 8 0 4 4 0 1 0-8 0"/><path d="M3 9a4 4 0 1 0 8 0 4 4 0 1 0-8 0M13 15a4 4 0 1 0 8 0 4 4 0 1 0-8 0M13 6h4a2 2 0 0 1 2 2v2l-2-2M11 18H7a2 2 0 0 1-2-2v-2l2 2"/></svg><span>Remplacer</span></button>
+      <button class="outil" data-outil="lettre" title="Changer la couleur d'une lettre (phrases et alphabet)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M14 19a3 3 0 1 0 6 0 3 3 0 1 0-6 0"/><path d="M3 20L9 4l6 16M5.3 14h7.4M14 19a3 3 0 1 0 6 0 3 3 0 1 0-6 0"/></svg><span>Couleur lettre</span></button>
+      <button class="outil" data-outil="ligne" title="Ligne (L) — deux clics ou glisser"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M3.5 20.5a2 2 0 1 0 0-.01M18.5 5.5a2 2 0 1 0 0-.01"/><path d="M5 19L19 5M3.5 18.5a2 2 0 1 0 0 4 2 2 0 1 0 0-4M20.5 1.5a2 2 0 1 0 0 4 2 2 0 1 0 0-4"/></svg><span>Ligne</span></button>
+      <button class="outil" data-outil="rect" title="Rectangle (Q) — Maj = carré"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M3.5 6h17v12h-17z"/><path d="M3.5 6h17v12h-17z"/></svg><span>Rectangle</span></button>
+      <button class="outil" data-outil="ellipse" title="Cercle (O) — Maj = cercle parfait"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg><span>Cercle</span></button>
+      <div class="options-forme" id="optionsForme" hidden>
+        <button type="button" data-plein="0" class="actif" title="Seulement le contour">Évidé</button>
+        <button type="button" data-plein="1" title="Forme remplie">Plein</button>
+        <input type="checkbox" id="optPlein" hidden>
+      </div>
+      <button data-action="annuler" title="Annuler (Ctrl+Z)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5L4 10l5 5M4 10h10a6 6 0 0 1 0 12h-3"/></svg><span>Annuler</span></button>
+      <button data-action="refaire" title="Refaire (Ctrl+Y)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l5 5-5 5M20 10H10a6 6 0 0 0 0 12h3"/></svg><span>Refaire</span></button>
+      <button data-action="miroirH" title="Retourner gauche/droite"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M10 6L3 12l7 6z"/><path d="M12 2v20M10 6L3 12l7 6zM14 6l7 6-7 6z"/></svg><span>Miroir ↔</span></button>
+      <button data-action="miroirV" title="Retourner haut/bas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M6 10L12 3l6 7z"/><path d="M2 12h20M6 10L12 3l6 7zM6 14l6 7 6-7z"/></svg><span>Miroir ↕</span></button>
+      <button data-action="versPlaque" title="Les picots où il y a une perle deviennent une nouvelle plaque (cœur, étoile…)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M12 4l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L4.2 9.7l5.4-.8z"/><path d="M12 4l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L4.2 9.7l5.4-.8z"/></svg><span>Créer une plaque</span></button>
+      <button data-action="vider" class="danger" title="Retirer toutes les perles"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M6 7h12l-1 14H7z"/><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/></svg><span>Tout effacer</span></button>
+    </div>
+  </aside>
+
+  <main class="zone" id="zone">
+    <div class="toile-cadre" id="toileCadre"><canvas id="toile"></canvas></div>
+  </main>
+  <div class="zoom-barre" title="Zoom : Ctrl + molette, touches + et −, 0 pour ajuster">
+    <button id="zoomMoins" title="Dézoomer (−)">−</button>
+    <button id="zoomValeur" title="Revenir à 100 %">100 %</button>
+    <button id="zoomPlus" title="Zoomer (+)">+</button>
+    <button id="zoomAjuster" title="Voir toute la plaque (0)">Ajuster</button>
+    <button id="btnSymboles" title="Afficher un symbole dans chaque perle">Symboles</button>
+    <input type="checkbox" id="optSymboles" hidden>
+  </div>
+
+  <aside class="cote">
+    <section>
+      <div id="soudure" class="soudure"></div>
+      <h2>Plaque</h2>
+      <p id="infoPlaque" class="note"></p>
+      <div class="segment" id="segFusion" role="group" aria-label="Aperçu du repassage">
+        <span class="note">Aperçu repassage :</span>
+        <button type="button" data-fusion="0" title="Perles posées, sans repassage">Perles</button>
+        <button type="button" data-fusion="1" title="Fusion légère : trous ouverts">Légère</button>
+        <button type="button" data-fusion="2" title="Fusion moyenne : trous à moitié fermés">Moyenne</button>
+        <button type="button" data-fusion="3" title="Fusion complète : surface plate">Complète</button>
+        <select id="fusion" hidden>
+          <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+        </select>
+      </div>
+    </section>
+    <section class="couleurs-section">
+      <h2>Couleurs <small id="totalPerles"></small></h2>
+      <label class="tri">Classer par <select id="triCouleurs"></select></label>
+      <div id="listeCouleurs" class="couleurs"></div>
+      <div class="ligne-boutons">
+        <button data-action="ajouterCouleur">+ Couleur</button>
+        <button data-action="couleurs" title="Nuancier, mes perles, couleurs des lettres">Couleurs…</button>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<!-- Nouveau motif / changer de plaque -->
+<dialog id="dlgPlaque">
+  <form method="dialog">
+    <h3 id="titrePlaque">Plaque</h3>
+    <label id="lblNom">Nom du motif <input name="nom" value="Mon motif"></label>
+    <label>Plaque <select name="format"></select></label>
+    <p id="notePlaque" class="note"></p>
+    <div class="deux" id="tailleLibre">
+      <label>Largeur (picots) <input name="w" type="number" min="1" max="200" value="29"></label>
+      <label>Hauteur (picots) <input name="h" type="number" min="1" max="200" value="29"></label>
+    </div>
+    <div class="deux">
+      <label>Plaques côte à côte <input name="cols" type="number" min="1" max="10" value="1"></label>
+      <label>Rangées de plaques <input name="rangs" type="number" min="1" max="10" value="1"></label>
+    </div>
+    <label>Couleurs <select name="palette"></select></label>
+    <p class="note" id="totalPlaque"></p>
+    <menu>
+      <button value="annuler" formnovalidate>Annuler</button>
+      <button value="ok" class="principal">Valider</button>
+    </menu>
+  </form>
+</dialog>
+
+<!-- Ouvrir -->
+<dialog id="dlgOuvrir">
+  <form method="dialog">
+    <h3>Mes motifs enregistrés</h3>
+    <ul id="listeProjets" class="liste-projets"></ul>
+    <p class="note">Ils sont rangés dans ce navigateur. « Exporter fichier » de temps en temps : c'est ta vraie sauvegarde.</p>
+    <menu><button value="fermer">Fermer</button></menu>
+  </form>
+</dialog>
+
+<!-- Import image -->
+<dialog id="dlgImage" class="tres-large">
+  <form method="dialog">
+    <h3>Transformer une image en motif</h3>
+    <div class="img-grille">
+      <div class="img-reglages">
+        <label>Image <input type="file" id="fichierImage" accept="image/*"></label>
+        <fieldset>
+          <legend>Plaques</legend>
+          <label>Plaque <select name="format"></select></label>
+          <div class="deux" id="imgTailleLibre">
+            <label>Largeur (picots) <input name="w" type="number" min="1" max="200" value="29"></label>
+            <label>Hauteur (picots) <input name="h" type="number" min="1" max="200" value="29"></label>
+          </div>
+          <div class="deux">
+            <label>Plaques côte à côte <input name="cols" type="number" min="1" max="10" value="1"></label>
+            <label>Rangées de plaques <input name="rangs" type="number" min="1" max="10" value="1"></label>
+          </div>
+          <label>Cadrage
+            <select name="cadrage">
+              <option value="contenir">Image entière (marges vides possibles)</option>
+              <option value="remplir">Remplir toutes les plaques (bords rognés)</option>
+            </select>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Couleurs</legend>
+          <div class="deux">
+            <label>Couleurs max (0 = toutes) <input name="max" type="number" min="0" max="200" value="12"></label>
+            <label>Fond <select name="transp"><option value="1">transparent = vide</option><option value="0">transparent = blanc</option></select></label>
+          </div>
+          <label class="case"><input type="checkbox" name="tramage"> Tramage (dégradés plus doux, plus de perles isolées)</label>
+        </fieldset>
+      </div>
+      <div class="apercu"><canvas id="apercuImage"></canvas><p id="infoImage" class="note"></p></div>
+    </div>
+    <fieldset>
+      <legend>Références autorisées <small id="nbRefs"></small></legend>
+      <label>Utiliser
+        <select id="imgSource">
+          <option value="biblio">Mes perles (ma bibliothèque)</option>
+          <option value="manuel">Un choix fait ici</option>
+        </select>
+      </label>
+      <p class="note" id="imgNoteBiblio"></p>
+      <div id="refsManuel">
+      <div class="nu-outils" id="imgMarques"></div>
+      <div class="nu-outils">
+        <select id="imgTri" title="Classer par"></select>
+        <input id="imgCherche" type="search" placeholder="Chercher (réf. ou nom)…">
+        <button type="button" id="imgTout">Tout cocher</button>
+        <button type="button" id="imgRien">Tout décocher</button>
+      </div>
+      <div id="imgRefs" class="nu-liste petite"></div>
+      <p class="note">Décoche les couleurs à ne pas utiliser. Ce choix est retenu pour la prochaine fois.</p>
+      </div>
+    </fieldset>
+    <menu>
+      <button value="annuler" formnovalidate>Annuler</button>
+      <button value="ok" class="principal">Remplacer le motif</button>
+    </menu>
+  </form>
+</dialog>
+
+<!-- Impression : fenêtre d'aperçu créée par impression.js -->
+
+<input type="file" id="fichierProjet" accept=".json" hidden>
+<div id="impression"></div>
+
+<script src="palettes_fusibles.js"></script>
+<script src="noms-fr.js"></script>
+<script src="plaques.js"></script>
+<script src="verification.js"></script>
+<script src="dialogues.js"></script>
+<script src="app.js"></script>
+<script src="fusion.js"></script>
+<script src="couleurs.js"></script>
+<script src="bibliotheque.js"></script>
+<script src="modeles.js"></script>
+<script src="modeles/halloween.js"></script>
+<script src="modeles/halloween-rond.js"></script>
+<script src="modeles/noel.js"></script>
+<script src="modeles/noel-rond.js"></script>
+<script src="modeles/paques.js"></script>
+<script src="modeles/paques-rond.js"></script>
+<script src="modeles/alphabet.js"></script>
+<script src="couleurs-lettres.js"></script>
+<script src="couleurs-panneau.js"></script>
+<script src="image.js"></script>
+<script src="impression.js"></script>
+<script src="plaques-cotes.js"></script>
+<script src="interface.js"></script>
+<script>demarrer();</script>
+</body>
+</html>
