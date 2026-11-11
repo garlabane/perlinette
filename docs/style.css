@@ -76,3 +76,9 @@ kbd { border: 1px solid #d8bcd0; }
   .entete nav { margin-left: 0; }
   .tuto { padding: 18px; }
 }
+
+/* Aperçu des catégories de modèles (tutoriels) */
+.categories { display: grid; gap: 14px; margin: 14px 0 6px; }
+.categories figure { margin: 0; background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: 12px; padding: 10px 10px 6px; overflow-x: auto; }
+.categories img { display: block; width: 100%; min-width: 560px; height: auto; }
+.categories figcaption { margin-top: 4px; font-size: .95rem; }

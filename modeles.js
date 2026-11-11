@@ -38,9 +38,9 @@ const G = {
 };
 const RONDS = ['midi-rond-grand'];
 // listes de plaques pour les nouveaux thèmes
-const P_PETITS = ['midi-carre-petit', 'midi-carre-grand', 'maxi-carre-grand', 'mini-carre-grand']; // motifs ≤ 13 perles
+const P_PETITS = ['midi-carre-petit']; // petit carré : modèles ≤ 13 perles (chaque plaque a ses propres modèles)
 const P_GRANDS = ['midi-carre-grand', 'mini-carre-grand'];                                        // motifs jusqu'à 19 perles
-const P_RONDS = ['midi-rond-grand', 'midi-rond-moyen', 'midi-hexa-grand', 'midi-hexa-moyen', 'midi-carre-petit', 'maxi-carre-grand'];
+const P_RONDS = ['midi-rond-grand', 'midi-rond-moyen', 'midi-hexa-grand', 'midi-hexa-moyen', 'midi-carre-petit'];
 // nuancier selon la taille de perle de la plaque
 const NUANCIER_GAMME = { Midi: 'hama-midi', Mini: 'hama-mini', Maxi: 'hama-maxi' };
 
@@ -50,7 +50,12 @@ function poserModele(m, formatId) {
   const fmt = formatParId(formatId), surf = construireSurface(fmt, {});
   const pal = paletteParId(NUANCIER_GAMME[fmt.gamme] || 'hama-midi'), palMidi = paletteParId('hama-midi');
   let lettres = surf.picots.map(() => null);
-  if (m.f) {
+  // modèle adapté à la plaque (agrandi lissé ou dessin détaillé) — voir modeles-taille.js
+  const adaptees = typeof lettresAdaptees === 'function' ? lettresAdaptees(m, fmt, surf) : null;
+  const viaDessin = adaptees && m.dessin && fmt.gamme !== 'Maxi' && tailleUtile(surf) >= SEUIL_DESSIN;
+  if (adaptees) {
+    lettres = adaptees;
+  } else if (m.f) {
     // modèle « recette » : la couleur est calculée à l'emplacement de chaque picot
     // R = rayon utile de la plaque (en pas) : les recettes récentes s'en servent pour s'adapter à la taille
     const cx = surf.larg / 2, cy = surf.haut / 2, R = Math.min(surf.larg, surf.haut) / 2 - 0.5;
@@ -77,8 +82,9 @@ function poserModele(m, formatId) {
       for (const [i, l] of reclame) if (!lettres[i] || freq[l] < freq[lettres[i]]) lettres[i] = l;
     }
   }
-  const codes = { ...m.couleurs };
-  if (m.relief) lettres = appliquerRelief(surf, lettres, m.relief, codes);
+  const codes = { ...m.couleurs, ...(viaDessin ? m.couleursDessin : {}) };
+  // Maxi (plaques enfants) : couleurs franches, sans dégradés
+  if (m.relief && !viaDessin && fmt.gamme !== 'Maxi') lettres = appliquerRelief(surf, lettres, m.relief, codes);
   // traduction lettres → couleurs Hama
   const ordreL = [...new Set(lettres.filter(Boolean))];
   // les modèles sont écrits en références Hama Midi ; en Mini / Maxi on prend la même référence
