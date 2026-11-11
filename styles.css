@@ -326,3 +326,11 @@ dialog.impr { max-width: 1180px; width: 96vw; }
 
 /* sur les vignettes de modèles : simple mention, pas la grosse carte */
 .mod-carte .soudure { padding: 0; margin: 0; background: none; border: none; font-size: 11px; font-weight: 600; }
+
+/* outil Sélection : barre d'actions */
+.barre-sel { position: fixed; left: 50%; transform: translateX(-50%); top: 64px; display: flex; gap: 4px; align-items: center; background: var(--panneau); border: 1px solid var(--bord); border-radius: 10px; padding: 4px 6px; box-shadow: 0 2px 10px rgba(0,0,0,.14); z-index: 6; }
+.barre-sel button { min-height: 34px; padding: 3px 10px; font-size: 13px; border-radius: 7px; }
+.barre-sel button:disabled { opacity: .45; cursor: default; }
+.barre-sel-titre { font-size: 12px; font-weight: 700; color: var(--prune); padding: 0 6px; }
+body.enfant .barre-sel { display: none !important; }
+@media print { .barre-sel { display: none; } }

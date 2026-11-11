@@ -18,7 +18,7 @@ Hama · Perler · Artkal — gratuit, en français, sans compte et sans installa
 
 - **Les vraies plaques** : grand et petit carré, hexagones, ronds (picots en anneaux), Mini et Maxi — et tes propres plaques (cœur, étoile…) que tu dessines toi-même.
 - **Assemblages** : ajoute une plaque à gauche, à droite, en haut ou en bas ; le dessin reste en place.
-- **Dessin** : crayon, gomme, remplissage, pipette, remplacer une couleur, ligne / rectangle / cercle (pleins ou évidés), miroirs, annuler.
+- **Dessin** : crayon, gomme, remplissage, pipette, remplacer une couleur, ligne / rectangle / cercle (pleins ou évidés), **sélection avec copier / couper / coller** (même d’un motif à l’autre), miroirs, annuler.
 - **Nuanciers complets** de Hama (Midi, Mini, Maxi), Perler et Artkal, avec les **noms en français**, et **« Mes perles »** : les couleurs que tu as chez toi, avec le stock.
 - **Vérification de soudure** : Perlinette signale les perles qui ne tiendraient pas au repassage (perle isolée, tenue seulement par un coin).
 - **Aperçu du repassage** : fusion légère, moyenne ou complète.
