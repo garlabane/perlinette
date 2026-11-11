@@ -22,7 +22,7 @@ Hama · Perler · Artkal — gratuit, en français, sans compte et sans installa
 - **Nuanciers complets** de Hama (Midi, Mini, Maxi), Perler et Artkal, avec les **noms en français**, et **« Mes perles »** : les couleurs que tu as chez toi, avec le stock.
 - **Vérification de soudure** : Perlinette signale les perles qui ne tiendraient pas au repassage (perle isolée, tenue seulement par un coin).
 - **Aperçu du repassage** : fusion légère, moyenne ou complète.
-- **Modèles prêts à l'emploi** : Halloween, Noël, Pâques (pour le carré et pour le rond), alphabet, chiffres, accents et signes.
+- **Plus de 200 modèles prêts à l'emploi** : animaux, plantes et fleurs, emoji, véhicules, gourmandises, mer et océan, ciel et météo, kawaii, mandalas, saisons, Halloween, Noël, Pâques, alphabet, chiffres et signes — pour les carrés, les ronds, les hexagones, en Midi, Mini et Maxi.
 - **Écrire une phrase** : un prénom ou un mot en lettres avec relief, sur le moins de plaques possible, avec des jeux de couleurs prédéfinis.
 - **Importer une image** et la transformer en motif, avec seulement les couleurs que tu possèdes.
 - **Impression A4 à taille réelle**, pour poser une plaque transparente directement sur la feuille : aperçu, légende des couleurs, logo, plusieurs plaques par feuille, repères d'assemblage.

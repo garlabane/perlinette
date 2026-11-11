@@ -37,21 +37,24 @@ const G = {
   spirale(r, a, pas, n) { return Math.floor(((a / (2 * Math.PI) + r / pas) % 1 + 1) % 1 * n); },
 };
 const RONDS = ['midi-rond-grand'];
-const PLAQUES_MODELES = [
-  { id: 'midi-carre-grand', nom: 'Grand carré' },
-  { id: 'midi-rond-grand', nom: 'Grand rond' },
-];
+// listes de plaques pour les nouveaux thèmes
+const P_PETITS = ['midi-carre-petit', 'midi-carre-grand', 'maxi-carre-grand', 'mini-carre-grand']; // motifs ≤ 13 perles
+const P_GRANDS = ['midi-carre-grand', 'mini-carre-grand'];                                        // motifs jusqu'à 19 perles
+const P_RONDS = ['midi-rond-grand', 'midi-rond-moyen', 'midi-hexa-grand', 'midi-hexa-moyen', 'midi-carre-petit', 'maxi-carre-grand'];
+// nuancier selon la taille de perle de la plaque
+const NUANCIER_GAMME = { Midi: 'hama-midi', Mini: 'hama-mini', Maxi: 'hama-maxi' };
 
 // Pose un modèle sur une plaque : chaque picot reçoit la lettre (couleur) qui est dessous,
 // puis on ajoute le relief, puis on traduit les lettres en vraies couleurs Hama.
 function poserModele(m, formatId) {
   const fmt = formatParId(formatId), surf = construireSurface(fmt, {});
-  const pal = paletteParId('hama-midi');
+  const pal = paletteParId(NUANCIER_GAMME[fmt.gamme] || 'hama-midi'), palMidi = paletteParId('hama-midi');
   let lettres = surf.picots.map(() => null);
   if (m.f) {
     // modèle « recette » : la couleur est calculée à l'emplacement de chaque picot
-    const cx = surf.larg / 2, cy = surf.haut / 2;
-    lettres = surf.picots.map((q) => { const x = q.x - cx, y = q.y - cy, l = m.f(x, y, Math.hypot(x, y), Math.atan2(y, x)); return !l || l === '.' ? null : l; });
+    // R = rayon utile de la plaque (en pas) : les recettes récentes s'en servent pour s'adapter à la taille
+    const cx = surf.larg / 2, cy = surf.haut / 2, R = Math.min(surf.larg, surf.haut) / 2 - 0.5;
+    lettres = surf.picots.map((q) => { const x = q.x - cx, y = q.y - cy, l = m.f(x, y, Math.hypot(x, y), Math.atan2(y, x), R); return !l || l === '.' ? null : l; });
   } else {
     const gh = m.grille.length, gw = m.grille[0].length;
     const ox = (surf.larg - gw) / 2, oy = (surf.haut - gh) / 2;
@@ -78,10 +81,17 @@ function poserModele(m, formatId) {
   if (m.relief) lettres = appliquerRelief(surf, lettres, m.relief, codes);
   // traduction lettres → couleurs Hama
   const ordreL = [...new Set(lettres.filter(Boolean))];
+  // les modèles sont écrits en références Hama Midi ; en Mini / Maxi on prend la même référence
+  // si elle existe dans ce nuancier, sinon la couleur la plus proche.
+  const labsPal = pal.couleurs.map((c) => rgbLab(hexRgb(c.hex)));
   const couleurs = ordreL.map((l) => {
-    const c = pal.couleurs.find((x) => x.code === codes[l]);
-    if (!c) throw new Error(`Modèle « ${m.nom} » : couleur inconnue pour « ${l} » (${codes[l]})`);
-    return { code: c.code, nom: c.nom, hex: c.hex, marque: nomCourt(pal) };
+    let c = pal.couleurs.find((x) => x.code === codes[l]);
+    if (!c) {
+      const ref = palMidi.couleurs.find((x) => x.code === codes[l]);
+      if (!ref) throw new Error(`Modèle « ${m.nom} » : couleur inconnue pour « ${l} » (${codes[l]})`);
+      c = pal.couleurs[plusProche(rgbLab(hexRgb(ref.hex)), labsPal, [...labsPal.keys()])];
+    }
+    return { code: c.code, nom: c.nom, nomOfficiel: c.nomOfficiel, hex: c.hex, marque: nomCourt(pal) };
   });
   // deux lettres peuvent viser la même référence : on fusionne
   const parCode = new Map(), carte = ordreL.map((l, k) => { const code = couleurs[k].code; if (!parCode.has(code)) parCode.set(code, parCode.size); return parCode.get(code); });
@@ -137,8 +147,7 @@ function ouvrirModeles() {
     dlg.innerHTML = `<form method="dialog"><h3>Modèles prêts à l'emploi</h3>
       <div class="nu-outils">
         <label class="case">Thème <select id="modTheme"></select></label>
-        <span class="note">Plaque :</span>
-        <span id="modPlaques"></span>
+        <label class="case">Plaque <select id="modPlaque"></select></label>
         <span style="flex:1"></span>
         <button type="button" id="modMot" class="principal">✏️ Écrire une phrase…</button>
       </div>
@@ -146,18 +155,28 @@ function ouvrirModeles() {
       <div id="modListe" class="mod-liste"></div>
       <menu><button value="fermer">Fermer</button></menu></form>`;
     document.body.appendChild(dlg);
-    $('#modPlaques').innerHTML = PLAQUES_MODELES.map((p, k) => `<label class="case"><input type="radio" name="modPlaque" value="${p.id}" ${k === 0 ? 'checked' : ''}> ${p.nom}</label>`).join(' ');
-    $('#modTheme').onchange = majModeles;
+    $('#modPlaque').onchange = majModeles;
+    $('#modTheme').onchange = () => { majPlaquesTheme(); majModeles(); };
     $('#modMot').onclick = () => ecrirePhrase();
-    $$('#modPlaques input').forEach((r) => (r.onchange = majModeles));
   }
   const themes = [...new Set(MODELES.map((m) => m.theme))];
   remplirChoix($('#modTheme'), themes.map((t) => `<option>${echap(t)}</option>`).join(''), $('#modTheme').value || themes[0]);
+  majPlaquesTheme();
   majModeles();
   dlg.showModal();
 }
+// plaques proposées pour le thème choisi (avec le nombre de modèles pour chacune)
+function majPlaquesTheme() {
+  const theme = $('#modTheme').value, compte = new Map();
+  for (const m of MODELES.filter((x) => x.theme === theme)) for (const p of m.plaques || ['midi-carre-grand']) compte.set(p, (compte.get(p) || 0) + 1);
+  const avant = $('#modPlaque').value;
+  remplirChoix($('#modPlaque'), [...compte.entries()].map(([id, n]) => {
+    const f = formatParId(id);
+    return `<option value="${id}">${echap(f.gamme)} · ${echap(f.nom)} (${n})</option>`;
+  }).join(''), compte.has(avant) ? avant : [...compte.keys()][0]);
+}
 function majModeles() {
-  const theme = $('#modTheme').value, plaque = $$('#modPlaques input').find((r) => r.checked).value;
+  const theme = $('#modTheme').value, plaque = $('#modPlaque').value;
   const liste = $('#modListe');
   liste.innerHTML = '';
   // chaque modèle dit sur quelles plaques il est prévu (par défaut : le grand carré)
@@ -171,7 +190,7 @@ function majModeles() {
     const soud = analyserSoudure(pose.surf, pose.cases);
     carte.insertAdjacentHTML('beforeend', `<b>${echap(m.nom)}</b><small>${nb} perles · ${pose.couleurs.length} couleurs</small><small class="soudure ${soud.ok ? 'ok' : 'pb'}">${echap(texteSoudure(soud))}</small>`);
     carte.onclick = () => {
-      const motif = creerMotif(`${m.nom} (${theme})`, plaque, {}, 'hama-midi');
+      const motif = creerMotif(`${m.nom} (${theme})`, plaque, {}, NUANCIER_GAMME[pose.fmt.gamme] || 'hama-midi');
       motif.cases = pose.cases; motif.couleurs = pose.couleurs;
       if (m.caractere && typeof lettresDepuisModele === 'function') lettresDepuisModele(motif, m);
       charger(motif); sauverMaintenant();
