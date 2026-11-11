@@ -334,3 +334,8 @@ dialog.impr { max-width: 1180px; width: 96vw; }
 .barre-sel-titre { font-size: 12px; font-weight: 700; color: var(--prune); padding: 0 6px; }
 body.enfant .barre-sel { display: none !important; }
 @media print { .barre-sel { display: none; } }
+
+/* image : choix de la version (brute / nettoyée) */
+.img-version { justify-content: center; margin: 0 0 8px; }
+.img-version button { min-height: 32px; padding: 3px 12px; font-size: 13px; }
+.img-version button.actif { background: var(--prune); color: #fff; border-color: var(--prune); }

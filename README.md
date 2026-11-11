@@ -24,7 +24,7 @@ Hama · Perler · Artkal — gratuit, en français, sans compte et sans installa
 - **Aperçu du repassage** : fusion légère, moyenne ou complète.
 - **Plus de 400 modèles dessinés perle par perle**, chacun pour sa plaque : simples et francs pour la Maxi des petits, petits sujets pour le petit carré, personnages et objets en entier pour le grand carré, grands dessins détaillés pour la Mini. Thèmes : animaux, fruits et légumes, plantes et fleurs, gourmandises, snacks du monde, boissons, mer et océan, ciel et météo, kawaii, mode et accessoires, amour et mariage, plage et vacances, camping et nature, voyage et monuments, musique, école, sport, véhicules, course de karts (un kit de pièces qui se raccordent pour créer un niveau au mur), saisons, Halloween, Noël, Pâques, emoji, mandalas, plus l'alphabet, les chiffres et les signes.
 - **Écrire une phrase** : un prénom ou un mot en lettres avec relief, sur le moins de plaques possible, avec des jeux de couleurs prédéfinis.
-- **Importer une image** et la transformer en motif, avec seulement les couleurs que tu possèdes.
+- **Importer une image** et la transformer en motif, avec seulement les couleurs que tu possèdes, et un **nettoyage facultatif** (perles parasites, teintes proches, contour, perles seules) à comparer avec la version brute.
 - **Impression A4 à taille réelle**, pour poser une plaque transparente directement sur la feuille : aperçu, légende des couleurs, logo, plusieurs plaques par feuille, repères d'assemblage.
 - **Mode enfant** : quatre gros outils et de grandes pastilles de couleur.
 

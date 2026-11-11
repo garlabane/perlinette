@@ -70,6 +70,19 @@ function ouvrirImage() {
     const palette = brute.map(({ code, nom, hex, marque }) => ({ code, nom, hex, marque }));
     calculerImage(f, palette);
   };
+  // nettoyage facultatif : options retenues, version choisie au-dessus de l'aperçu
+  const optN = Object.assign({}, NETTOYAGE_DEFAUT, reglages.nettoyage || {});
+  for (const k of Object.keys(NETTOYAGE_DEFAUT)) f['n_' + k].checked = !!optN[k];
+  const majVersion = () => $$('#imgVersion button').forEach((b) => b.classList.toggle('actif', b.dataset.version === (reglages.versionImage || 'brute')));
+  $$('#imgVersion button').forEach((b) => (b.onclick = () => { reglages.versionImage = b.dataset.version; ecrire(CLE.reglages, reglages); majVersion(); relancer(); }));
+  majVersion();
+  const surNettoyage = () => {
+    reglages.nettoyage = Object.fromEntries(Object.keys(NETTOYAGE_DEFAUT).map((k) => [k, f['n_' + k].checked]));
+    ecrire(CLE.reglages, reglages);
+    if ((reglages.versionImage || 'brute') === 'brute') { reglages.versionImage = 'nette'; majVersion(); } // on montre l'effet du réglage touché
+    relancer();
+  };
+  for (const k of Object.keys(NETTOYAGE_DEFAUT)) f['n_' + k].onchange = surNettoyage;
   [f.format, f.w, f.h, f.cols, f.rangs, f.cadrage, f.max, f.tramage, f.transp].forEach((el) => (el.oninput = el.onchange = relancer));
   dlg._relancer = relancer;
   majRefs();
@@ -108,7 +121,11 @@ function calculerImage(f, palette) {
   apercu.width = 0; apercu.height = 0;
   if (!imageChargee) { info.textContent = taille + '. Choisis une image (dessin, logo, photo…) : les dessins simples donnent les meilleurs résultats.'; return; }
   if (!palette.length) { info.textContent = 'Aucune référence autorisée : coche au moins une couleur.'; return; }
-  resultatImage = convertirImage(imageChargee, surf, f.cadrage.value, +f.max.value || 0, f.tramage.checked, f.transp.value === '1', palette);
+  const brut = convertirImage(imageChargee, surf, f.cadrage.value, +f.max.value || 0, f.tramage.checked, f.transp.value === '1', palette);
+  const optN = Object.fromEntries(Object.keys(NETTOYAGE_DEFAUT).map((k) => [k, f['n_' + k].checked]));
+  const net = nettoyerImage(surf, brut, optN);
+  const versionNette = (reglages.versionImage || 'brute') === 'nette';
+  resultatImage = versionNette ? net : brut;
   const t = Math.max(2, Math.min(14, Math.floor(440 / Math.max(surf.larg, surf.haut))));
   apercu.width = Math.ceil(surf.larg * t); apercu.height = Math.ceil(surf.haut * t);
   const g = apercu.getContext('2d');
@@ -124,7 +141,9 @@ function calculerImage(f, palette) {
     g.fillStyle = v >= 0 ? resultatImage.couleurs[v].hex : '#ddd'; g.fill();
   });
   const nb = resultatImage.cases.filter((v) => v >= 0).length;
-  info.textContent = `${taille} · ${resultatImage.couleurs.length} couleurs · ${nb} perles.`;
+  const pl = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
+  info.textContent = `${taille} · ${resultatImage.couleurs.length} couleurs · ${nb} perles. ` +
+    (versionNette ? `Nettoyage : ${pl(net.changees, 'perle')} ${net.changees > 1 ? 'modifiées' : 'modifiée'}.` : `(Le nettoyage modifierait ${pl(net.changees, 'perle')}.)`);
 }
 
 function convertirImage(img, surf, cadrage, max, tramage, transp, palette) {

@@ -173,8 +173,23 @@
           </div>
           <label class="case"><input type="checkbox" name="tramage"> Tramage (dégradés plus doux, plus de perles isolées)</label>
         </fieldset>
+        <fieldset>
+          <legend>Nettoyage (facultatif)</legend>
+          <label class="case"><input type="checkbox" name="n_parasites"> Retirer les perles parasites</label>
+          <label class="case"><input type="checkbox" name="n_details"> … mais garder les petits détails (yeux, reflets)</label>
+          <label class="case"><input type="checkbox" name="n_teintes"> Regrouper les teintes presque identiques</label>
+          <label class="case"><input type="checkbox" name="n_contour"> Ajouter un contour foncé autour du sujet</label>
+          <label class="case"><input type="checkbox" name="n_soudure"> Retirer les perles seules (elles tomberaient)</label>
+          <p class="note">Compare les deux versions au-dessus de l'aperçu, et garde celle que tu préfères.</p>
+        </fieldset>
       </div>
-      <div class="apercu"><canvas id="apercuImage"></canvas><p id="infoImage" class="note"></p></div>
+      <div class="apercu">
+        <div class="segment img-version" id="imgVersion">
+          <button type="button" data-version="brute" class="actif">Sans nettoyage</button>
+          <button type="button" data-version="nette">Avec nettoyage</button>
+        </div>
+        <canvas id="apercuImage"></canvas><p id="infoImage" class="note"></p>
+      </div>
     </div>
     <fieldset>
       <legend>Références autorisées <small id="nbRefs"></small></legend>
@@ -255,6 +270,7 @@
 <script src="modeles/alphabet.js"></script>
 <script src="couleurs-lettres.js"></script>
 <script src="couleurs-panneau.js"></script>
+<script src="image-nettoyage.js"></script>
 <script src="image.js"></script>
 <script src="impression.js"></script>
 <script src="plaques-cotes.js"></script>
