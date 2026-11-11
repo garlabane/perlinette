@@ -12,7 +12,7 @@ const CLE_LOGO = 'perlesrep.logo';
 function mm(v) { return +(+v).toFixed(3); }
 
 function optionsParDefaut() {
-  return Object.assign({ couleurs: true, symboles: true, picots: true, legende: 'page', ensemble: true, regrouper: true, logo: 'perlinette' }, reglages.impression || {});
+  return Object.assign({ couleurs: true, symboles: true, picots: true, legende: 'page', ensemble: true, regrouper: true, logo: 'perlinette', repasse: true }, reglages.impression || {});
 }
 
 // ---------- éléments de page ----------
@@ -29,9 +29,39 @@ function svgLogo(o, x, y) {
     largeur: 45,
   };
 }
+// miniature du motif entier « repassé à fond » (même rendu que l'aperçu Complète), dans un carré de côté `taille`
+function svgRepasse(x, y, taille) {
+  const d = DEGRES_FUSION[3], k = taille / Math.max(SURF.larg, SURF.haut);
+  const ox = x + (taille - SURF.larg * k) / 2, oy = y + (taille - SURF.haut * k) / 2;
+  const posee = (i) => P.cases[i] >= 0 && P.couleurs[P.cases[i]], hex = (i) => P.couleurs[P.cases[i]].hex;
+  const px = (i) => mm(ox + SURF.picots[i].x * k), py = (i) => mm(oy + SURF.picots[i].y * k);
+  let s = `<g stroke-linecap="butt" stroke-width="${mm(d.pont * k)}">`;
+  SURF.picots.forEach((q, i) => {
+    if (!posee(i)) return;
+    for (const j of SURF.voisins[i]) {
+      if (j < i || !posee(j)) continue;
+      const mx = mm((+px(i) + +px(j)) / 2), my = mm((+py(i) + +py(j)) / 2);
+      s += `<path d="M${px(i)} ${py(i)}L${mx} ${my}" stroke="${hex(i)}"/><path d="M${mx} ${my}L${px(j)} ${py(j)}" stroke="${hex(j)}"/>`;
+    }
+  });
+  s += '</g>';
+  SURF.picots.forEach((q, i) => {
+    if (!posee(i)) return;
+    const tr = estTransparente(P.couleurs[P.cases[i]]) ? ' fill-opacity="0.7"' : '';
+    s += `<circle cx="${px(i)}" cy="${py(i)}" r="${mm(d.rayon * k)}" fill="${hex(i)}"${tr}/>`;
+  });
+  return s;
+}
 function svgEntete(page, o, titre, sousTitre) {
   const logo = svgLogo(o, BORD, 7), x = BORD + logo.largeur;
-  return logo.svg
+  let mini = '';
+  if (o.repasse && o._repasse) {
+    const T = 17, xm = page.w - BORD - T;
+    mini = `<rect x="${mm(xm - 1)}" y="3.5" width="${T + 2}" height="${T + 2}" rx="1.5" fill="#f7f3ee"/>` + o._repasse
+      + `<text x="${mm(xm - 3)}" y="10.5" font-size="2.6" fill="#666" text-anchor="end" font-family="Segoe UI, sans-serif">Après</text>`
+      + `<text x="${mm(xm - 3)}" y="14" font-size="2.6" fill="#666" text-anchor="end" font-family="Segoe UI, sans-serif">repassage</text>`;
+  }
+  return mini + logo.svg
     + `<text x="${mm(x)}" y="13" font-size="5.2" font-weight="700" fill="#222" font-family="Segoe UI, sans-serif">${echap(titre)}</text>`
     + `<text x="${mm(x)}" y="19" font-size="3" fill="#666" font-family="Segoe UI, sans-serif">${echap(sousTitre)}</text>`
     + `<line x1="${BORD}" y1="22.5" x2="${page.w - BORD}" y2="22.5" stroke="#e2d8cb" stroke-width="0.3"/>`;
@@ -118,6 +148,7 @@ function preparerPages(o) {
     if (cl.c * cl.r > cp.c * cp.r) orient = 'paysage'; else if (cp.c * cp.r > 0) orient = 'portrait';
   }
   const page = FORMAT_A4[orient], Z = zone(page), cap = capacite(page);
+  o._repasse = o.repasse ? svgRepasse(page.w - BORD - 17, 4.5, 17) : ''; // miniature calculée une fois pour toutes les pages
   const parFeuille = o.regrouper ? Math.max(1, cap.c * Math.max(1, cap.r)) : 1;
   const depasse = lw > Z.w + 0.01 || lh > Z.h + 0.01;
   const nomFormat = formatParId(P.format).nom, ecart = String(pas).replace('.', ',');
@@ -211,6 +242,7 @@ function ouvrirImpression() {
         <label class="case"><input type="checkbox" id="ipCouleurs"> En couleur (sinon : à colorier)</label>
         <label class="case"><input type="checkbox" id="ipSymboles"> Symboles dans les perles</label>
         <label class="case"><input type="checkbox" id="ipPicots"> Picots vides visibles</label>
+        <label class="case"><input type="checkbox" id="ipRepasse"> Miniature « après repassage » en haut</label>
         <h4>Légende des couleurs</h4>
         <select id="ipLegende"><option value="page">Sur chaque feuille</option><option value="fin">Tableau à la fin (avec le stock)</option><option value="non">Aucune</option></select>
         <h4>Plusieurs plaques</h4>
@@ -227,14 +259,14 @@ function ouvrirImpression() {
   document.body.appendChild(dlg);
   const $d = (s) => dlg.querySelector(s);
   $d('#ipTitre').value = o.titre; $d('#ipPas').value = o.pas;
-  $d('#ipCouleurs').checked = o.couleurs; $d('#ipSymboles').checked = o.symboles; $d('#ipPicots').checked = o.picots;
+  $d('#ipCouleurs').checked = o.couleurs; $d('#ipSymboles').checked = o.symboles; $d('#ipPicots').checked = o.picots; $d('#ipRepasse').checked = o.repasse;
   $d('#ipLegende').value = o.legende; $d('#ipRegrouper').checked = o.regrouper; $d('#ipEnsemble').checked = o.ensemble;
   const multi = SURF.plaques.length > 1;
   $d('#ipEnsemble').closest('label').hidden = !multi;
   let rendu = null;
   const lireOptions = () => Object.assign(o, {
     titre: $d('#ipTitre').value.trim() || P.nom, pas: +$d('#ipPas').value || P.pas,
-    couleurs: $d('#ipCouleurs').checked, symboles: $d('#ipSymboles').checked, picots: $d('#ipPicots').checked,
+    couleurs: $d('#ipCouleurs').checked, symboles: $d('#ipSymboles').checked, picots: $d('#ipPicots').checked, repasse: $d('#ipRepasse').checked,
     legende: $d('#ipLegende').value, regrouper: $d('#ipRegrouper').checked, ensemble: $d('#ipEnsemble').checked,
   });
   const maj = () => {
@@ -277,7 +309,7 @@ function ouvrirImpression() {
     if (dlg.returnValue === 'ok') {
       lireOptions();
       if (o.pas !== P.pas) { P.pas = o.pas; sauverAuto(); }
-      reglages.impression = { couleurs: o.couleurs, symboles: o.symboles, picots: o.picots, legende: o.legende, regrouper: o.regrouper, ensemble: o.ensemble, logo: o.logo };
+      reglages.impression = { couleurs: o.couleurs, symboles: o.symboles, picots: o.picots, legende: o.legende, regrouper: o.regrouper, ensemble: o.ensemble, logo: o.logo, repasse: o.repasse };
       ecrire(CLE.reglages, reglages);
       imprimerPages(preparerPages(o));
     }
