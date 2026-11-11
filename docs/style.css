@@ -82,3 +82,16 @@ kbd { border: 1px solid #d8bcd0; }
 .categories figure { margin: 0; background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: 12px; padding: 10px 10px 6px; overflow-x: auto; }
 .categories img { display: block; width: 100%; min-width: 560px; height: auto; }
 .categories figcaption { margin-top: 4px; font-size: .95rem; }
+
+/* De l'écran au sapin : la vidéo + les 5 vues */
+.film { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 24px; align-items: start; margin-top: 18px; }
+.film video { width: 100%; aspect-ratio: 9 / 16; border-radius: 14px; background: #2a1d24; box-shadow: 0 10px 34px rgba(60,30,50,.18); }
+.vues { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.vues figure { margin: 0; }
+.vues img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 10px; border: 1px solid var(--bord); display: block; }
+.vues figcaption { font-size: 13px; color: var(--doux); margin-top: 5px; text-align: center; }
+@media (max-width: 820px) {
+  .film { grid-template-columns: 1fr; }
+  .film video { max-width: 340px; margin: 0 auto; display: block; }
+  .vues { grid-template-columns: repeat(3, 1fr); }
+}
