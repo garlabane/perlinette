@@ -8,8 +8,8 @@
 Hama · Perler · Artkal — gratuit, en français, sans compte et sans installation.</p>
 
 <p align="center">
-  <a href="https://sophiegarguilo-star.github.io/perlinette/"><b>Présentation et tutoriels</b></a> ·
-  <a href="https://github.com/sophiegarguilo-star/perlinette/archive/refs/heads/main.zip"><b>Télécharger</b></a>
+  <a href="https://garlabane.github.io/perlinette/"><b>Présentation et tutoriels</b></a> ·
+  <a href="https://github.com/garlabane/perlinette/archive/refs/heads/main.zip"><b>Télécharger</b></a>
 </p>
 
 <p align="center"><img src="docs/captures/editeur.jpg" alt="L'éditeur de Perlinette avec un mouton kawaii sur un grand carré" width="760"></p>
@@ -30,14 +30,14 @@ Hama · Perler · Artkal — gratuit, en français, sans compte et sans installa
 
 ## Démarrer
 
-1. [Télécharge Perlinette](https://github.com/sophiegarguilo-star/perlinette/archive/refs/heads/main.zip) et décompresse le dossier.
+1. [Télécharge Perlinette](https://github.com/garlabane/perlinette/archive/refs/heads/main.zip) et décompresse le dossier.
 2. **Windows** : double-clique sur `Perlinette.bat`.
    **Mac / Linux** : ouvre `index.html` avec ton navigateur (Chrome, Edge, Firefox, Safari).
 3. C'est tout : rien à installer, aucune connexion Internet nécessaire.
 
 > Tes motifs sont enregistrés dans le navigateur. Pense à faire **Fichier → Exporter un fichier** de temps en temps : c'est ta vraie sauvegarde, que tu peux ranger où tu veux.
 
-Les tutoriels pas à pas sont sur la [page de présentation](https://sophiegarguilo-star.github.io/perlinette/tutoriels.html).
+Les tutoriels pas à pas sont sur la [page de présentation](https://garlabane.github.io/perlinette/tutoriels.html).
 
 ## Imprimer à la bonne taille
 
