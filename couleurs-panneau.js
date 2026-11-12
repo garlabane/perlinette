@@ -40,7 +40,7 @@ function ouvrirCouleurs() {
     <h3>Couleurs</h3>
     <section class="bloc">
       <h4>Nuancier du motif</h4>
-      <p class="note">Actuellement : <b>${echap(nomDuNuancier(actuel))}</b>. Convertir = chaque perle prend la couleur la plus proche dans le nuancier choisi (« Annuler » reste possible).</p>
+      <p class="note">Actuellement : <b>${echap(nomDuNuancier(actuel))}</b>. Convertir = chaque couleur reçoit la perle la plus proche du nuancier choisi ; un tableau te laisse changer une ligne avant d’appliquer (« Annuler » reste possible).</p>
       <div class="nu-outils">
         <select id="cpNuancier">
           <option value="biblio" ${nbBiblio ? '' : 'disabled'}>Mes perles (${nbBiblio} couleurs)</option>
@@ -70,14 +70,12 @@ function ouvrirCouleurs() {
   document.body.appendChild(dlg);
   const sel = dlg.querySelector('#cpNuancier');
   sel.value = actuel === 'biblio' && !nbBiblio ? 'hama-midi' : actuel;
+  // conversion : tableau « couleur du motif → perle », modifiable avant d'appliquer (adapter-perles.js)
   dlg.querySelector('#cpConvertir').onclick = () => {
-    const id = sel.value, couleurs = couleursDuNuancier(id);
-    if (!couleurs.length) { message('Ce nuancier est vide.'); return; }
-    appliquerPalette({ couleurs }, true);
-    P.nuancier = id;
-    nettoyerCouleurs(); fini();
-    message(`Motif converti en « ${nomDuNuancier(id)} ».`);
+    const id = sel.value;
+    if (!couleursDuNuancier(id).length) { message('Ce nuancier est vide.'); return; }
     dlg.close();
+    adapterMotifOuvert(id, `Convertir en « ${nomDuNuancier(id)} »`);
   };
   dlg.querySelector('#cpAjouter').onclick = () => { dlg.close(); ouvrirAjoutCouleur(); };
   dlg.querySelector('#cpPurger').onclick = () => { purgerCouleurs(); };

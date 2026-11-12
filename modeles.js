@@ -154,6 +154,7 @@ function ouvrirModeles() {
       <div class="nu-outils">
         <label class="case">Thème <select id="modTheme"></select></label>
         <label class="case">Plaque <select id="modPlaque"></select></label>
+        <label class="case" id="modMesPerlesLbl"><input type="checkbox" id="modMesPerles"> Avec mes perles</label>
         <span style="flex:1"></span>
         <button type="button" id="modMot" class="principal">✏️ Écrire une phrase…</button>
       </div>
@@ -164,7 +165,13 @@ function ouvrirModeles() {
     $('#modPlaque').onchange = majModeles;
     $('#modTheme').onchange = () => { majPlaquesTheme(); majModeles(); };
     $('#modMot').onclick = () => ecrirePhrase();
+    $('#modMesPerles').onchange = (e) => { reglages.modMesPerles = e.target.checked; ecrire(CLE.reglages, reglages); majModeles(); };
   }
+  // « Avec mes perles » : seulement si la liste n'est pas vide
+  const nbPerles = couleursBiblio().length, caseMP = $('#modMesPerles');
+  caseMP.disabled = !nbPerles;
+  caseMP.checked = !!nbPerles && !!reglages.modMesPerles;
+  $('#modMesPerlesLbl').title = nbPerles ? `Les modèles s'affichent avec tes ${nbPerles} couleurs de « Mes perles »` : 'Ta liste « Mes perles » est vide (bouton Couleurs → Gérer mes perles)';
   const themes = [...new Set(MODELES.map((m) => m.theme))];
   remplirChoix($('#modTheme'), themes.map((t) => `<option>${echap(t)}</option>`).join(''), $('#modTheme').value || themes[0]);
   majPlaquesTheme();
@@ -185,23 +192,29 @@ function majModeles() {
   const theme = $('#modTheme').value, plaque = $('#modPlaque').value;
   const liste = $('#modListe');
   liste.innerHTML = '';
+  const mesPerles = $('#modMesPerles').checked ? perlesCibles('biblio') : null;
   // chaque modèle dit sur quelles plaques il est prévu (par défaut : le grand carré)
   for (const m of MODELES.filter((x) => x.theme === theme && (x.plaques || ['midi-carre-grand']).includes(plaque))) {
     const pose = poserModele(m, plaque), nb = pose.cases.filter((v) => v >= 0).length;
     const carte = document.createElement('button');
     carte.type = 'button'; carte.className = 'mod-carte';
     const cv = document.createElement('canvas');
-    vignette(cv, pose, 150);
+    const vue = mesPerles ? recolorerPose(pose, mesPerles) : pose;
+    vignette(cv, vue, 150);
     carte.appendChild(cv);
     const soud = analyserSoudure(pose.surf, pose.cases);
-    carte.insertAdjacentHTML('beforeend', `<b>${echap(m.nom)}</b><small>${nb} perles · ${pose.couleurs.length} couleurs</small><small class="soudure ${soud.ok ? 'ok' : 'pb'}">${echap(texteSoudure(soud))}</small>`);
-    carte.onclick = () => {
+    const nAppr = mesPerles ? vue.etat.filter((e) => e.approchee || e.genre).length : 0;
+    carte.insertAdjacentHTML('beforeend', `<b>${echap(m.nom)}</b><small>${nb} perles · ${pose.couleurs.length} couleurs</small><small class="soudure ${soud.ok ? 'ok' : 'pb'}">${echap(texteSoudure(soud))}</small>`
+      + (nAppr ? `<small class="approchee">≈ ${nAppr} couleur${nAppr > 1 ? 's' : ''} approchée${nAppr > 1 ? 's' : ''}</small>` : ''));
+    carte.onclick = async () => {
       const motif = creerMotif(`${m.nom} (${theme})`, plaque, {}, NUANCIER_GAMME[pose.fmt.gamme] || 'hama-midi');
       motif.cases = pose.cases; motif.couleurs = pose.couleurs;
       if (m.caractere && typeof lettresDepuisModele === 'function') lettresDepuisModele(motif, m);
       charger(motif); sauverMaintenant();
       $('#dlgModeles').close();
       message(`« ${m.nom} » ouvert sur la plaque ${pose.fmt.nom}. Il est enregistré dans « Ouvrir ».`, 4000);
+      // avec mes perles : tableau de correspondance ; « Annuler » ramène les couleurs du modèle
+      if (mesPerles) await adapterMotifOuvert('biblio', `« ${m.nom} » avec mes perles`, 'Chaque couleur du modèle reçoit ta perle la plus proche. Tu peux changer une ligne avant d’appliquer ; « Annuler » ramène ensuite les couleurs du modèle.');
     };
     liste.appendChild(carte);
   }

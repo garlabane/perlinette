@@ -27,6 +27,10 @@ Hama · Perler · Artkal — gratuit, en français, sans compte et sans installa
 - **Importer une image** et la transformer en motif, avec seulement les couleurs que tu possèdes, et un **nettoyage facultatif** (perles parasites, teintes proches, contour, perles seules) à comparer avec la version brute.
 - **Impression A4 à taille réelle**, pour poser une plaque transparente directement sur la feuille : aperçu, légende des couleurs, logo, plusieurs plaques par feuille, repères d'assemblage.
 - **Mode enfant** : quatre gros outils et de grandes pastilles de couleur.
+- **Avec mes perles** : un modèle s'adapte aux couleurs que tu as chez toi, avec un tableau « couleur du modèle → ta perle » que tu peux modifier (les couleurs voisines restent distinctes, les transparentes restent transparentes, le stock est pris en compte).
+- **Plusieurs motifs ouverts**, dans des onglets : rien n'est jamais écrasé, chaque motif est enregistré automatiquement.
+- **Rendu repassé, sans fond** : la pièce repassée à fond, avec un effet plastique brillant et une ombre, en PNG transparent (pour une photo ou une publication).
+- **Numéro de version** et petit avis quand une nouvelle version est disponible.
 
 ## Démarrer
 

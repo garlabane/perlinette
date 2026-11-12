@@ -45,6 +45,8 @@ function majCouleurActive() {
 // ---------- aide ----------
 function afficherAide() {
   avertir([
+    `Perlinette ${VERSION}`,
+    '',
     'DESSINER',
     '• Clic gauche : poser une perle. Clic droit : effacer.',
     '• Ligne, Rectangle, Cercle : cliquer le départ puis l\'arrivée (ou glisser). Maj = carré / cercle parfait. Échap = annuler la forme.',

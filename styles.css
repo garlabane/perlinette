@@ -339,3 +339,43 @@ body.enfant .barre-sel { display: none !important; }
 .img-version { justify-content: center; margin: 0 0 8px; }
 .img-version button { min-height: 32px; padding: 3px 12px; font-size: 13px; }
 .img-version button.actif { background: var(--prune); color: #fff; border-color: var(--prune); }
+
+/* rendu repassé sans fond : damier pour montrer la transparence */
+.rendu-apercu { display: flex; justify-content: center; align-items: center; min-height: 240px; max-height: 60vh; overflow: auto; border-radius: 8px;
+  background: repeating-conic-gradient(#ece6df 0 25%, #fbf8f5 0 50%) 0 0 / 18px 18px; padding: 10px; }
+.rendu-apercu img { max-width: 100%; max-height: calc(60vh - 20px); }
+.rendu-options { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; align-items: center; }
+.rendu-options label.case { margin: 0; gap: 6px; }
+
+/* tableau « couleur du modèle → ta perle » (adapter-perles.js) */
+.corresp-tete, .corresp-ligne { display: grid; grid-template-columns: minmax(0, 1.1fr) 22px minmax(0, 1.3fr); gap: 4px 10px; align-items: center; }
+.corresp-tete { font-size: 12px; color: var(--doux); font-weight: 600; margin: 4px 0; }
+.corresp-liste { max-height: 55vh; overflow: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px; }
+.corresp-ligne { padding: 6px 8px; border: 1px solid var(--bord); border-radius: 8px; }
+.corresp-src, .corresp-dst { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; }
+.corresp-src small { color: var(--doux); }
+.corresp-dst select { flex: 1; min-width: 0; }
+.corresp-fleche { color: var(--doux); text-align: center; }
+.corresp-info { grid-column: 1 / -1; font-size: 12px; color: var(--doux); }
+.corresp-alerte { color: #a3561c; font-weight: 600; }
+.corresp-doux { color: var(--doux); font-style: italic; }
+.corresp-pastille { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(0,0,0,.2); }
+.corresp-pastille.transp { opacity: .6; }
+.mod-carte .approchee { color: #a3561c; font-weight: 600; }
+
+/* onglets : plusieurs motifs ouverts (onglets.js) */
+.onglets { position: sticky; top: -16px; z-index: 5; display: flex; gap: 4px; align-items: flex-end; overflow-x: auto; margin: -16px -16px 12px; padding: 8px 16px 0; background: var(--fond); border-bottom: 1px solid var(--bord); scrollbar-width: thin; }
+.onglet { flex: none; display: flex; align-items: center; max-width: 220px; border: 1px solid var(--bord); border-bottom: none; border-radius: 9px 9px 0 0; background: var(--panneau); opacity: .75; }
+.onglet.actif { opacity: 1; background: #fff; box-shadow: 0 -2px 0 var(--prune) inset; margin-bottom: -1px; padding-bottom: 1px; }
+.onglet-nom { border: none; background: none; padding: 7px 4px 7px 12px; font: inherit; font-size: 13px; color: var(--texte); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; min-width: 0; }
+.onglet.actif .onglet-nom { font-weight: 600; color: var(--prune); }
+.onglet-fermer { border: none; background: none; width: 26px; height: 26px; margin-right: 4px; border-radius: 50%; font-size: 16px; line-height: 1; color: var(--doux); cursor: pointer; }
+.onglet-plus { flex: none; border: 1px dashed var(--bord); background: none; border-radius: 9px 9px 0 0; width: 34px; height: 32px; font-size: 18px; color: var(--prune); cursor: pointer; }
+@media (hover: hover) { .onglet:hover { opacity: 1; } .onglet-fermer:hover { background: var(--prune-clair); color: var(--prune); } .onglet-plus:hover { background: var(--prune-clair); } }
+
+/* numéro de version et bandeau de mise à jour (version.js) */
+.version-app { margin-left: 6px; font-size: 11px; font-weight: 500; color: var(--doux); }
+.bandeau-maj { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; max-width: calc(100vw - 32px); background: var(--panneau); border: 1px solid var(--bord); border-left: 5px solid var(--prune); border-radius: 12px; padding: 10px 12px 10px 16px; box-shadow: 0 8px 26px rgba(60,30,50,.2); font-size: 14px; }
+.bandeau-maj .maj-dl { background: var(--prune); color: #fff; text-decoration: none; border-radius: 8px; padding: 6px 12px; font-weight: 600; }
+.bandeau-maj .maj-voir { font-size: 13px; }
+.bandeau-maj .maj-fermer { border: none; background: none; font-size: 18px; color: var(--doux); cursor: pointer; padding: 0 4px; }

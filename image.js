@@ -3,7 +3,7 @@
 // autorisées ; l'image est échantillonnée à l'emplacement de chaque picot, quelle que
 // soit la forme de la plaque (carré, hexagone, rond, plaque dessinée…).
 
-let imageChargee = null, resultatImage = null, surfaceImage = null;
+let imageChargee = null, resultatImage = null, surfaceImage = null, nomImage = null;
 
 // choix des références, retenu d'une fois sur l'autre
 function refsImage() {
@@ -91,6 +91,11 @@ function ouvrirImage() {
 
   dlg.onclose = () => {
     if (dlg.returnValue !== 'ok' || !resultatImage) return;
+    // un motif déjà commencé n'est jamais écrasé : l'image s'ouvre dans un nouvel onglet
+    if (P.cases.some((v) => v >= 0)) {
+      charger(creerMotif(nomImage || 'Image', surfaceImage.format.id, surfaceImage.cfg, P.nuancier || 'hama-midi'));
+      message('L’image s’ouvre dans un nouvel onglet : ton motif précédent reste ouvert à côté.', 4000);
+    }
     memoriser();
     const { format, cfg, surf } = surfaceImage;
     if (format.id !== P.format) P.pas = GAMMES[format.gamme]?.pas || P.pas;
@@ -108,7 +113,7 @@ $('#fichierImage').onchange = (e) => {
   const fic = e.target.files[0];
   if (!fic) return;
   const img = new Image();
-  img.onload = () => { imageChargee = img; $('#dlgImage')._relancer(); };
+  img.onload = () => { imageChargee = img; nomImage = fic.name.replace(/\.[^.]+$/, '').slice(0, 40); $('#dlgImage')._relancer(); };
   img.onerror = () => avertir('Image illisible.');
   img.src = URL.createObjectURL(fic);
 };

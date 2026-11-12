@@ -379,6 +379,7 @@ const actions = {
   importerFichier: () => $('#fichierProjet').click(),
   image: () => ouvrirImage(),
   png: exporterPng,
+  rendu: () => ouvrirRendu(),
   imprimer: () => ouvrirImpression(),
   annuler, refaire,
   miroirH: () => { memoriser(); P.cases = transposer(SURF, P.cases, SURF, (x, y) => [SURF.larg - x, y]); fini(); },

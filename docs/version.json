@@ -1,0 +1,11 @@
+{
+  "version": "1.1.0",
+  "date": "2026-11-12",
+  "nouveautes": [
+    "Plusieurs motifs ouverts en même temps, dans des onglets : plus rien n'est écrasé",
+    "Modèles « Avec mes perles » : le modèle s'adapte aux couleurs que tu as, avec un tableau modifiable",
+    "Rendu repassé sans fond, avec effet plastique, à enregistrer en PNG",
+    "Miniature « après repassage » en haut des feuilles imprimées",
+    "Numéro de version et avis quand une nouvelle version existe"
+  ]
+}

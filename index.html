@@ -10,7 +10,7 @@
 <body>
 <div id="app">
   <header class="barre">
-    <strong class="marque"><span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="7" r="6" fill="#E8A498"/><circle cx="7" cy="16" r="6" fill="#E9C704"/><circle cx="25" cy="16" r="6" fill="#49AE89"/><circle cx="16" cy="25" r="6" fill="#6e2f5c"/><g fill="#fffdf9"><circle cx="16" cy="7" r="2"/><circle cx="7" cy="16" r="2"/><circle cx="25" cy="16" r="2"/><circle cx="16" cy="25" r="2"/></g></svg></span>Perlinette</strong>
+    <strong class="marque"><span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="7" r="6" fill="#E8A498"/><circle cx="7" cy="16" r="6" fill="#E9C704"/><circle cx="25" cy="16" r="6" fill="#49AE89"/><circle cx="16" cy="25" r="6" fill="#6e2f5c"/><g fill="#fffdf9"><circle cx="16" cy="7" r="2"/><circle cx="7" cy="16" r="2"/><circle cx="25" cy="16" r="2"/><circle cx="16" cy="25" r="2"/></g></svg></span>Perlinette<small id="versionApp" class="version-app"></small></strong>
     <button id="nomProjet" class="nom-projet" title="Renommer le motif"></button>
     <nav>
       <div class="menu">
@@ -23,6 +23,7 @@
           <button data-action="exporter">Exporter un fichier <small>(sauvegarde)</small></button>
           <button data-action="importerFichier">Importer un fichier…</button>
           <button data-action="png">Enregistrer en image PNG</button>
+          <button data-action="rendu">Rendu repassé, sans fond <small>(PNG)</small></button>
         </div>
       </div>
       <span class="sep"></span>
@@ -67,6 +68,7 @@
   </aside>
 
   <main class="zone" id="zone">
+    <div class="onglets" id="onglets" role="tablist" aria-label="Motifs ouverts"></div>
     <div class="toile-cadre" id="toileCadre"><canvas id="toile"></canvas></div>
   </main>
   <div class="zoom-barre" title="Zoom : Ctrl + molette, touches + et −, 0 pour ajuster">
@@ -231,9 +233,12 @@
 <script src="dialogues.js"></script>
 <script src="app.js"></script>
 <script src="fusion.js"></script>
+<script src="rendu.js"></script>
+<script src="onglets.js"></script>
 <script src="couleurs.js"></script>
 <script src="bibliotheque.js"></script>
 <script src="modeles.js"></script>
+<script src="adapter-perles.js"></script>
 <script src="modeles-taille.js"></script>
 <script src="modeles/halloween.js"></script>
 <script src="modeles/halloween-rond.js"></script>
@@ -276,6 +281,7 @@
 <script src="plaques-cotes.js"></script>
 <script src="interface.js"></script>
 <script src="selection.js"></script>
+<script src="version.js"></script>
 <script>demarrer();</script>
 </body>
 </html>
