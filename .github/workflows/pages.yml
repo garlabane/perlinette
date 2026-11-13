@@ -1,0 +1,35 @@
+# Publie le site (dossier docs) ET l'application en ligne (dossier app/ du site).
+# Seuls les fichiers suivis par git sont publiés : les dossiers privés n'y sont jamais.
+name: Site et application en ligne
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assembler le site et l'application
+        run: |
+          mkdir -p _site/app
+          cp -r docs/. _site/
+          cp index.html styles.css *.js LICENSE CREDITS.md _site/app/
+          cp -r modeles _site/app/
+          test -f _site/app/index.html && test -f _site/version.json
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploiement
+        uses: actions/deploy-pages@v4

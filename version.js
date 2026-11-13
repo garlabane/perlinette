@@ -9,6 +9,10 @@ const VERSION = '1.1.0';
 const URL_VERSION = 'https://garlabane.github.io/perlinette/version.json';
 const URL_TELECHARGER = 'https://github.com/garlabane/perlinette/archive/refs/heads/main.zip';
 const CLE_MAJ = 'perlesrep.maj';
+// Version en ligne (garlabane.github.io/perlinette/app/) : toujours à jour, donc pas d'avis
+// de mise à jour ; à la place, un rappel unique que les motifs restent dans ce navigateur.
+// (« ?web=1 » permet de tester ce mode en local.)
+const EN_LIGNE = /\.github\.io$/.test(location.hostname) || /[?&]web=1\b/.test(location.search);
 
 // « 1.10.0 » > « 1.9.2 » : on compare nombre par nombre
 function versionPlusRecente(a, b) {
@@ -56,5 +60,16 @@ async function verifierMaj(forcer = false) {
   } catch (e) { return null; } // pas d'Internet : on réessaiera une autre fois
 }
 
+function rappelEnLigne() {
+  const m = lire(CLE_MAJ, {});
+  if (m.rappelWeb) return;
+  ecrire(CLE_MAJ, { ...m, rappelWeb: Date.now() });
+  avertir(['Bienvenue dans Perlinette en ligne !', '',
+    'Tes motifs sont enregistrés tout seuls, dans ce navigateur, sur cet appareil : rien n’est envoyé sur Internet.',
+    'Si tu effaces les données du navigateur, ils disparaissent. Pense donc à faire de temps en temps Fichier › Exporter un fichier, et à le ranger où tu veux.',
+    '', 'Pour l’utiliser sans Internet, tu peux aussi télécharger Perlinette depuis le site.'].join('\n'));
+}
+
 afficherVersion();
-setTimeout(() => verifierMaj(), 1500);
+if (EN_LIGNE) setTimeout(rappelEnLigne, 800);
+else setTimeout(() => verifierMaj(), 1500);

@@ -8,6 +8,7 @@
 Hama · Perler · Artkal — gratuit, en français, sans compte et sans installation.</p>
 
 <p align="center">
+  <a href="https://garlabane.github.io/perlinette/app/"><b>Essayer en ligne</b></a> ·
   <a href="https://garlabane.github.io/perlinette/"><b>Présentation et tutoriels</b></a> ·
   <a href="https://github.com/garlabane/perlinette/archive/refs/heads/main.zip"><b>Télécharger</b></a>
 </p>
@@ -33,6 +34,10 @@ Hama · Perler · Artkal — gratuit, en français, sans compte et sans installa
 - **Numéro de version** et petit avis quand une nouvelle version est disponible.
 
 ## Démarrer
+
+**En ligne, sans rien installer :** ouvre [garlabane.github.io/perlinette/app](https://garlabane.github.io/perlinette/app/). Tes motifs restent dans ton navigateur.
+
+**Ou sur ton ordinateur, même sans Internet :**
 
 1. [Télécharge Perlinette](https://github.com/garlabane/perlinette/archive/refs/heads/main.zip) et décompresse le dossier.
 2. **Windows** : double-clique sur `Perlinette.bat`.
