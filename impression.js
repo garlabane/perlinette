@@ -255,7 +255,7 @@ function ouvrirImpression() {
       </div>
       <div class="impr-pages" id="ipPages"></div>
     </div>
-    <menu><button value="annuler" formnovalidate>Annuler</button><button value="ok" class="principal">Imprimer</button></menu></form>`;
+    <menu><button value="annuler" formnovalidate>Annuler</button><button value="pdf" title="Un fichier PDF à partager ou à enregistrer, pour imprimer ailleurs">📄 PDF à partager</button><button value="ok" class="principal">Imprimer</button></menu></form>`;
   document.body.appendChild(dlg);
   const $d = (s) => dlg.querySelector(s);
   $d('#ipTitre').value = o.titre; $d('#ipPas').value = o.pas;
@@ -306,12 +306,13 @@ function ouvrirImpression() {
     inp.click();
   };
   dlg.addEventListener('close', () => {
-    if (dlg.returnValue === 'ok') {
+    if (dlg.returnValue === 'ok' || dlg.returnValue === 'pdf') {
       lireOptions();
       if (o.pas !== P.pas) { P.pas = o.pas; sauverAuto(); }
       reglages.impression = { couleurs: o.couleurs, symboles: o.symboles, picots: o.picots, legende: o.legende, regrouper: o.regrouper, ensemble: o.ensemble, logo: o.logo, repasse: o.repasse };
       ecrire(CLE.reglages, reglages);
-      imprimerPages(preparerPages(o));
+      if (dlg.returnValue === 'pdf') proposerPdf(preparerPages(o));
+      else imprimerPages(preparerPages(o));
     }
     dlg.remove();
   });

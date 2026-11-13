@@ -243,12 +243,13 @@ function ouvrirPose() {
       </header>
       <div class="pose-outils">
         <button type="button" id="poseReel" title="Affiche le motif à sa vraie taille, pour poser la plaque transparente sur l'écran">📏 Taille réelle</button>
+        <button type="button" id="poseMoins" class="pose-loupe" title="Plus petit" aria-label="Plus petit">−</button>
+        <button type="button" id="posePlus" class="pose-loupe" title="Plus grand" aria-label="Plus grand">+</button>
         <button type="button" id="poseRegler" class="reel-seul" title="Refaire le réglage avec une carte">Régler</button>
         <button type="button" id="poseVerrou" class="reel-seul">🔒 Verrouiller</button>
         <div class="pose-plaques" id="posePlaques" hidden></div>
       </div>
       <div class="pose-vue" id="poseVue"><canvas id="poseToile"></canvas></div>
-      <div class="pose-zoom"><button type="button" id="poseMoins" title="Plus petit">−</button><button type="button" id="posePlus" title="Plus grand">+</button></div>
       <footer class="pose-bas">
         <div class="pose-barre"><div id="poseAvance"></div></div>
         <div class="pose-info" id="poseInfo"></div>

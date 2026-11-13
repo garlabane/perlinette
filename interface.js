@@ -45,7 +45,7 @@ function majCouleurActive() {
 // ---------- aide ----------
 function afficherAide() {
   avertir([
-    `Perlinette ${VERSION}`,
+    `Perlinette ${VERSION} — gratuite. Pour m’offrir un café : buymeacoffee.com/garlabane`,
     '',
     'DESSINER',
     '• Clic gauche : poser une perle. Clic droit : effacer.',

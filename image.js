@@ -98,7 +98,20 @@ function ouvrirImage() {
     if (fm.libre) { cfg.w = Math.max(1, Math.min(200, +f.w.value || 29)); cfg.h = Math.max(1, Math.min(200, +f.h.value || 29)); }
     surfaceImage = { format: fm, cfg, surf: construireSurface(fm, cfg) };
     const brute = source.value === 'biblio' ? couleursBiblio() : couleursDesPalettes(refs.palettes).filter((c) => !refs.exclues.has(c.cle));
-    const palette = brute.map(({ code, nom, hex, marque }) => ({ code, nom, hex, marque }));
+    let palette = brute.map(({ code, nom, hex, marque }) => ({ code, nom, hex, marque }));
+    dlg._noteGris = '';
+    if (reglages.teintesImage === 'gris') {
+      // noir, gris, blanc : on ne garde que les couleurs sans teinte
+      // (et pas les perles spéciales : transparentes, phosphorescentes, métallisées, pailletées)
+      const speciale = (c) => /transparent|translucent|clear|incolore|glow|phospho|argent|silver|bronze|\bor\b|gold|m[ée]tal|nacr|pearl|paillet|glitter/i.test(`${c.nom || ''} ${c.nomOfficiel || ''}`);
+      const neutre = (c) => { if (speciale(c)) return false; const l = rgbLab(hexRgb(c.hex)); return Math.hypot(l[1], l[2]) < 10; };
+      let gris = palette.filter(neutre);
+      if (gris.length < 2) { // pas assez de gris dans ce choix : on prend ceux du nuancier
+        gris = couleursDesPalettes(refs.palettes).filter(neutre).map(({ code, nom, hex, marque }) => ({ code, nom, hex, marque }));
+        dlg._noteGris = ' Tes références n’ont pas assez de gris : ceux du nuancier sont utilisés.';
+      }
+      palette = gris;
+    }
     calculerImage(f, palette);
   };
   // nettoyage facultatif : options retenues, version choisie au-dessus de l'aperçu
@@ -150,6 +163,10 @@ function ouvrirImage() {
   };
   ap.onpointerup = ap.onpointercancel = () => { prise = null; };
   ap.onwheel = (e) => { if (!imageChargee) return; e.preventDefault(); cadreImage.zoom = borner(cadreImage.zoom * (e.deltaY < 0 ? 1.1 : 0.9), 0.3, 4); majTaille(); vite(); };
+  // couleurs ou noir et blanc
+  const majTeintes = () => $$('#imgTeintes button').forEach((b) => b.classList.toggle('actif', b.dataset.teinte === (reglages.teintesImage === 'gris' ? 'gris' : 'couleur')));
+  $$('#imgTeintes button').forEach((b) => (b.onclick = () => { reglages.teintesImage = b.dataset.teinte; ecrire(CLE.reglages, reglages); majTeintes(); relancer(); }));
+  majTeintes();
   dlg._majTaille = majTaille;
   majTaille();
   // sur petit écran, les réglages secondaires sont repliés
@@ -205,7 +222,7 @@ function calculerImage(f, palette) {
   apercu.width = 0; apercu.height = 0;
   if (!imageChargee) { info.textContent = taille + '. Choisis une image pour voir le motif ici.'; return; }
   if (!palette.length) { info.textContent = 'Aucune référence autorisée : coche au moins une couleur.'; return; }
-  const brut = convertirImage(imageChargee, surf, { ...cadreImage, boite: boiteUtile(f.rogner.checked) }, +f.max.value || 0, f.tramage.checked, f.transp.value === '1', palette);
+  const brut = convertirImage(imageChargee, surf, { ...cadreImage, boite: boiteUtile(f.rogner.checked), gris: reglages.teintesImage === 'gris' }, +f.max.value || 0, f.tramage.checked, f.transp.value === '1', palette);
   const optN = Object.fromEntries(Object.keys(NETTOYAGE_DEFAUT).map((k) => [k, f['n_' + k].checked]));
   const net = nettoyerImage(surf, brut, optN);
   const versionNette = (reglages.versionImage || 'brute') === 'nette';
@@ -231,6 +248,7 @@ function calculerImage(f, palette) {
   const occupe = nb ? ` Le dessin occupe ${Math.round(dx - gx + 1)} × ${Math.round(dy - gy + 1)} perles sur ${Math.round(surf.larg)} × ${Math.round(surf.haut)}.` : '';
   const pl = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
   info.textContent = `${taille} · ${resultatImage.couleurs.length} couleurs · ${nb} perles.${occupe} ` +
+    ($('#dlgImage')._noteGris || '') +
     (versionNette ? `Nettoyage : ${pl(net.changees, 'perle')} ${net.changees > 1 ? 'modifiées' : 'modifiée'}.` : `(Le nettoyage modifierait ${pl(net.changees, 'perle')}.)`);
 }
 
@@ -277,6 +295,27 @@ function convertirImage(img, surf, cadre, max, tramage, transp, palette) {
     const blanc = k - a; // transparent compté comme blanc
     rgb[i * 3] = (r + 255 * blanc) / k; rgb[i * 3 + 1] = (gg + 255 * blanc) / k; rgb[i * 3 + 2] = (b + 255 * blanc) / k;
   });
+
+  // 2 bis) noir et blanc : chaque picot devient un gris, et le contraste est étiré
+  //        (le plus sombre de l'image vers le noir, le plus clair vers le blanc)
+  if (cadre.gris) {
+    const lum = [];
+    for (let i = 0; i < n; i++) {
+      if (vide[i]) continue;
+      const y = 0.299 * rgb[i * 3] + 0.587 * rgb[i * 3 + 1] + 0.114 * rgb[i * 3 + 2];
+      rgb[i * 3] = rgb[i * 3 + 1] = rgb[i * 3 + 2] = y;
+      lum.push(y);
+    }
+    if (lum.length > 8) {
+      lum.sort((a, b) => a - b);
+      const bas = lum[Math.floor(lum.length * 0.02)], haut = lum[Math.floor(lum.length * 0.98)];
+      if (haut - bas > 20) for (let i = 0; i < n; i++) {
+        if (vide[i]) continue;
+        const y = Math.max(0, Math.min(255, ((rgb[i * 3] - bas) / (haut - bas)) * 255));
+        rgb[i * 3] = rgb[i * 3 + 1] = rgb[i * 3 + 2] = y;
+      }
+    }
+  }
 
   // 3) couleurs les plus utilisées parmi les références autorisées
   const labs = palette.map((c) => rgbLab(hexRgb(c.hex))), rgbs = palette.map((c) => hexRgb(c.hex)), tous = [...palette.keys()];

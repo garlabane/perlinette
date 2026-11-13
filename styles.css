@@ -650,3 +650,43 @@ dialog.accueil { max-width: 560px; }
   .pose-suite { flex-wrap: wrap; overflow: visible; }
   .pose-zoom { right: 300px; top: 96px; }
 }
+
+/* ===== Rien ne flotte plus au-dessus de la plaque sur petit écran =====
+   « Annuler » et « Tout voir » sont fixes au début de la barre d'outils ; le zoom se fait à deux doigts. */
+.outils-fixes { display: none; }
+.outils-fixes svg { width: 22px; height: 22px; fill: none; stroke: var(--prune); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 900px) {
+  .outils { overflow: hidden; }
+  .outils-fixes { display: flex; gap: 5px; flex: 0 0 auto; padding-right: 6px; border-right: 1px solid var(--bord); }
+  .outils-fixes button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 58px; min-height: 52px; padding: 4px 6px; }
+  .outils-fixes button span { font-size: 11px; line-height: 1.1; }
+  .couleur-active, body.enfant .couleur-active { display: none; }
+  .grille-outils, body.enfant .grille-outils { flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  .grille-outils::-webkit-scrollbar { display: none; }
+  .grille-outils > [data-action="annuler"] { display: none !important; }
+  .zoom-barre .zoom-annuler { display: none; }
+}
+@media (max-width: 900px) and (pointer: coarse) { .zoom-barre { display: none !important; } }
+@media (max-width: 950px) and (max-height: 520px) and (orientation: landscape) {
+  .outils-fixes { flex-direction: column; padding: 0 0 5px; border-right: none; border-bottom: 1px solid var(--bord); }
+  .outils-fixes button { min-width: 0; min-height: 44px; }
+  .grille-outils, body.enfant .grille-outils { overflow-x: hidden; overflow-y: auto; min-height: 0; }
+}
+
+/* « Poser mes perles » : la loupe est dans la barre, plus sur le dessin */
+.pose-loupe { min-width: 40px; font-size: 20px; padding: 0 !important; font-weight: 700; color: var(--prune); }
+.pose.reel .pose-loupe { display: none; }
+
+/* les deux pastilles (brut / nettoyé, couleurs / noir et blanc) côte à côte au-dessus de l'aperçu */
+.img-grille .apercu { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; column-gap: 8px; }
+.img-grille .apercu > p { flex: 0 0 100%; }
+.img-grille .apercu > canvas { flex: 0 0 auto; margin: 0 auto; }
+.img-grille .apercu > .saut { flex: 0 0 100%; height: 0; }
+
+/* PDF du patron */
+dialog.pdf-pret { max-width: 420px; }
+dialog.pdf-pret menu { flex-wrap: wrap; }
+
+/* le petit mot « café », discret */
+.accueil-cafe { margin-top: 6px !important; text-align: right; font-size: 11px; opacity: .8; }
+.accueil-cafe a { color: var(--doux); }

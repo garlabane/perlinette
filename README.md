@@ -60,3 +60,7 @@ Voir [CREDITS.md](CREDITS.md) (nuanciers, sources des plaques, marques).
 
 Perlinette est un logiciel libre, sous licence [GNU AGPL v3](LICENSE).
 © 2026 Sophie Garguilo.
+
+## Soutenir
+
+Perlinette est gratuite et le restera. Si elle te sert, tu peux [☕ m'offrir un café](https://buymeacoffee.com/garlabane).

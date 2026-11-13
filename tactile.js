@@ -178,3 +178,6 @@ document.addEventListener('click', (e) => {
   champ.dispatchEvent(new Event('input', { bubbles: true }));
   champ.dispatchEvent(new Event('change', { bubbles: true }));
 });
+
+// « Tout voir » : toute la plaque à l'écran (sur petit écran, il remplace la barre de zoom flottante)
+actions.ajuster = () => zoomAjuster();

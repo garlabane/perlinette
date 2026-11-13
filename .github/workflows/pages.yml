@@ -26,9 +26,10 @@ jobs:
           cp -r docs/. _site/
           cp index.html styles.css *.js manifest.webmanifest icone-*.png LICENSE CREDITS.md _site/app/
           cp -r modeles _site/app/
-          # chaque publication change l'adresse des fichiers : le navigateur ne garde pas d'ancienne version
-          sed -E -i 's/(src|href)="([^"?]+\.(js|css))"/\1="\2?v='"${GITHUB_SHA::8}"'"/g' _site/app/index.html
-          grep -q "styles.css?v=" _site/app/index.html
+          # un seul fichier de scripts, à une adresse qui change à chaque publication :
+          # chargement plus rapide et plus sûr, et le navigateur ne garde pas d'ancienne version
+          python3 outils/regrouper.py _site/app "${GITHUB_SHA::8}"
+          grep -q "perlinette.js?v=" _site/app/index.html
           test -f _site/app/index.html && test -f _site/version.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

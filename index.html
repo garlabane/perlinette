@@ -52,6 +52,10 @@
 
   <aside class="outils">
     <div class="couleur-active" id="couleurActive" title="Couleur en cours — choisis-en une dans la liste à droite"></div>
+    <div class="outils-fixes">
+      <button data-action="annuler" title="Annuler"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5L4 10l5 5M4 10h10a6 6 0 0 1 0 12h-3"/></svg><span>Annuler</span></button>
+      <button data-action="ajuster" title="Voir toute la plaque"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Tout voir</span></button>
+    </div>
     <div class="grille-outils">
       <button class="outil actif" data-outil="crayon" title="Crayon (C)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M16.5 3.5l4 4L9 19l-5 1 1-5z"/><path d="M16.5 3.5l4 4L9 19l-5 1 1-5zM14 6l4 4M5 15l4 4"/></svg><span>Crayon</span></button>
       <button class="outil" data-outil="gomme" title="Gomme (E) — ou clic droit"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M9.5 20L4 14.5 13.5 5 19 10.5z"/><path d="M9.5 20L4 14.5 13.5 5 19 10.5zM7 11.5l5.5 5.5M9.5 20H20"/></svg><span>Gomme</span></button>
@@ -169,6 +173,11 @@
           <button type="button" data-version="brute" class="actif" title="Le motif tel quel, sans nettoyage">Brut</button>
           <button type="button" data-version="nette" title="Le motif avec le nettoyage choisi plus bas">✨ Nettoyé</button>
         </div>
+        <div class="segment img-version" id="imgTeintes">
+          <button type="button" data-teinte="couleur" class="actif" title="Le motif garde les couleurs de l'image">🎨 Couleurs</button>
+          <button type="button" data-teinte="gris" title="Le motif n'utilise que du noir, des gris et du blanc">⚫ Noir et blanc</button>
+        </div>
+        <span class="saut" aria-hidden="true"></span>
         <canvas id="apercuImage" title="Fais glisser pour déplacer l'image"></canvas><p id="infoImage" class="note"></p>
       </div>
       <div class="img-reglages">
@@ -301,6 +310,7 @@
 <script src="image-nettoyage.js"></script>
 <script src="image.js"></script>
 <script src="impression.js"></script>
+<script src="pdf.js"></script>
 <script src="plaques-cotes.js"></script>
 <script src="interface.js"></script>
 <script src="selection.js"></script>

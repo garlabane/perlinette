@@ -37,6 +37,7 @@ function ouvrirAccueil() {
     <p class="note">${typeof EN_LIGNE !== 'undefined' && EN_LIGNE
       ? 'Tes motifs sont enregistrés tout seuls dans ce navigateur, sur cet appareil : rien n’est envoyé sur Internet. Pense à les exporter de temps en temps (menu Fichier).'
       : 'Tes motifs sont enregistrés tout seuls. Tu retrouves cet écran en touchant le logo Perlinette.'}</p>
+    <p class="note accueil-cafe">Perlinette est gratuite. <a href="https://buymeacoffee.com/garlabane" target="_blank" rel="noopener">☕ M’offrir un café</a></p>
   </form>`;
   dlg.querySelectorAll('[data-choix]').forEach((b) => (b.onclick = () => {
     const choix = b.dataset.choix;
