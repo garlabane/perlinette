@@ -437,7 +437,8 @@ function zoomA(z, cx, cy) {
 function zoomer(sens, cx, cy) { zoomA(reglages.zoom * (sens > 0 ? 1.25 : 0.8), cx, cy); }
 function zoomAjuster() {
   const zone = $('#zone');
-  const z = Math.min((zone.clientWidth - 100 - 2 * MARGE) / SURF.larg, (zone.clientHeight - 100 - 2 * MARGE) / SURF.haut); // 100 = marges + boutons des côtés
+  const reserve = window.matchMedia('(max-width: 900px)').matches ? 76 : 100; // marges + boutons des côtés (moins de marge sur petit écran)
+  const z = Math.min((zone.clientWidth - reserve - 2 * MARGE) / SURF.larg, (zone.clientHeight - reserve - 2 * MARGE) / SURF.haut);
   zoomA(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z)));
   zone.scrollLeft = 0; zone.scrollTop = 0;
 }

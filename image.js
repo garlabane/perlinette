@@ -4,6 +4,37 @@
 // soit la forme de la plaque (carré, hexagone, rond, plaque dessinée…).
 
 let imageChargee = null, resultatImage = null, surfaceImage = null, nomImage = null;
+// placement de l'image sur les plaques : taille (1 = image entière, la plus grande possible),
+// décalage en pas, et la partie utile de l'image (sans ses bords vides)
+let cadreImage = { zoom: 1, dx: 0, dy: 0 }, boiteImage = null;
+const borner = (v, a, b) => Math.max(a, Math.min(b, v));
+
+// La partie utile d'une image : sans ses bords transparents (ou d'une couleur unie).
+function boiteContenu(img) {
+  const k = Math.min(1, 600 / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.drawImage(img, 0, 0, w, h);
+  let d;
+  try { d = g.getImageData(0, 0, w, h).data; } catch (e) { return null; }
+  let opaque = true;
+  for (let i = 3; i < d.length; i += 4) if (d[i] < 250) { opaque = false; break; }
+  const vide = (o) => (opaque ? Math.abs(d[o] - d[0]) + Math.abs(d[o + 1] - d[1]) + Math.abs(d[o + 2] - d[2]) < 30 : d[o + 3] < 24);
+  // image sans transparence : on ne retire un fond que si les quatre coins ont la même couleur
+  if (opaque && ![(w - 1) * 4, (h - 1) * w * 4, (h * w - 1) * 4].every(vide)) return null;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (vide((y * w + x) * 4)) continue;
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  if (x1 < 0) return null;
+  x0 = Math.max(0, x0 - 1); y0 = Math.max(0, y0 - 1); x1 = Math.min(w - 1, x1 + 1); y1 = Math.min(h - 1, y1 + 1);
+  return { x: x0 / k, y: y0 / k, w: (x1 - x0 + 1) / k, h: (y1 - y0 + 1) / k };
+}
+function boiteUtile(rogner) {
+  return rogner && boiteImage ? boiteImage : { x: 0, y: 0, w: imageChargee.naturalWidth, h: imageChargee.naturalHeight };
+}
 
 // choix des références, retenu d'une fois sur l'autre
 function refsImage() {
@@ -83,7 +114,47 @@ function ouvrirImage() {
     relancer();
   };
   for (const k of Object.keys(NETTOYAGE_DEFAUT)) f['n_' + k].onchange = surNettoyage;
-  [f.format, f.w, f.h, f.cols, f.rangs, f.cadrage, f.max, f.tramage, f.transp].forEach((el) => (el.oninput = el.onchange = relancer));
+  [f.format, f.w, f.h, f.cols, f.rangs, f.max, f.tramage, f.transp, f.rogner].forEach((el) => (el.oninput = el.onchange = relancer));
+  dlg.querySelectorAll('.pas-a-pas button').forEach((b) => (b.onclick = () => {
+    const champ = b.parentElement.querySelector('input');
+    champ.value = borner((+champ.value || 1) + +b.dataset.pas, +champ.min, +champ.max);
+    relancer();
+  }));
+  // placer l'image : taille, déplacement en faisant glisser l'aperçu
+  let attente = false;
+  const vite = () => { if (attente) return; attente = true; requestAnimationFrame(() => { attente = false; relancer(); }); };
+  const majTaille = () => { const pc = Math.round(cadreImage.zoom * 100); f.taille.value = pc; $('#imgTailleVal').textContent = pc + ' %'; };
+  f.taille.oninput = () => { cadreImage.zoom = (+f.taille.value || 100) / 100; $('#imgTailleVal').textContent = f.taille.value + ' %'; vite(); };
+  $('#imgAjuster').onclick = () => { cadreImage = { zoom: 1, dx: 0, dy: 0 }; majTaille(); relancer(); };
+  $('#imgCentrer').onclick = () => { cadreImage.dx = 0; cadreImage.dy = 0; relancer(); };
+  $('#imgRemplir').onclick = () => {
+    if (!imageChargee) return;
+    const b = boiteUtile(f.rogner.checked), su = surfaceImage.surf, a = su.larg / b.w, c = su.haut / b.h;
+    cadreImage = { zoom: borner(Math.max(a, c) / Math.min(a, c), 0.3, 4), dx: 0, dy: 0 };
+    majTaille(); relancer();
+  };
+  const ap = $('#apercuImage');
+  let prise = null;
+  ap.onpointerdown = (e) => {
+    if (!imageChargee) return;
+    e.preventDefault();
+    try { ap.setPointerCapture(e.pointerId); } catch (err) { /* pointeur déjà relâché */ }
+    prise = { x: e.clientX, y: e.clientY, dx: cadreImage.dx, dy: cadreImage.dy };
+  };
+  ap.onpointermove = (e) => {
+    if (!prise) return;
+    const parPas = ap.clientWidth / surfaceImage.surf.larg; // pixels d'écran pour un pas
+    cadreImage.dx = prise.dx + (e.clientX - prise.x) / parPas;
+    cadreImage.dy = prise.dy + (e.clientY - prise.y) / parPas;
+    vite();
+  };
+  ap.onpointerup = ap.onpointercancel = () => { prise = null; };
+  ap.onwheel = (e) => { if (!imageChargee) return; e.preventDefault(); cadreImage.zoom = borner(cadreImage.zoom * (e.deltaY < 0 ? 1.1 : 0.9), 0.3, 4); majTaille(); vite(); };
+  dlg._majTaille = majTaille;
+  majTaille();
+  // sur petit écran, les réglages secondaires sont repliés
+  const petit = window.matchMedia('(max-width: 900px)').matches;
+  ['imgPliCouleurs', 'imgPliNettoyage', 'imgPliRefs'].forEach((id) => { $('#' + id).open = !petit; });
   dlg._relancer = relancer;
   majRefs();
   majSource();
@@ -113,7 +184,15 @@ $('#fichierImage').onchange = (e) => {
   const fic = e.target.files[0];
   if (!fic) return;
   const img = new Image();
-  img.onload = () => { imageChargee = img; nomImage = fic.name.replace(/\.[^.]+$/, '').slice(0, 40); $('#dlgImage')._relancer(); };
+  img.onload = () => {
+    imageChargee = img; nomImage = fic.name.replace(/\.[^.]+$/, '').slice(0, 40);
+    boiteImage = boiteContenu(img);
+    cadreImage = { zoom: 1, dx: 0, dy: 0 };
+    $('#imgNom').textContent = fic.name;
+    const dlg = $('#dlgImage');
+    if (dlg._majTaille) dlg._majTaille();
+    dlg._relancer();
+  };
   img.onerror = () => avertir('Image illisible.');
   img.src = URL.createObjectURL(fic);
 };
@@ -124,9 +203,9 @@ function calculerImage(f, palette) {
   const taille = `${surf.plaques.length} plaque(s) · ${surf.picots.length} picots · ${cm(surf.larg)} × ${cm(surf.haut)} cm`;
   resultatImage = null;
   apercu.width = 0; apercu.height = 0;
-  if (!imageChargee) { info.textContent = taille + '. Choisis une image (dessin, logo, photo…) : les dessins simples donnent les meilleurs résultats.'; return; }
+  if (!imageChargee) { info.textContent = taille + '. Choisis une image pour voir le motif ici.'; return; }
   if (!palette.length) { info.textContent = 'Aucune référence autorisée : coche au moins une couleur.'; return; }
-  const brut = convertirImage(imageChargee, surf, f.cadrage.value, +f.max.value || 0, f.tramage.checked, f.transp.value === '1', palette);
+  const brut = convertirImage(imageChargee, surf, { ...cadreImage, boite: boiteUtile(f.rogner.checked) }, +f.max.value || 0, f.tramage.checked, f.transp.value === '1', palette);
   const optN = Object.fromEntries(Object.keys(NETTOYAGE_DEFAUT).map((k) => [k, f['n_' + k].checked]));
   const net = nettoyerImage(surf, brut, optN);
   const versionNette = (reglages.versionImage || 'brute') === 'nette';
@@ -146,18 +225,27 @@ function calculerImage(f, palette) {
     g.fillStyle = v >= 0 ? resultatImage.couleurs[v].hex : '#ddd'; g.fill();
   });
   const nb = resultatImage.cases.filter((v) => v >= 0).length;
+  // place réellement occupée par le dessin, en perles
+  let gx = Infinity, gy = Infinity, dx = -Infinity, dy = -Infinity;
+  surf.picots.forEach((q, i) => { if (resultatImage.cases[i] < 0) return; gx = Math.min(gx, q.x); dx = Math.max(dx, q.x); gy = Math.min(gy, q.y); dy = Math.max(dy, q.y); });
+  const occupe = nb ? ` Le dessin occupe ${Math.round(dx - gx + 1)} × ${Math.round(dy - gy + 1)} perles sur ${Math.round(surf.larg)} × ${Math.round(surf.haut)}.` : '';
   const pl = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
-  info.textContent = `${taille} · ${resultatImage.couleurs.length} couleurs · ${nb} perles. ` +
+  info.textContent = `${taille} · ${resultatImage.couleurs.length} couleurs · ${nb} perles.${occupe} ` +
     (versionNette ? `Nettoyage : ${pl(net.changees, 'perle')} ${net.changees > 1 ? 'modifiées' : 'modifiée'}.` : `(Le nettoyage modifierait ${pl(net.changees, 'perle')}.)`);
 }
 
-function convertirImage(img, surf, cadrage, max, tramage, transp, palette) {
-  // 1) image posée dans la surface : entière (contenir) ou en remplissant tout (remplir)
+function convertirImage(img, surf, cadre, max, tramage, transp, palette) {
+  // 1) image posée dans la surface : sa partie utile (cadre.boite), à la taille voulue
+  //    (cadre.zoom, 1 = entière et la plus grande possible), décalée de cadre.dx / cadre.dy pas
   const RES = 6; // pixels par pas
   const W = Math.ceil(surf.larg * RES), H = Math.ceil(surf.haut * RES);
-  const ech = (cadrage === 'remplir' ? Math.max : Math.min)(W / img.naturalWidth, H / img.naturalHeight);
-  const dw = img.naturalWidth * ech, dh = img.naturalHeight * ech;
-  let src = img, sw = img.naturalWidth, sh = img.naturalHeight;
+  const b = cadre.boite || { x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight };
+  const ech = Math.min(W / b.w, H / b.h) * (cadre.zoom || 1);
+  const dw = b.w * ech, dh = b.h * ech;
+  let src = document.createElement('canvas');
+  src.width = Math.max(1, Math.round(b.w)); src.height = Math.max(1, Math.round(b.h));
+  src.getContext('2d').drawImage(img, b.x, b.y, b.w, b.h, 0, 0, src.width, src.height);
+  let sw = src.width, sh = src.height;
   while (sw / 2 >= dw * 1.5 && sh / 2 >= dh * 1.5) { // réduction par moitiés = vraie moyenne
     const c = document.createElement('canvas');
     c.width = Math.floor(sw / 2); c.height = Math.floor(sh / 2);
@@ -168,7 +256,7 @@ function convertirImage(img, surf, cadrage, max, tramage, transp, palette) {
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const g = cv.getContext('2d', { willReadFrequently: true });
   g.imageSmoothingQuality = 'high';
-  g.drawImage(src, 0, 0, sw, sh, (W - dw) / 2, (H - dh) / 2, dw, dh);
+  g.drawImage(src, 0, 0, sw, sh, (W - dw) / 2 + (cadre.dx || 0) * RES, (H - dh) / 2 + (cadre.dy || 0) * RES, dw, dh);
   const px = g.getImageData(0, 0, W, H).data;
 
   // 2) couleur moyenne autour de chaque picot

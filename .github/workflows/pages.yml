@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p _site/app
           cp -r docs/. _site/
-          cp index.html styles.css *.js LICENSE CREDITS.md _site/app/
+          cp index.html styles.css *.js manifest.webmanifest icone-*.png LICENSE CREDITS.md _site/app/
           cp -r modeles _site/app/
           # chaque publication change l'adresse des fichiers : le navigateur ne garde pas d'ancienne version
           sed -E -i 's/(src|href)="([^"?]+\.(js|css))"/\1="\2?v='"${GITHUB_SHA::8}"'"/g' _site/app/index.html

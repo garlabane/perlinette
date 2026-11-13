@@ -9,6 +9,28 @@
 const DOIGTS = new Map(); // pointeurs tactiles posés sur la zone de dessin
 let PINCE = null;         // geste à deux doigts en cours
 let GLISSE = null;        // déplacement à un doigt (outil « Déplacer »)
+let STYLET = false;       // un stylet a servi : il dessine, et le doigt déplace la plaque
+let LONG = null;          // appui long en attente (pipette)
+let TAPE2 = null;         // deux doigts posés puis relevés aussitôt = annuler
+
+function annulerAppuiLong() { if (LONG) { clearTimeout(LONG.minuterie); LONG = null; } }
+// appui long sur une perle : on reprend sa couleur, sans rien poser
+function pipetteAppuiLong(e) {
+  const p = picotSous(e);
+  annulerAppuiLong();
+  if (!S.dessin || p.i < 0 || !S.annuler.length) return;
+  // la perle telle qu'elle était AVANT ce trait ; sur un picot vide, l'appui long pose simplement la perle
+  let avant = -1;
+  try { avant = JSON.parse(S.annuler[S.annuler.length - 1]).cases[p.i]; } catch (err) { return; }
+  if (!(avant >= 0)) return;
+  reprendreTraitEnCours();
+  S.couleur = avant;
+  if (S.outil !== 'crayon' && S.outil !== 'remplir') choisirOutil('crayon');
+  toutMettreAJour();
+  if (navigator.vibrate) navigator.vibrate(15);
+  const c = P.couleurs[avant];
+  message(`Couleur reprise : ${c ? (c.nom || c.code) : ''}`, 1800);
+}
 
 // un trait commencé avec le premier doigt est repris quand le deuxième se pose
 function reprendreTraitEnCours() {
@@ -33,15 +55,26 @@ window.addEventListener('pointerdown', (e) => {
   }
   const dansZone = e.target.closest && e.target.closest('#zone');
   if (!dansZone) return;
+  if (e.pointerType === 'pen') STYLET = true;
   if (e.pointerType === 'touch') {
     DOIGTS.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (DOIGTS.size >= 2) {
       e.stopPropagation(); e.preventDefault();
-      if (DOIGTS.size === 2) { reprendreTraitEnCours(); GLISSE = null; PINCE = { ...mesurePince(), zoom: reglages.zoom }; }
+      annulerAppuiLong();
+      if (DOIGTS.size === 2) {
+        reprendreTraitEnCours(); GLISSE = null;
+        PINCE = { ...mesurePince(), zoom: reglages.zoom };
+        TAPE2 = { t: Date.now(), bouge: 0, zoom: reglages.zoom };
+      } else TAPE2 = null;
       return;
     }
+    // appui long (sans bouger) sur la plaque = pipette
+    if (e.target === toile && !STYLET && S.outil !== 'main' && S.outil !== 'selection') {
+      const x = e.clientX, y = e.clientY, id = e.pointerId;
+      LONG = { id, x, y, minuterie: setTimeout(() => pipetteAppuiLong({ clientX: x, clientY: y }), 550) };
+    }
   }
-  if (S.outil === 'main' && e.target.closest('#toileCadre')) {
+  if ((S.outil === 'main' || (STYLET && e.pointerType === 'touch')) && e.target.closest('#toileCadre')) {
     e.stopPropagation(); e.preventDefault();
     const zone = $('#zone');
     GLISSE = { id: e.pointerId, x: e.clientX, y: e.clientY, gauche: zone.scrollLeft, haut: zone.scrollTop };
@@ -50,12 +83,14 @@ window.addEventListener('pointerdown', (e) => {
 
 window.addEventListener('pointermove', (e) => {
   if (DOIGTS.has(e.pointerId)) DOIGTS.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (LONG && LONG.id === e.pointerId && Math.hypot(e.clientX - LONG.x, e.clientY - LONG.y) > 8) annulerAppuiLong();
   const zone = $('#zone');
   if (PINCE && DOIGTS.size >= 2) {
     e.stopPropagation(); e.preventDefault();
     const m = mesurePince();
     const vise = PINCE.zoom * (m.d / PINCE.d);
     if (Math.abs(vise - reglages.zoom) / reglages.zoom > 0.03) zoomA(vise, m.cx, m.cy);
+    if (TAPE2) TAPE2.bouge += Math.abs(m.cx - PINCE.cx) + Math.abs(m.cy - PINCE.cy);
     zone.scrollLeft -= m.cx - PINCE.cx; zone.scrollTop -= m.cy - PINCE.cy;
     PINCE.cx = m.cx; PINCE.cy = m.cy;
     return;
@@ -69,8 +104,16 @@ window.addEventListener('pointermove', (e) => {
 
 function finDoigt(e) {
   const etaitPince = !!PINCE, etaitGlisse = GLISSE && GLISSE.id === e.pointerId;
+  if (LONG && LONG.id === e.pointerId) annulerAppuiLong();
   DOIGTS.delete(e.pointerId);
-  if (PINCE && DOIGTS.size < 2) PINCE = null;
+  if (PINCE && DOIGTS.size < 2) {
+    PINCE = null;
+    // deux doigts posés et relevés aussitôt, sans zoomer ni glisser : on annule le dernier geste
+    if (TAPE2 && e.type === 'pointerup' && Date.now() - TAPE2.t < 320 && TAPE2.bouge < 12 && Math.abs(reglages.zoom - TAPE2.zoom) < 0.01 && S.annuler.length) {
+      annuler(); message('Annulé', 1200);
+    }
+    TAPE2 = null;
+  }
   if (etaitGlisse) GLISSE = null;
   if (etaitPince || etaitGlisse) e.stopPropagation();
 }
@@ -124,3 +167,14 @@ function surTaille() {
 window.addEventListener('resize', surTaille);
 window.addEventListener('orientationchange', () => setTimeout(surTaille, 250));
 setTimeout(surTaille, 0);
+
+// boutons − / + autour d'un nombre (plaques côte à côte, rangées…) : plus simple qu'un clavier
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.pas-a-pas button');
+  if (!b || b.onclick) return;               // la fenêtre d'import gère déjà les siens
+  const champ = b.parentElement.querySelector('input');
+  const v = Math.max(+champ.min || 1, Math.min(+champ.max || 99, (+champ.value || 1) + +b.dataset.pas));
+  champ.value = v;
+  champ.dispatchEvent(new Event('input', { bubbles: true }));
+  champ.dispatchEvent(new Event('change', { bubbles: true }));
+});

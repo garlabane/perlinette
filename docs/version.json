@@ -1,10 +1,12 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "date": "2026-11-13",
   "nouveautes": [
-    "Perlinette en ligne : s'utilise directement dans le navigateur, sans rien télécharger",
-    "Téléphone et tablette : la plaque en grand, deux doigts pour zoomer et se déplacer",
-    "Nouvel outil « Déplacer » pour faire glisser la plaque",
-    "Sur petit écran : menu sous ☰, couleurs en bande de pastilles, outils en bas"
+    "« Poser mes perles » : l'écran te guide couleur par couleur ou rangée par rangée, et reste allumé",
+    "Taille réelle : pose ta plaque transparente directement sur la tablette",
+    "Écran d'accueil : modèle, image, prénom ou dessin en un geste",
+    "Importer une image : agrandir, déplacer et caler l'image sur les plaques",
+    "Sur téléphone : appui long pour reprendre une couleur, deux doigts pour annuler",
+    "Partager l'image ou le motif, liste des perles pour le magasin"
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "name": "Perlinette",
+  "short_name": "Perlinette",
+  "description": "Motifs de perles à repasser",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffdf9",
+  "theme_color": "#6e2f5c",
+  "icons": [
+    {
+      "src": "icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
