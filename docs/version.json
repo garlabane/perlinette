@@ -1,11 +1,10 @@
 {
-  "version": "1.1.0",
-  "date": "2026-11-12",
+  "version": "1.2.0",
+  "date": "2026-11-13",
   "nouveautes": [
-    "Plusieurs motifs ouverts en même temps, dans des onglets : plus rien n'est écrasé",
-    "Modèles « Avec mes perles » : le modèle s'adapte aux couleurs que tu as, avec un tableau modifiable",
-    "Rendu repassé sans fond, avec effet plastique, à enregistrer en PNG",
-    "Miniature « après repassage » en haut des feuilles imprimées",
-    "Numéro de version et avis quand une nouvelle version existe"
+    "Perlinette en ligne : s'utilise directement dans le navigateur, sans rien télécharger",
+    "Téléphone et tablette : la plaque en grand, deux doigts pour zoomer et se déplacer",
+    "Nouvel outil « Déplacer » pour faire glisser la plaque",
+    "Sur petit écran : menu sous ☰, couleurs en bande de pastilles, outils en bas"
   ]
 }

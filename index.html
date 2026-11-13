@@ -12,6 +12,7 @@
   <header class="barre">
     <strong class="marque"><span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="7" r="6" fill="#E8A498"/><circle cx="7" cy="16" r="6" fill="#E9C704"/><circle cx="25" cy="16" r="6" fill="#49AE89"/><circle cx="16" cy="25" r="6" fill="#6e2f5c"/><g fill="#fffdf9"><circle cx="16" cy="7" r="2"/><circle cx="7" cy="16" r="2"/><circle cx="25" cy="16" r="2"/><circle cx="16" cy="25" r="2"/></g></svg></span>Perlinette<small id="versionApp" class="version-app"></small></strong>
     <button id="nomProjet" class="nom-projet" title="Renommer le motif"></button>
+    <button id="btnMenu" class="menu-bouton" aria-label="Menu" aria-expanded="false" title="Menu">☰</button>
     <nav>
       <div class="menu">
         <button id="btnFichier" aria-haspopup="true" aria-expanded="false">Fichier ▾</button>
@@ -47,6 +48,7 @@
       <button class="outil" data-outil="gomme" title="Gomme (E) — ou clic droit"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M9.5 20L4 14.5 13.5 5 19 10.5z"/><path d="M9.5 20L4 14.5 13.5 5 19 10.5zM7 11.5l5.5 5.5M9.5 20H20"/></svg><span>Gomme</span></button>
       <button class="outil" data-outil="remplir" title="Remplissage (F)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M5 11l6-6 7 7-6 6z"/><path d="M5 11l6-6 7 7-6 6zM5 11h13M9 3l2 2M19.5 15.5s2 2.4 2 3.7a2 2 0 0 1-4 0c0-1.3 2-3.7 2-3.7z"/></svg><span>Remplir</span></button>
       <button class="outil" data-outil="pipette" title="Pipette (I)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M16 3.5a2.5 2.5 0 0 1 3.5 3.5L17 9.5 14.5 7z"/><path d="M16 3.5a2.5 2.5 0 0 1 3.5 3.5L17 9.5 14.5 7zM13 5.5l5.5 5.5M15.5 8L6 17.5V20h2.5L18 10.5M4 20.5h.01"/></svg><span>Pipette</span></button>
+      <button class="outil outil-main" data-outil="main" title="Déplacer la plaque — ou glisser avec deux doigts"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M12 3l3 3.5h-2V11h4.5V9l3.5 3-3.5 3v-2H13v4.5h2L12 21l-3-3.5h2V13H6.5v2L3 12l3.5-3v2H11V6.500H9z"/><path d="M12 3l3 3.5M12 3L9 6.5M12 3v18M12 21l3-3.5M12 21l-3-3.500M3 12l3.5-3M3 12l3.500 3M3 12h18M21 12l-3.500-3M21 12l-3.500 3"/></svg><span>Déplacer</span></button>
       <button class="outil" data-outil="remplacer" title="Remplacer cette couleur partout (R)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M3 9a4 4 0 1 0 8 0 4 4 0 1 0-8 0"/><path d="M3 9a4 4 0 1 0 8 0 4 4 0 1 0-8 0M13 15a4 4 0 1 0 8 0 4 4 0 1 0-8 0M13 6h4a2 2 0 0 1 2 2v2l-2-2M11 18H7a2 2 0 0 1-2-2v-2l2 2"/></svg><span>Remplacer</span></button>
       <button class="outil" data-outil="lettre" title="Changer la couleur d'une lettre (phrases et alphabet)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M14 19a3 3 0 1 0 6 0 3 3 0 1 0-6 0"/><path d="M3 20L9 4l6 16M5.3 14h7.4M14 19a3 3 0 1 0 6 0 3 3 0 1 0-6 0"/></svg><span>Couleur lettre</span></button>
       <button class="outil" data-outil="ligne" title="Ligne (L) — deux clics ou glisser"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M3.5 20.5a2 2 0 1 0 0-.01M18.5 5.5a2 2 0 1 0 0-.01"/><path d="M5 19L19 5M3.5 18.5a2 2 0 1 0 0 4 2 2 0 1 0 0-4M20.5 1.5a2 2 0 1 0 0 4 2 2 0 1 0 0-4"/></svg><span>Ligne</span></button>
@@ -100,6 +102,7 @@
       <h2>Couleurs <small id="totalPerles"></small></h2>
       <label class="tri">Classer par <select id="triCouleurs"></select></label>
       <div id="listeCouleurs" class="couleurs"></div>
+      <button type="button" id="btnCote" class="cote-bascule" aria-expanded="false" title="Toutes les couleurs, la plaque et l’aperçu du repassage">▲</button>
       <div class="ligne-boutons">
         <button data-action="ajouterCouleur">+ Couleur</button>
         <button data-action="couleurs" title="Nuancier, mes perles, couleurs des lettres">Couleurs…</button>
@@ -281,6 +284,7 @@
 <script src="plaques-cotes.js"></script>
 <script src="interface.js"></script>
 <script src="selection.js"></script>
+<script src="tactile.js"></script>
 <script src="version.js"></script>
 <script>demarrer();</script>
 </body>

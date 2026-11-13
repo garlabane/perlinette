@@ -379,3 +379,124 @@ body.enfant .barre-sel { display: none !important; }
 .bandeau-maj .maj-dl { background: var(--prune); color: #fff; text-decoration: none; border-radius: 8px; padding: 6px 12px; font-weight: 600; }
 .bandeau-maj .maj-voir { font-size: 13px; }
 .bandeau-maj .maj-fermer { border: none; background: none; font-size: 18px; color: var(--doux); cursor: pointer; padding: 0 4px; }
+
+/* ===== Écrans tactiles : la main, le menu ☰, le bouton du panneau ===== */
+.menu-bouton, .cote-bascule { display: none; }
+.zone { touch-action: pan-x pan-y; }            /* le pincement est géré par Perlinette, pas par le navigateur */
+#toile.main, body.outil-main #toile { cursor: grab; }
+@media (hover: hover) and (pointer: fine) and (min-width: 901px) { .outil-main { display: none !important; } }
+
+/* ===== Écrans moyens et petits (tablette, petit ordinateur) : le menu se range sous ☰ ===== */
+@media (max-width: 1280px) {
+  /* barre du haut : logo, nom du motif, ☰, ?, Imprimer */
+  .barre { position: relative; flex-wrap: nowrap; gap: 8px; padding: 6px 8px; }
+  .nom-projet { flex: 1 1 auto; min-width: 0; max-width: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+  .barre .espace { display: none; }
+  .menu-bouton { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 40px; font-size: 20px; padding: 0; }
+  .barre > button { min-height: 40px; flex: 0 0 auto; }
+  .barre > .nom-projet { flex: 1 1 0; min-width: 0; }
+  .barre > .principal { font-size: 0; padding: 0 12px; }
+  .barre > .principal::after { content: 'Imprimer'; font-size: 15px; }
+  .enfant-bouton { font-size: 0 !important; padding: 0 10px; }
+  .enfant-bouton::after { content: '🧒'; font-size: 20px; }
+  body.enfant .enfant-bouton::after { content: '↩'; }
+  .barre nav, body.enfant .barre nav { display: none; }
+  body.menu-ouvert .barre nav {
+    display: flex; flex-direction: column; flex-wrap: nowrap; gap: 4px; margin: 0;
+    position: absolute; top: 100%; left: 8px; right: 8px; z-index: 30;
+    max-height: calc(100dvh - 70px); overflow-y: auto;
+    background: var(--panneau); border: 1px solid var(--bord); border-radius: 10px; padding: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  }
+  body.menu-ouvert .barre nav button { min-height: 46px; text-align: left; padding: 8px 12px; }
+  body.menu-ouvert .barre nav .sep { width: auto; height: 1px; margin: 2px 0; }
+  body.menu-ouvert .barre nav .menu { display: flex; flex-direction: column; }
+  body.menu-ouvert .barre nav .menu-liste { position: static; box-shadow: none; border: none; padding: 0 0 0 14px; min-width: 0; }
+  body.enfant.menu-ouvert .barre nav > *:not([data-action="modeles"]) { display: none; }
+}
+@media (min-width: 901px) and (max-width: 1280px) {
+  #app { grid-template-columns: 124px minmax(0, 1fr) 264px; }
+  body.enfant #app { grid-template-columns: 150px minmax(0, 1fr) 240px; }
+  .zoom-barre { right: 280px; }
+  body.enfant .zoom-barre { right: 256px; }
+  .barre > .principal { font-size: inherit; padding: 5px 12px; }
+  .barre > .principal::after { content: none; }
+  .enfant-bouton { font-size: inherit !important; padding: 5px 10px; }
+  .enfant-bouton::after, body.enfant .enfant-bouton::after { content: none; }
+  body.menu-ouvert .barre nav { left: auto; width: 320px; }
+}
+
+/* ===== Petits écrans (téléphone, tablette tenue debout) =====
+   La plaque prend toute la largeur ; en bas, la bande des couleurs puis la barre des outils. */
+@media (max-width: 900px) {
+  html, body { overscroll-behavior: none; }
+  #app, body.enfant #app {
+    height: 100vh; height: 100dvh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "barre" "zone" "cote" "outils";
+  }
+  button, select, input { font-size: 16px; }     /* pas de zoom automatique d'iOS sur les champs */
+
+  /* la plaque */
+  .zone { padding: 6px; }
+  .onglets { top: -6px; margin: -6px -6px 8px; padding: 6px 8px 0; }
+  .onglet-nom { max-width: 38vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .zoom-barre, body.enfant .zoom-barre { right: 8px; bottom: calc(var(--bas, 130px) + 8px); }
+  .zoom-barre button { min-width: 40px; min-height: 40px; font-size: 18px; }
+  .zoom-barre #zoomValeur, .zoom-barre #btnSymboles { display: none; }
+  .zoom-barre #zoomAjuster { font-size: 14px; }
+
+  /* la bande des couleurs */
+  .cote { flex-direction: row; align-items: center; border-left: none; border-top: 1px solid var(--bord); min-width: 0; }
+  .cote-bascule { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; min-width: 44px; min-height: 44px; }
+  body:not(.cote-ouverte) .cote section:first-child { display: none; }
+  body:not(.cote-ouverte) .couleurs-section { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: row; align-items: center; gap: 6px; padding: 5px 8px; border-bottom: none; }
+  body:not(.cote-ouverte) .couleurs-section h2,
+  body:not(.cote-ouverte) .couleurs-section .tri,
+  body:not(.cote-ouverte) .couleurs-section .ligne-boutons,
+  body:not(.cote-ouverte) .coul-titre { display: none !important; }
+  body:not(.cote-ouverte) #listeCouleurs { display: flex; flex-direction: row; flex: 1 1 auto; min-width: 0; max-height: none; overflow-x: auto; overflow-y: hidden; gap: 4px; padding: 0; scrollbar-width: none; }
+  body:not(.cote-ouverte) #listeCouleurs::-webkit-scrollbar { display: none; }
+  body:not(.cote-ouverte) .coul { display: flex; flex: 0 0 auto; padding: 2px; border-radius: 50%; border: 3px solid transparent; }
+  body:not(.cote-ouverte) .coul .lib, body:not(.cote-ouverte) .coul .nb, body:not(.cote-ouverte) .coul .sym { display: none; }
+  body:not(.cote-ouverte) .coul .pastille { width: 36px; height: 36px; border-radius: 50%; box-shadow: inset -3px -3px 0 rgba(0,0,0,.12); }
+  body:not(.cote-ouverte) .coul.choisie { border-color: var(--prune); background: none; }
+  /* le panneau complet, ouvert par « ▲ » */
+  body.cote-ouverte .cote { position: fixed; inset: 0; z-index: 40; flex-direction: column; align-items: stretch; overflow-y: auto; border: none; }
+  body.cote-ouverte .couleurs { max-height: none; }
+  body.cote-ouverte .cote section:first-child { padding-top: 60px; }
+  body.cote-ouverte .coul { min-height: 44px; }
+  body.cote-ouverte .cote-bascule { position: fixed; top: 8px; right: 8px; z-index: 41; padding: 0 14px; background: var(--prune); color: #fff; border-color: var(--prune); }
+  body.cote-ouverte .zoom-barre { display: none; }
+
+  /* la barre des outils */
+  .outils { flex-direction: row; align-items: stretch; gap: 6px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); border-right: none; border-top: 1px solid var(--bord); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  .outils::-webkit-scrollbar { display: none; }
+  .couleur-active, body.enfant .couleur-active { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; padding: 4px 8px; }
+  .couleur-active b, .couleur-active small { display: none; }
+  .couleur-active .pastille-grande, body.enfant .couleur-active .pastille-grande { width: 38px; height: 38px; }
+  .grille-outils, body.enfant .grille-outils { display: flex; flex-direction: row; gap: 5px; flex: 0 0 auto; }
+  .grille-outils > button, body.enfant .grille-outils > button { flex: 0 0 auto; min-width: 58px; min-height: 52px; padding: 4px 6px; }
+  body.enfant .grille-outils > button span { font-size: 12px; }
+  body.enfant .grille-outils svg { width: 26px; height: 26px; }
+  .options-forme { flex: 0 0 auto; align-self: center; }
+
+  /* fenêtres */
+  dialog { width: auto; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow: auto; padding: 14px; }
+  dialog menu button { min-height: 44px; padding: 8px 16px; }
+  .deux { grid-template-columns: 1fr; }
+  .impr-grille { grid-template-columns: 1fr; }
+}
+
+/* ===== Téléphone : l'essentiel seulement ===== */
+@media (max-width: 600px) {
+  .marque { font-size: 0; gap: 0; }
+  .version-app { display: none; }
+  .mod-liste { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .barre [data-action="aide"] { display: none; }
+  .grille-outils > [data-outil="lettre"], .grille-outils > [data-outil="ligne"], .grille-outils > [data-outil="rect"],
+  .grille-outils > [data-outil="ellipse"], .grille-outils > [data-outil="selection"], .grille-outils > [data-outil="remplacer"],
+  .grille-outils > [data-action="miroirH"], .grille-outils > [data-action="miroirV"], .grille-outils > [data-action="versPlaque"],
+  .options-forme { display: none !important; }
+}
