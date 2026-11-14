@@ -37,12 +37,14 @@ function boiteUtile(rogner) {
 }
 
 // choix des références, retenu d'une fois sur l'autre
-// Baril Hama Midi « mélange n° 67 » (22 couleurs) : références 01 à 12, 17, 18, 20, 21 et 26 à 31
-// (liste donnée par les vendeurs du mélange 67 ; à vérifier sur ton baril si le contenu a changé).
-const BARIL_MIDI = ['H01', 'H02', 'H03', 'H04', 'H05', 'H06', 'H07', 'H08', 'H09', 'H10', 'H11', 'H12', 'H17', 'H18', 'H20', 'H21', 'H26', 'H27', 'H28', 'H29', 'H30', 'H31'];
-function appliquerBaril(refs) {
+// Gamme « classique » Hama Midi : tout le nuancier, sauf les effets spéciaux (transparentes, fluos et néons,
+// phosphorescentes, or / argent / bronze / nacré), qui donnent des motifs surprenants quand on n'en veut pas.
+// Mesuré sur des illustrations : avec toute cette gamme, Perlinette choisit seule les ~22 meilleures couleurs
+// et le motif est nettement plus fidèle qu'avec une courte liste fixe (pas de peau, de pastels ni de bruns manquants).
+const SPECIAUX_MIDI = new Set([13, 14, 15, 16, 19, 24, 25, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 55, 56, 57, 61, 62, 63, 64, 72, 73, 74]);
+function appliquerClassique(refs) {
   refs.palettes = ['hama-midi'];
-  refs.exclues = new Set(couleursDesPalettes(refs.palettes).filter((x) => !BARIL_MIDI.includes(x.code)).map((x) => x.cle));
+  refs.exclues = new Set(couleursDesPalettes(refs.palettes).filter((x) => SPECIAUX_MIDI.has(parseInt(String(x.code).slice(1), 10))).map((x) => x.cle));
   retenirRefs(refs);
 }
 function refsImage() {
@@ -53,6 +55,7 @@ function retenirRefs(r) { reglages.refsImage = { palettes: r.palettes, exclues: 
 
 function ouvrirImage() {
   const dlg = $('#dlgImage'), f = dlg.querySelector('form');
+  { const m = $('#infoAuto'); if (m) m.textContent = ''; }
   dlg._retirees = new Set(); // couleurs retirées pour cet import (remplacées automatiquement par les plus proches)
   // plaque : par défaut celle du motif
   remplirChoix(f.format, optionsFormats(), P.format);
@@ -80,20 +83,21 @@ function ouvrirImage() {
   };
   // source des références : ma bibliothèque, ou un choix fait ici
   const nbBiblio = couleursBiblio().length, source = $('#imgSource');
-  source.value = reglages.sourceImage && (reglages.sourceImage !== 'biblio' || nbBiblio) ? reglages.sourceImage : (nbBiblio ? 'biblio' : 'baril');
-  // premier usage avec le baril : on coche ses 22 couleurs
-  if (source.value === 'baril' && !reglages.refsImage) appliquerBaril(refs);
-  if (source.value === 'baril') f.max.value = 22;
+  if (reglages.sourceImage === 'baril' || reglages.sourceImage === 'magasin') { reglages.sourceImage = 'classique'; appliquerClassique(refs); } // anciens noms du choix
+  source.value = reglages.sourceImage && (reglages.sourceImage !== 'biblio' || nbBiblio) ? reglages.sourceImage : (nbBiblio ? 'biblio' : 'classique');
+  // premier usage : toute la gamme classique est cochée, Perlinette en choisit les 22 meilleures couleurs
+  if (source.value === 'classique' && !reglages.refsImage) appliquerClassique(refs);
+  if (source.value === 'classique') f.max.value = 22;
   const majSource = () => {
     $('#refsManuel').hidden = source.value === 'biblio';
-    $('#imgNoteBiblio').innerHTML = source.value === 'baril' ? 'Les 22 couleurs du baril Hama Midi (mélange n° 67) sont cochées. Si tu as d’autres perles, coche-les ci-dessous : elles s’ajoutent.' : source.value !== 'biblio' ? '' : nbBiblio
+    $('#imgNoteBiblio').innerHTML = source.value === 'classique' ? 'Toute la gamme Hama Midi classique est cochée (sans les perles à effets : fluo, phosphorescentes, métalliques, transparentes). Perlinette choisit seule les couleurs qui servent le mieux ton image. Tu peux en cocher d’autres ci-dessous.' : source.value !== 'biblio' ? '' : nbBiblio
       ? 'Seules les couleurs que tu as chez toi seront utilisées. Pour changer la liste : bouton « Mes perles ».'
       : '<b>Ta bibliothèque est vide</b> : remplis-la avec le bouton « Mes perles », ou choisis « Un choix fait ici ».';
     majCompte();
   };
   source.onchange = () => {
     reglages.sourceImage = source.value; ecrire(CLE.reglages, reglages);
-    if (source.value === 'baril') { appliquerBaril(refs); f.max.value = 22; majRefs(); $$('#imgMarques input').forEach((cb) => (cb.checked = refs.palettes.includes(cb.value))); }
+    if (source.value === 'classique') { appliquerClassique(refs); f.max.value = 22; majRefs(); $$('#imgMarques input').forEach((cb) => (cb.checked = refs.palettes.includes(cb.value))); }
     majSource(); relancer();
   };
   $$('#imgMarques input').forEach((cb) => (cb.onchange = () => {
@@ -233,11 +237,37 @@ $('#fichierImage').onchange = (e) => {
     $('#imgNom').textContent = fic.name;
     const dlg = $('#dlgImage');
     if (dlg._majTaille) dlg._majTaille();
+    ajusterPlaques(dlg.querySelector('form'));
     dlg._relancer();
   };
   img.onerror = () => avertir('Image illisible.');
   img.src = URL.createObjectURL(fic);
 };
+
+// Une image détaillée sur une seule plaque devient illisible (visage, yeux…) : à l'ouverture d'une image,
+// on propose d'office le plus petit nombre de plaques (3 × 3 au plus) qui lui laisse au moins 50 perles
+// sur son grand côté. On le dit, et on peut tout changer ensuite.
+function ajusterPlaques(f) {
+  const fm = formatParId(f.format.value);
+  if (!fm || fm.libre || !imageChargee) return;
+  const un = construireSurface(fm, { cols: 1, rangs: 1 });
+  const b = boiteUtile(f.rogner.checked);
+  if (!b || !b.w || !b.h || !un.larg) return;
+  const CIBLE = 50;
+  let choix = null;
+  const essais = [];
+  for (let c = 1; c <= 3; c++) for (let r = 1; r <= 3; r++) essais.push([c, r]);
+  essais.sort((x, y) => x[0] * x[1] - y[0] * y[1] || Math.abs(x[0] - x[1]) - Math.abs(y[0] - y[1]));
+  for (const [c, r] of essais) {
+    const echelle = Math.min(c * un.larg / b.w, r * un.haut / b.h);
+    if (echelle * Math.max(b.w, b.h) >= CIBLE) { choix = [c, r]; break; }
+  }
+  if (!choix) choix = [3, 3];
+  const [cols, rangs] = choix;
+  if (cols === (+f.cols.value || 1) && rangs === (+f.rangs.value || 1)) return;
+  f.cols.value = cols; f.rangs.value = rangs;
+  $('#infoAuto').textContent = `Plaques ajustées à ton image : ${cols} × ${rangs} (pour garder les détails). Change-les si tu préfères.`;
+}
 
 const cleCouleur = (c) => `${c.marque || ''}|${c.code}|${c.hex}`;
 // Couleurs réellement utilisées par le motif, avec leur nombre de perles : un toucher en retire une,
@@ -287,6 +317,11 @@ function calculerImage(f, palette) {
   }
   surf.picots.forEach((q, i) => {
     const v = resultatImage.cases[i];
+    if (v >= 0 && t >= 8 && typeof spritePerle === 'function') {
+      const col = resultatImage.couleurs[v], rr = t * 0.47;
+      g.drawImage(spritePerle(col.hex, Math.round(rr * 4), typeof estTransparente === 'function' && estTransparente(col)), q.x * t - rr, q.y * t - rr, rr * 2, rr * 2);
+      return;
+    }
     g.beginPath(); g.arc(q.x * t, q.y * t, v >= 0 ? t * 0.47 : Math.max(0.6, t * 0.12), 0, Math.PI * 2);
     g.fillStyle = v >= 0 ? resultatImage.couleurs[v].hex : '#ddd'; g.fill();
   });

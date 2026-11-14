@@ -274,7 +274,7 @@ body.enfant .nom-projet { pointer-events: none; }
 body.enfant .nom-projet::after { content: ''; }
 body.enfant #app { grid-template-columns: 150px 1fr 260px; }
 body.enfant .grille-outils { grid-template-columns: 1fr; }
-body.enfant .grille-outils > *:not([data-outil="crayon"]):not([data-outil="gomme"]):not([data-outil="remplir"]):not([data-action="annuler"]) { display: none !important; }
+body.enfant .grille-outils > *:not([data-outil="crayon"]):not([data-outil="gomme"]):not([data-outil="remplir"]):not([data-action="annuler"]):not([data-action="repasser"]) { display: none !important; }
 body.enfant .grille-outils > button { min-height: 76px; font-size: 15px; }
 body.enfant .grille-outils > button span { font-size: 15px; font-weight: 600; }
 body.enfant .grille-outils svg { width: 36px; height: 36px; }
@@ -701,3 +701,30 @@ dialog.pdf-pret menu { flex-wrap: wrap; }
 .puce-util.retiree { opacity: .65; text-decoration: line-through; }
 .util-retirees { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 4px; }
 #imgPliUtilisees { flex-basis: 100%; width: 100%; max-width: 100%; }
+
+/* liste de courses */
+.courses-reglages { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 10px; }
+.courses-reglages label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
+.courses-reglages input { width: 110px; }
+.courses-table { max-height: 50vh; overflow: auto; border: 1px solid var(--bord); border-radius: 8px; }
+#coursesTable { width: 100%; border-collapse: collapse; font-size: 14px; }
+#coursesTable th, #coursesTable td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--bord); white-space: nowrap; }
+#coursesTable th:first-child, #coursesTable td:first-child { text-align: left; }
+#coursesTable th { position: sticky; top: 0; background: var(--panneau); font-size: 12px; }
+#coursesTable td i { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); vertical-align: -3px; margin-right: 6px; }
+#coursesTable tr.ok { opacity: .55; }
+#coursesTable .prix-ligne { width: 70px; padding: 2px 4px; text-align: right; }
+
+/* mode enfant : le bouton Repasser et son animation */
+.btn-repasser { display: none !important; }
+body.enfant .btn-repasser { display: flex !important; background: #fff4d6; border-color: #e0b84a; }
+.repasse-couche { position: fixed; z-index: 40; overflow: hidden; border-radius: 6px; cursor: pointer; }
+.repasse-papier { position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(255,250,235,.96) 0 6px, rgba(244,236,214,.96) 6px 7px); opacity: 0; box-shadow: inset 0 0 40px rgba(180,150,90,.25); }
+.repasse-fer { position: absolute; left: 0; top: 0; filter: drop-shadow(0 14px 10px rgba(0,0,0,.28)); transform-origin: 30% 80%; will-change: transform; }
+.repasse-fer svg { display: block; width: 100%; height: auto; }
+.repasse-msg { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: #fff; color: var(--prune); border: 2px solid var(--prune); border-radius: 999px; padding: 8px 18px; font-weight: 700; font-size: 18px; opacity: 0; transition: opacity .25s; white-space: nowrap; box-shadow: 0 3px 12px rgba(0,0,0,.18); }
+.repasse-msg.visible { opacity: 1; }
+.repasse-bouton { margin-left: 10px; min-height: 40px; padding: 4px 14px; font-size: 16px; border-radius: 999px; border: 2px solid var(--prune); background: var(--prune); color: #fff; cursor: pointer; }
+.repasse-couche.termine { background: transparent; pointer-events: none; }
+.repasse-couche.termine .repasse-msg { pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) { .repasse-msg { transition: none; } }

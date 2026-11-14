@@ -23,6 +23,7 @@ const NOMS_HAMA = {
   H107: 'Lavande', H108: 'Aubergine', H109: 'Gris nuageux', H110: 'Matcha', H111: 'Rose terre foncé', H112: 'Rose terre',
   H113: 'Aqua', H114: 'Rouge cerise', H115: 'Vert vif', H116: 'Bleu nuit', H117: 'Gris taupe', H118: 'Rouge marron',
   H119: 'Bleu ciel',
+  H120: 'Bleu Arctic', H121: 'Rose bonbon', H122: 'Jaune curry',
 };
 
 // traduction mot à mot : couleurs (noms) puis qualificatifs placés après, à la française

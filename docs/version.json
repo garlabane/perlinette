@@ -1,7 +1,11 @@
 {
-  "version": "1.4.4",
+  "version": "1.5.0",
   "date": "2026-11-14",
   "nouveautes": [
-    "Import d'image : 22 couleurs par défaut au lieu de 12, pour un motif plus fidèle"
+    "Liste de courses : sachets à acheter et prix, selon « Mes perles »",
+    "Import d'image : toute la gamme Hama Midi classique par défaut, 22 couleurs choisies automatiquement, plaques ajustées à l'image",
+    "Mode enfant : bouton « Repasser » avec animation",
+    "Perles dessinées comme de vraies perles (anneau et trou)",
+    "Trois nouvelles couleurs Hama : Bleu Arctic, Rose bonbon, Jaune curry"
   ]
 }

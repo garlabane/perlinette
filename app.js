@@ -151,14 +151,20 @@ function rendu() {
       return;
     }
     const hex = P.couleurs[v].hex, transp = estTransparente(P.couleurs[v]);
-    ctx.globalAlpha = transp ? 0.62 : 1;
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = hex; ctx.fill();
-    ctx.globalAlpha = 1;
-    if (z >= 8) { ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = 1; ctx.stroke(); }
-    if (transp && z >= 8) { ctx.beginPath(); ctx.arc(cx - r * 0.35, cy - r * 0.35, r * 0.22, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.fill(); }
+    // perle « réaliste » (anneau, trou, reflet) dès que la taille le permet, sauf avec les symboles
+    const reel = z >= 10 && !symb && typeof spritePerle === 'function';
+    if (reel) {
+      ctx.drawImage(spritePerle(hex, Math.max(12, Math.round(r * 2 * 2)), transp), cx - r, cy - r, r * 2, r * 2);
+    } else {
+      ctx.globalAlpha = transp ? 0.62 : 1;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = hex; ctx.fill();
+      ctx.globalAlpha = 1;
+      if (z >= 8) { ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = 1; ctx.stroke(); }
+      if (transp && z >= 8) { ctx.beginPath(); ctx.arc(cx - r * 0.35, cy - r * 0.35, r * 0.22, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.fill(); }
+    }
     if (estPhospho(P.couleurs[v]) && z >= 8) { ctx.strokeStyle = 'rgba(120,230,120,.8)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(cx, cy, r * 0.8, 0, Math.PI * 2); ctx.stroke(); }
     if (symb) { ctx.fillStyle = clair(hex) ? '#000' : '#fff'; ctx.fillText(SYMBOLES[v % SYMBOLES.length], cx, cy + 1); }
-    else if (z >= 7) { ctx.beginPath(); ctx.arc(cx, cy, z * 0.15, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.fill(); }
+    else if (z >= 7 && !reel) { ctx.beginPath(); ctx.arc(cx, cy, z * 0.15, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.fill(); }
   });
   // perles à problème : cercle rouge pointillé (on informe, on ne bloque rien)
   const aSignaler = [...S.soudure.isolees, ...S.soudure.coins];

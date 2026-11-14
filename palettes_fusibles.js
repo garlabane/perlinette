@@ -6,7 +6,7 @@
 const PALETTES_FUSIBLES = [
 {
 "id": "hama-midi",
-"nom": "Hama Midi (5 mm) — 92 couleurs",
+"nom": "Hama Midi (5 mm) — 95 couleurs",
 "forme": "hama",
 "integree": true,
 "pas": 5.0,
@@ -470,12 +470,27 @@ const PALETTES_FUSIBLES = [
 "code": "H119",
 "nom": "Sky Blue",
 "hex": "#4167B4"
+},
+{
+"code": "H120",
+"nom": "Arctic Blue",
+"hex": "#A4C6F1"
+},
+{
+"code": "H121",
+"nom": "Bubblegum Pink",
+"hex": "#EA3D78"
+},
+{
+"code": "H122",
+"nom": "Curry Yellow",
+"hex": "#B97815"
 }
 ]
 },
 {
 "id": "hama-mini",
-"nom": "Hama Mini — 78 couleurs",
+"nom": "Hama Mini — 81 couleurs",
 "forme": "hama",
 "integree": true,
 "pas": 2.5,
@@ -869,6 +884,21 @@ const PALETTES_FUSIBLES = [
 "code": "H119",
 "nom": "Sky Blue",
 "hex": "#4167B4"
+},
+{
+"code": "H120",
+"nom": "Arctic Blue",
+"hex": "#A4C6F1"
+},
+{
+"code": "H121",
+"nom": "Bubblegum Pink",
+"hex": "#EA3D78"
+},
+{
+"code": "H122",
+"nom": "Curry Yellow",
+"hex": "#B97815"
 }
 ]
 },

@@ -31,6 +31,7 @@
           <hr>
           <button data-action="partagerImage">Partager l'image du motif…</button>
           <button data-action="partagerListe">Liste des perles <small>(pour le magasin)</small></button>
+          <button data-action="courses">🛒 Liste de courses <small>(sachets et prix)</small></button>
           <button data-action="partagerMotif">Envoyer le motif <small>(pour l'ouvrir ailleurs)</small></button>
         </div>
       </div>
@@ -75,6 +76,7 @@
       </div>
       <button data-action="annuler" title="Annuler (Ctrl+Z)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5L4 10l5 5M4 10h10a6 6 0 0 1 0 12h-3"/></svg><span>Annuler</span></button>
       <button data-action="refaire" title="Refaire (Ctrl+Y)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l5 5-5 5M20 10H10a6 6 0 0 0 0 12h3"/></svg><span>Refaire</span></button>
+      <button data-action="repasser" class="btn-repasser" title="Repasser ma pièce"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M3 17c0-3 2-5 5-5.5L16 10c3 0 5 1.500 5 4v3H3z"/><path d="M3 17c0-3 2-5 5-5.500L16 10c3 0 5 1.500 5 4v3H3zM9 13l1-4h5l1 3M3 20h18"/></svg><span>Repasser</span></button>
       <button data-action="miroirH" title="Retourner gauche/droite"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M10 6L3 12l7 6z"/><path d="M12 2v20M10 6L3 12l7 6zM14 6l7 6-7 6z"/></svg><span>Miroir ↔</span></button>
       <button data-action="miroirV" title="Retourner haut/bas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M6 10L12 3l6 7z"/><path d="M2 12h20M6 10L12 3l6 7zM6 14l6 7 6-7z"/></svg><span>Miroir ↕</span></button>
       <button data-action="versPlaque" title="Les picots où il y a une perle deviennent une nouvelle plaque (cœur, étoile…)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M12 4l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L4.2 9.7l5.4-.8z"/><path d="M12 4l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L4.2 9.7l5.4-.8z"/></svg><span>Créer une plaque</span></button>
@@ -210,6 +212,7 @@
             <label>Plaques côte à côte <span class="pas-a-pas"><button type="button" data-pas="-1" aria-label="Une de moins">−</button><input name="cols" type="number" min="1" max="10" value="1"><button type="button" data-pas="1" aria-label="Une de plus">+</button></span></label>
             <label>Rangées de plaques <span class="pas-a-pas"><button type="button" data-pas="-1" aria-label="Une de moins">−</button><input name="rangs" type="number" min="1" max="10" value="1"><button type="button" data-pas="1" aria-label="Une de plus">+</button></span></label>
           </div>
+          <p class="note" id="infoAuto"></p>
         </fieldset>
         <details class="pli" id="imgPliCouleurs" open>
           <summary>Couleurs</summary>
@@ -235,7 +238,7 @@
       <label>Utiliser
         <select id="imgSource">
           <option value="biblio">Mes perles (ma bibliothèque)</option>
-          <option value="baril">Baril Hama Midi (22 couleurs, mélange n° 67)</option>
+          <option value="classique">Hama Midi, gamme classique (le plus fidèle)</option>
           <option value="manuel">Un choix fait ici</option>
         </select>
       </label>
@@ -269,6 +272,7 @@
 <script src="plaques.js"></script>
 <script src="verification.js"></script>
 <script src="dialogues.js"></script>
+<script src="perle-realiste.js"></script>
 <script src="app.js"></script>
 <script src="fusion.js"></script>
 <script src="rendu.js"></script>
@@ -323,7 +327,9 @@
 <script src="tactile.js"></script>
 <script src="version.js"></script>
 <script src="partage.js"></script>
+<script src="courses.js"></script>
 <script src="pose.js"></script>
+<script src="repasser.js"></script>
 <script src="accueil.js"></script>
 <script>demarrer();</script>
 </body>
