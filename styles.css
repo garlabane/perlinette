@@ -523,7 +523,7 @@ details.pli[open] > summary { margin-bottom: 8px; }
   /* l'aperçu reste visible en haut pendant qu'on règle */
   .img-grille { display: flex; flex-direction: column; gap: 10px; }
   .img-grille .apercu { position: sticky; top: -14px; z-index: 2; background: var(--panneau); padding: 6px 0 4px; border-bottom: 1px solid var(--bord); }
-  #apercuImage { max-height: 38dvh; width: auto; max-width: 100%; }
+  #apercuImage { max-height: 30dvh; width: auto; max-width: 100%; }
   #infoImage { margin: 4px 0 0; text-align: center; }
   .bouton-fichier { flex: 1 1 100%; justify-content: center; min-height: 48px; font-size: 17px; }
   #dlgImage .deux { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -700,7 +700,7 @@ dialog.pdf-pret menu { flex-wrap: wrap; }
 .puce-util:hover { border-color: var(--prune); }
 .puce-util.retiree { opacity: .65; text-decoration: line-through; }
 .util-retirees { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 4px; }
-#imgPliUtilisees { flex-basis: 100%; width: 100%; max-width: 100%; }
+
 
 /* liste de courses */
 .courses-reglages { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 10px; }
@@ -728,3 +728,29 @@ body.enfant .btn-repasser { display: flex !important; background: #fff4d6; borde
 .repasse-couche.termine { background: transparent; pointer-events: none; }
 .repasse-couche.termine .repasse-msg { pointer-events: auto; }
 @media (prefers-reduced-motion: reduce) { .repasse-msg { transition: none; } }
+
+/* import d'image : onglets de réglages (petit écran) pour tout régler sans quitter l'aperçu des yeux */
+.img-onglets { display: none; }
+@media (max-width: 900px) {
+  .img-onglets { display: flex; gap: 4px; width: 100%; overflow-x: auto; padding: 4px 2px 2px; scrollbar-width: none; }
+  .img-onglets::-webkit-scrollbar { display: none; }
+  .img-onglets button { flex: 0 0 auto; min-height: 34px; padding: 3px 12px; font-size: 13px; border-radius: 999px; border: 1px solid var(--bord); background: #fff; white-space: nowrap; }
+  .img-onglets button.actif { background: var(--prune); color: #fff; border-color: var(--prune); }
+  #dlgImage [data-onglet] { display: none; }
+  #dlgImage[data-onglet="image"] [data-onglet="image"], #dlgImage[data-onglet="plaques"] [data-onglet="plaques"],
+  #dlgImage[data-onglet="couleurs"] [data-onglet="couleurs"], #dlgImage[data-onglet="nettoyage"] [data-onglet="nettoyage"],
+  #dlgImage[data-onglet="refs"] [data-onglet="refs"] { display: block; }
+}
+
+/* import d'image sur petit écran : on gagne de la place pour voir l'aperçu ET les réglages */
+.img-bascules { display: contents; }
+@media (max-width: 900px) {
+  .img-bascules { display: flex; flex-wrap: nowrap; justify-content: center; gap: 6px; width: 100%; }
+  .img-bascules .img-version { margin: 0 0 4px; }
+  .img-bascules .img-version button { padding: 2px 9px; font-size: 12px; min-height: 28px; }
+  #infoImage { font-size: 11px; line-height: 1.25; margin: 2px 0 0; }
+  .img-choix .bouton-fichier { min-height: 40px; font-size: 15px; }
+}
+@media (max-width: 900px) { #dlgImage details .img-version { margin: 6px 0 10px; } }
+
+.img-grille .apercu { align-content: flex-start; }

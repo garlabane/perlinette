@@ -148,6 +148,23 @@ function ouvrirImage() {
   const majVersion = () => $$('#imgVersion button').forEach((b) => b.classList.toggle('actif', b.dataset.version === (reglages.versionImage || 'brute')));
   $$('#imgVersion button').forEach((b) => (b.onclick = () => { reglages.versionImage = b.dataset.version; ecrire(CLE.reglages, reglages); majVersion(); relancer(); }));
   majVersion();
+  const majRendu = () => $$('#imgRendu button').forEach((b) => b.classList.toggle('actif', b.dataset.rendu === (reglages.imgRendu || 'repasse')));
+  $$('#imgRendu button').forEach((b) => (b.onclick = () => { reglages.imgRendu = b.dataset.rendu; ecrire(CLE.reglages, reglages); majRendu(); relancer(); }));
+  majRendu();
+  // petit écran : un seul groupe de réglages à la fois sous l'aperçu, qui reste visible
+  const montrerOnglet = (nom) => { dlg.dataset.onglet = nom; dlg.querySelectorAll(`details[data-onglet="${nom}"]`).forEach((d) => { d.open = true; }); $$('#imgOnglets button').forEach((b) => b.classList.toggle('actif', b.dataset.ongletBtn === nom)); };
+  $$('#imgOnglets button').forEach((b) => (b.onclick = () => montrerOnglet(b.dataset.ongletBtn)));
+  // sur petit écran, « Brut / Nettoyé » va dans l'onglet Nettoyage et « Couleurs / N&B » dans l'onglet Couleurs :
+  // on les touche en gardant l'aperçu sous les yeux. Sur grand écran, tout reste au-dessus de l'aperçu.
+  const ecranPetit = window.matchMedia('(max-width: 900px)');
+  const placerBascules = () => {
+    const ver = $('#imgVersion'), tei = $('#imgTeintes'), ren = $('#imgRendu'), bloc = ver.parentElement.classList.contains('img-bascules') ? ver.parentElement : ren.parentElement;
+    if (ecranPetit.matches) { $('#imgPliNettoyage').querySelector('summary').after(ver); $('#imgPliCouleurs').querySelector('summary').after(tei); }
+    else { bloc.insertBefore(ver, ren); bloc.insertBefore(tei, ren); }
+  };
+  if (!dlg._petitEcoute) { dlg._petitEcoute = true; ecranPetit.addEventListener('change', placerBascules); }
+  placerBascules();
+  montrerOnglet(dlg.dataset.onglet || 'image');
   const surNettoyage = () => {
     reglages.nettoyage = Object.fromEntries(Object.keys(NETTOYAGE_DEFAUT).map((k) => [k, f['n_' + k].checked]));
     ecrire(CLE.reglages, reglages);
@@ -315,15 +332,16 @@ function calculerImage(f, palette) {
     for (const pl of surf.plaques) g.strokeRect(pl.x * t + 0.5, pl.y * t + 0.5, pl.larg * t - 1, pl.haut * t - 1);
     g.setLineDash([]);
   }
-  surf.picots.forEach((q, i) => {
+  const repasse = reglages.imgRendu !== 'perles' && typeof dessinerFusion === 'function';
+  if (repasse) {
+    // par défaut on montre la pièce repassée : on se rend mieux compte de ce que ça donnera (et ça donne envie de la faire)
+    dessinerFusion(g, t, 0, surf, { couleurs: resultatImage.couleurs, cases: resultatImage.cases }, 2, analyserSoudure(surf, resultatImage.cases));
+  } else surf.picots.forEach((q, i) => {
     const v = resultatImage.cases[i];
-    if (v >= 0 && t >= 8 && typeof spritePerle === 'function') {
-      const col = resultatImage.couleurs[v], rr = t * 0.47;
-      g.drawImage(spritePerle(col.hex, Math.round(rr * 4), typeof estTransparente === 'function' && estTransparente(col)), q.x * t - rr, q.y * t - rr, rr * 2, rr * 2);
-      return;
-    }
     g.beginPath(); g.arc(q.x * t, q.y * t, v >= 0 ? t * 0.47 : Math.max(0.6, t * 0.12), 0, Math.PI * 2);
     g.fillStyle = v >= 0 ? resultatImage.couleurs[v].hex : '#ddd'; g.fill();
+    // les perles très claires (blanc, crème) reçoivent un fin contour : sinon on ne les voit pas sur le fond
+    if (v >= 0 && t >= 4 && perleTresClaire(resultatImage.couleurs[v].hex)) { g.strokeStyle = 'rgba(0,0,0,.42)'; g.lineWidth = Math.max(1, t * 0.07); g.stroke(); }
   });
   const nb = resultatImage.cases.filter((v) => v >= 0).length;
   majUtilisees();

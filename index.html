@@ -171,24 +171,32 @@
     </div>
     <div class="img-grille">
       <div class="apercu" id="imgApercu">
+        <div class="img-bascules">
         <div class="segment img-version" id="imgVersion">
           <button type="button" data-version="brute" class="actif" title="Le motif tel quel, sans nettoyage">Brut</button>
           <button type="button" data-version="nette" title="Le motif avec le nettoyage choisi plus bas">✨ Nettoyé</button>
         </div>
         <div class="segment img-version" id="imgTeintes">
           <button type="button" data-teinte="couleur" class="actif" title="Le motif garde les couleurs de l'image">🎨 Couleurs</button>
-          <button type="button" data-teinte="gris" title="Le motif n'utilise que du noir, des gris et du blanc">⚫ Noir et blanc</button>
+          <button type="button" data-teinte="gris" title="Le motif n'utilise que du noir, des gris et du blanc">⚫ N&amp;B</button>
+        </div>
+        <div class="segment img-version" id="imgRendu">
+          <button type="button" data-rendu="repasse" class="actif" title="Le motif une fois repassé : les perles fondent et se soudent">🔥 Repassé</button>
+          <button type="button" data-rendu="perles" title="Les perles posées sur la plaque, avant le repassage">Perles</button>
+        </div>
         </div>
         <span class="saut" aria-hidden="true"></span>
         <canvas id="apercuImage" title="Fais glisser pour déplacer l'image"></canvas><p id="infoImage" class="note"></p>
-      <details class="pli" id="imgPliUtilisees" open>
-        <summary>Couleurs utilisées <small id="nbUtilisees"></small></summary>
-        <p class="note">Touche une couleur pour la retirer : ses perles prennent automatiquement la couleur la plus proche parmi les autres. Pratique pour simplifier.</p>
-        <div id="imgUtilisees" class="util-liste"></div>
-    </details>
+        <div class="img-onglets" id="imgOnglets" role="tablist" aria-label="Réglages de l'import">
+          <button type="button" role="tab" data-onglet-btn="image" class="actif">Image</button>
+          <button type="button" role="tab" data-onglet-btn="plaques">Plaques</button>
+          <button type="button" role="tab" data-onglet-btn="couleurs">Couleurs</button>
+          <button type="button" role="tab" data-onglet-btn="nettoyage">Nettoyage</button>
+          <button type="button" role="tab" data-onglet-btn="refs">Références</button>
+        </div>
       </div>
       <div class="img-reglages">
-        <fieldset id="imgPlacer">
+        <fieldset id="imgPlacer" data-onglet="image">
           <legend>Placer l'image sur les plaques</legend>
           <label class="img-taille">Taille de l'image <output id="imgTailleVal">100 %</output>
             <input type="range" name="taille" min="30" max="400" step="5" value="100">
@@ -201,7 +209,7 @@
           <label class="case"><input type="checkbox" name="rogner" checked> Ignorer les bords vides de l'image (elle prend toute la place)</label>
           <p class="note">Pour la déplacer : fais glisser l'aperçu avec le doigt ou la souris.</p>
         </fieldset>
-        <fieldset>
+        <fieldset data-onglet="plaques">
           <legend>Plaques</legend>
           <label>Plaque <select name="format"></select></label>
           <div class="deux" id="imgTailleLibre">
@@ -214,7 +222,7 @@
           </div>
           <p class="note" id="infoAuto"></p>
         </fieldset>
-        <details class="pli" id="imgPliCouleurs" open>
+        <details class="pli" id="imgPliCouleurs" data-onglet="couleurs" open>
           <summary>Couleurs</summary>
           <div class="deux">
             <label>Couleurs max (0 = toutes) <input name="max" type="number" min="0" max="200" value="22"></label>
@@ -222,7 +230,12 @@
           </div>
           <label class="case"><input type="checkbox" name="tramage"> Tramage (dégradés plus doux, plus de perles isolées)</label>
         </details>
-        <details class="pli" id="imgPliNettoyage" open>
+        <details class="pli" id="imgPliUtilisees" data-onglet="couleurs" open>
+        <summary>Couleurs utilisées <small id="nbUtilisees"></small></summary>
+        <p class="note">Touche une couleur pour la retirer : ses perles prennent automatiquement la couleur la plus proche parmi les autres. Pratique pour simplifier.</p>
+        <div id="imgUtilisees" class="util-liste"></div>
+    </details>
+        <details class="pli" id="imgPliNettoyage" data-onglet="nettoyage" open>
           <summary>Nettoyage (facultatif)</summary>
           <label class="case"><input type="checkbox" name="n_parasites"> Retirer les perles parasites</label>
           <label class="case"><input type="checkbox" name="n_details"> … mais garder les petits détails (yeux, reflets)</label>
@@ -233,7 +246,7 @@
         </details>
       </div>
     </div>
-    <details class="pli" id="imgPliRefs" open>
+    <details class="pli" id="imgPliRefs" data-onglet="refs" open>
       <summary>Références autorisées <small id="nbRefs"></small></summary>
       <label>Utiliser
         <select id="imgSource">
@@ -272,7 +285,6 @@
 <script src="plaques.js"></script>
 <script src="verification.js"></script>
 <script src="dialogues.js"></script>
-<script src="perle-realiste.js"></script>
 <script src="app.js"></script>
 <script src="fusion.js"></script>
 <script src="rendu.js"></script>
