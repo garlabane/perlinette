@@ -21,10 +21,11 @@ page.on('pageerror', (e) => console.log('erreur de page :', e.message));
 await page.goto(pathToFileURL(resolve(site, 'app', 'index.html')).href);
 await page.waitForFunction(() => typeof epingleDeModele === 'function' && typeof MODELES !== 'undefined' && MODELES.length > 100);
 // la fiche de chaque modèle : nom, thème, plaque, perles, couleurs
+const AVIS = await page.evaluate(() => (typeof AVIS_THEMES === 'object' ? AVIS_THEMES : {}));
 const fiches = await page.evaluate(() => MODELES.filter((m) => !m.caractere).map((m) => {
   const fid = (m.plaques || ['midi-carre-grand'])[0], r = poserModele(m, fid), f = formatParId(fid);
   const pas = (GAMMES[f.gamme] || { pas: 5 }).pas, cm = (v) => (v * pas / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
-  return { slug: slugModele(m), nom: m.nom, theme: m.theme, plaque: f.nom, perles: r.cases.filter((v) => v >= 0).length, couleurs: r.couleurs.length, taille: `${cm(r.surf.larg)} × ${cm(r.surf.haut)} cm`,
+  return { slug: slugModele(m), nom: m.nom, theme: m.theme, plaque: (r.surf.plaques.length > 1 ? `${r.surf.plaques.length} × ` : '') + f.nom, perles: r.cases.filter((v) => v >= 0).length, couleurs: r.couleurs.length, taille: `${cm(r.surf.larg)} × ${cm(r.surf.haut)} cm`,
     refs: r.couleurs.map((c) => `${c.nom} (${c.code})`).slice(0, 14) };
 }));
 if (new Set(fiches.map((f) => f.slug)).size !== fiches.length) console.log('attention : des modèles portent le même nom dans un même thème');
@@ -70,6 +71,7 @@ ${image ? `<meta property="og:image" content="${image}">\n<meta property="og:ima
 .mod-gal a.carte { display: block; text-decoration: none; color: inherit; font-weight: 600; font-size: 14px; text-align: center; }
 .mod-gal a.carte img { width: 100%; height: auto; aspect-ratio: 2 / 3; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.12); display: block; margin-bottom: 6px; background: #f1e8dc; }
 .mod-themes { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; } .mod-themes a { padding: 6px 12px; border-radius: 999px; background: #f1e3ec; color: #6e2f5c; text-decoration: none; font-weight: 600; font-size: 14px; }
+.mod-avis { background: #fdf0e6; border: 1px solid #e8b48c; color: #7a3a10; border-radius: 10px; padding: 10px 14px; font-weight: 600; }
 @media (max-width: 760px) { .mod-page { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -99,6 +101,7 @@ for (const f of ok) {
     <a class="theme" href="../#${ancre(f.theme)}">${e(f.theme)}</a>
     <h1>${e(f.nom)} en perles à repasser</h1>
     <p>${e(description)}</p>
+    ${AVIS[f.theme] ? `<p class="mod-avis">⚠ ${e(AVIS[f.theme])}</p>` : ''}
     <div class="mod-actions">
       <a class="bouton plein" href="${app}">Ouvrir ce modèle dans Perlinette</a>
       <a class="bouton vide" href="${pin}" target="_blank" rel="noopener">📌 Enregistrer sur Pinterest</a>
@@ -124,6 +127,7 @@ writeFileSync(resolve(site, 'modeles', 'index.html'), tete(`${ok.length} modèle
   <p>Choisis un modèle : il s'ouvre dans Perlinette, où tu peux le modifier et l'imprimer à taille réelle. Gratuit, sans compte.</p>
   <div class="mod-themes">${themes.map((t) => `<a href="#${ancre(t)}">${e(t)}</a>`).join('')}</div>
   ${themes.map((t) => `<h2 id="${ancre(t)}">${e(t)}</h2>
+  ${AVIS[t] ? `<p class="mod-avis">⚠ ${e(AVIS[t])}</p>` : ''}
   <div class="grille">${ok.filter((f) => f.theme === t).map((f) => `<a class="carte" href="${f.slug}/"><img src="../epingles/${f.slug}.jpg" alt="${e(f.nom)}" loading="lazy" width="800" height="1200">${e(f.nom)}</a>`).join('')}</div>`).join('\n  ')}
 </section>` + pied);
 // plan du site, pour les moteurs de recherche

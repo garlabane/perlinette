@@ -96,6 +96,9 @@ function epingleSvg() {
   // les couleurs les plus utilisées
   const yc = cy + carte + 62, pastilles = I.util.slice(0, 8), pas = 62, xm = 385, x0 = xm - (pastilles.length - 1) * pas / 2; // centré à gauche de la vignette « repassé »
   s += pastilles.map((u, i) => `<circle cx="${x0 + i * pas}" cy="${yc}" r="25" fill="${u.c.hex}" stroke="#0003" stroke-width="2"/>`).join('');
+  // « créé par » : le compte de la personne, sous le motif ; la marque Perlinette reste dans le bandeau
+  const auteur = (reglages.auteur || '').trim();
+  if (auteur) s += `<text x="${xm}" y="${yc + 124}" font-size="34" font-weight="700" fill="${PIN.prune}" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">créé par ${echap(auteur.slice(0, 40))}</text>`;
   s += `<text x="${xm}" y="${yc + 76}" font-size="36" fill="#6b5a66" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">${I.perles} perles · ${I.util.length} couleurs · ${echap(I.taille)}</text>`;
   // bandeau de marque : jamais rogné, lisible en miniature
   const hb = 250, yb = H - hb;
@@ -127,7 +130,7 @@ function descriptionPin(lien) {
   // avec le lien du motif : texte court, pour rester sous la limite de Pinterest (800 caractères)
   const court = `${P.nom} : motif de perles à repasser (${I.perles} perles, ${I.util.length} couleurs, ${I.taille}), à imprimer en taille réelle. Refais-le dans Perlinette, gratuit et sans compte : ${lien}`;
   if (lien && court.length + tags.length <= 790) return court + tags;
-  return `${P.nom} : un motif de perles à repasser de ${I.perles} perles et ${I.util.length} couleurs (${I.taille}). `
+  return `${P.nom}${(reglages.auteur || '').trim() ? ', créé par ' + reglages.auteur.trim() : ''} : un motif de perles à repasser de ${I.perles} perles et ${I.util.length} couleurs (${I.taille}). `
     + `Patron à imprimer en taille réelle (A4) avec le guide des couleurs. Fait avec Perlinette, gratuit et sans compte : ${LIEN_PERLINETTE}` + tags + ' #loisirscréatifs #artkal';
 }
 
@@ -227,7 +230,7 @@ const plaqueDeBase = (m) => (m.plaques || ['midi-carre-grand'])[0];
 // Le modèle de Perlinette que montre le motif en cours, s'il n'a pas été modifié (sinon null)
 function modeleDuMotif() {
   const m = MODELES.find((x) => !x.caractere && `${x.nom} (${x.theme})` === P.nom);
-  if (!m || P.format !== plaqueDeBase(m) || SURF.plaques.length !== 1) return null;
+  if (!m || P.format !== plaqueDeBase(m) || SURF.plaques.length !== ((m.assemblage && m.assemblage.cols) || 1) * ((m.assemblage && m.assemblage.rangs) || 1)) return null;
   let r; try { r = poserModele(m, P.format); } catch (e) { return null; }
   if (r.cases.length !== P.cases.length) return null;
   for (let i = 0; i < r.cases.length; i++) {
@@ -240,7 +243,7 @@ function modeleDuMotif() {
 async function epingleDeModele(m) {
   const gp = P, gs = SURF, fid = plaqueDeBase(m), r = poserModele(m, fid);
   try {
-    P = creerMotif(m.nom, fid, { cols: 1, rangs: 1 }, 'hama-midi'); P.cases = r.cases; P.couleurs = r.couleurs; SURF = r.surf;
+    P = creerMotif(m.nom, fid, m.assemblage || { cols: 1, rangs: 1 }, 'hama-midi'); P.cases = r.cases; P.couleurs = r.couleurs; SURF = r.surf;
     // 800 × 1200 en JPEG : net sur Pinterest, et léger (il y a plus de 500 modèles)
     const c = await epingleCanvas(), r2 = document.createElement('canvas'); r2.width = 800; r2.height = 1200;
     const g = r2.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(c, 0, 0, 800, 1200);
@@ -255,7 +258,7 @@ window.addEventListener('load', () => {
   if (!m) return;
   setTimeout(() => {
     const fid = plaqueDeBase(m), pose = poserModele(m, fid);
-    const motif = creerMotif(`${m.nom} (${m.theme})`, fid, {}, 'hama-midi');
+    const motif = creerMotif(`${m.nom} (${m.theme})`, fid, m.assemblage || {}, 'hama-midi');
     motif.cases = pose.cases; motif.couleurs = pose.couleurs;
     document.querySelectorAll('dialog[open]').forEach((d) => d.close());
     charger(motif); sauverMaintenant();

@@ -80,8 +80,13 @@ function ouvrirPartage() {
     ['partagerLien', '🔗', 'Lien du motif', 'Un lien qui rouvre ce motif dans Perlinette'],
     ['partagerMotif', '✉️', 'Envoyer le fichier du motif', 'Pour l’importer dans Perlinette ailleurs'],
   ];
-  dlg.innerHTML = `<form method="dialog"><h3>Imprimer et partager</h3><div class="partage-liste">${l.map(([a, i, t, d]) => `<button type="button" data-partage="${a}"><i>${i}</i><b>${t}</b><small>${d}</small></button>`).join('')}</div><menu><button value="fermer">Fermer</button></menu></form>`;
+  dlg.innerHTML = `<form method="dialog"><h3>Imprimer et partager</h3>
+    <label class="partage-auteur">Créé par <small>(facultatif : ton prénom, ton compte Instagram ou Pinterest…)</small>
+      <input id="ptAuteur" maxlength="40" placeholder="@mon.compte" autocomplete="nickname"></label><div class="partage-liste">${l.map(([a, i, t, d]) => `<button type="button" data-partage="${a}"><i>${i}</i><b>${t}</b><small>${d}</small></button>`).join('')}</div><menu><button value="fermer">Fermer</button></menu></form>`;
   document.body.appendChild(dlg);
+  const au = dlg.querySelector('#ptAuteur');
+  au.value = reglages.auteur || '';
+  au.onchange = au.oninput = () => { reglages.auteur = au.value.trim().slice(0, 40); ecrire(CLE.reglages, reglages); };
   dlg.querySelectorAll('[data-partage]').forEach((b) => (b.onclick = () => { dlg.close(); actions[b.dataset.partage](); }));
   dlg.addEventListener('close', () => dlg.remove());
   dlg.showModal();

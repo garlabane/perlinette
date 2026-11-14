@@ -47,7 +47,8 @@ const NUANCIER_GAMME = { Midi: 'hama-midi', Mini: 'hama-mini', Maxi: 'hama-maxi'
 // Pose un modèle sur une plaque : chaque picot reçoit la lettre (couleur) qui est dessous,
 // puis on ajoute le relief, puis on traduit les lettres en vraies couleurs Hama.
 function poserModele(m, formatId) {
-  const fmt = formatParId(formatId), surf = construireSurface(fmt, {});
+  // un modèle peut demander plusieurs plaques assemblées : assemblage = { cols, rangs }
+  const fmt = formatParId(formatId), surf = construireSurface(fmt, m.assemblage || {});
   const pal = paletteParId(NUANCIER_GAMME[fmt.gamme] || 'hama-midi'), palMidi = paletteParId('hama-midi');
   let lettres = surf.picots.map(() => null);
   // modèle adapté à la plaque (agrandi lissé ou dessin détaillé) — voir modeles-taille.js
@@ -146,8 +147,11 @@ function vignette(canvas, pose, taille) {
   });
 }
 
+// Avertissement affiché avec certains thèmes (dans l'application et sur les pages du site)
+const AVIS_THEMES = { Princesses: 'Fan art non officiel, pour un usage strictement privé : toute utilisation commerciale (vente des modèles, des patrons ou des créations en perles) est interdite.' };
+
 // Familles pour classer les modèles d'un thème, d'après leur nom (mots-clés) ; « Autres » sinon.
-const FAMILLES_MODELES = ['Personnages', 'Animaux', 'Sapins et décorations', 'Gourmandises', 'Cadeaux et jouets', 'Vêtements et accessoires', 'Maisons et paysages', 'Autres'];
+const FAMILLES_MODELES = ['Boules de Noël', 'Personnages', 'Animaux', 'Sapins et décorations', 'Gourmandises', 'Cadeaux et jouets', 'Vêtements et accessoires', 'Maisons et paysages', 'Autres'];
 const MOTS_FAMILLES = [
   ['Personnages', /(^|[^a-zà-ÿ])(p[eè]re no[eë]l|m[eè]re no[eë]l|lutin|ange|bonhomme|casse-noisette|soldat|princesse|f[ée]e|sorci[eè]re|fant[oô]me|elfe|pirate|robot|momie|vampire|zombie)(?![a-zà-ÿ])/i],
   ['Animaux', /(^|[^a-zà-ÿ])(renne|renard|ours|ourson|hibou|chouette|lapin|chat|chaton|chien|chiot|corgi|panda|pingouin|manchot|phoque|morse|cerf|biche|[ée]cureuil|mulot|souris|oiseau|oiseaux|cardinal|rouge-gorge|harfang|flamant|cygne|oie|canard|poussin|poule|mouton|agneau|cochon|vache|cheval|licorne|dragon|poisson|baleine|dauphin|tortue|grenouille|abeille|papillon|loup|h[ée]risson|koala|lion|tigre|girafe|[ée]l[ée]phant|singe|chauve-souris|araign[ée]e)s?(?![a-zà-ÿ])/i],
@@ -160,6 +164,8 @@ const MOTS_FAMILLES = [
 // la famille du PREMIER mot reconnu dans le nom : « Boule renne » est une décoration, « Renne en chaussettes » un animal,
 // « Botte du Père Noël » un vêtement
 function familleModele(m) {
+  // toutes les boules ensemble (« Boule renne », « Renard dans sa boule de verre »…), mais pas « Boule-chat » ni « Mouton-boule »
+  if (/(^|\s)boules?(\s|$)/i.test(m.nom)) return 'Boules de Noël';
   let best = 'Autres', pos = Infinity;
   for (const [f, re] of MOTS_FAMILLES) {
     const r = re.exec(m.nom);
@@ -231,6 +237,7 @@ function majModeles() {
   else if (tri === 'petit') choisis.sort((a, b) => taille(a.m) - taille(b.m) || alpha(a, b));
   else if (tri === 'nouveaux') choisis.sort((a, b) => b.i - a.i);
   else choisis.sort((a, b) => FAMILLES_MODELES.indexOf(familleModele(a.m)) - FAMILLES_MODELES.indexOf(familleModele(b.m)) || alpha(a, b));
+  if (AVIS_THEMES[theme]) { const p = document.createElement('p'); p.className = 'mod-avis'; p.textContent = '⚠ ' + AVIS_THEMES[theme]; liste.appendChild(p); }
   let familleEnCours = null;
   for (const { m } of choisis) {
     if (tri === 'familles') {
@@ -249,7 +256,7 @@ function majModeles() {
     carte.insertAdjacentHTML('beforeend', `<b>${echap(m.nom)}</b><small>${nb} perles · ${pose.couleurs.length} couleurs</small><small class="soudure ${soud.ok ? 'ok' : 'pb'}">${echap(texteSoudure(soud))}</small>`
       + (nAppr ? `<small class="approchee">≈ ${nAppr} couleur${nAppr > 1 ? 's' : ''} approchée${nAppr > 1 ? 's' : ''}</small>` : ''));
     carte.onclick = async () => {
-      const motif = creerMotif(`${m.nom} (${theme})`, plaque, {}, NUANCIER_GAMME[pose.fmt.gamme] || 'hama-midi');
+      const motif = creerMotif(`${m.nom} (${theme})`, plaque, m.assemblage || {}, NUANCIER_GAMME[pose.fmt.gamme] || 'hama-midi');
       motif.cases = pose.cases; motif.couleurs = pose.couleurs;
       if (m.caractere && typeof lettresDepuisModele === 'function') lettresDepuisModele(motif, m);
       charger(motif); sauverMaintenant();

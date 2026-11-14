@@ -61,7 +61,7 @@ function svgEntete(page, o, titre, sousTitre) {
   }
   return mini + logo.svg
     + `<text x="${mm(x)}" y="13" font-size="5.2" font-weight="700" fill="#222" font-family="Segoe UI, sans-serif">${echap(titre)}</text>`
-    + `<text x="${mm(x)}" y="19" font-size="3" fill="#666" font-family="Segoe UI, sans-serif">${echap(sousTitre)}</text>`
+    + `<text x="${mm(x)}" y="19" font-size="3" fill="#666" font-family="Segoe UI, sans-serif">${echap(sousTitre)}${(reglages.auteur || '').trim() ? ` · <tspan font-weight="700" fill="#6e2f5c">créé par ${echap(reglages.auteur.trim().slice(0, 40))}</tspan>` : ''}</text>`
     + `<line x1="${BORD}" y1="22.5" x2="${page.w - BORD}" y2="22.5" stroke="#e2d8cb" stroke-width="0.3"/>`;
 }
 function svgPied(page, num, total) {
@@ -246,6 +246,7 @@ function ouvrirImpression() {
         <select id="ipLegende"><option value="page">Sur chaque feuille</option><option value="fin">Tableau à la fin (avec le stock)</option><option value="non">Aucune</option></select>
         <details class="pli" id="ipPlus"><summary>Plus de réglages <small>(titre, taille des perles${SURF.plaques.length > 1 ? ', plusieurs plaques' : ''})</small></summary>
         <label>Titre sur les feuilles <input id="ipTitre"></label>
+        <label>Créé par <small>(facultatif : ton prénom ou ton compte)</small> <input id="ipAuteur" maxlength="40" placeholder="@mon.compte"></label>
         <h4>Taille des perles <small>(écart entre deux picots)</small></h4>
         <div class="impr-pas">
           <div class="segment" id="ipPasChoix"><button type="button" data-v="5">Midi<small> 5 mm</small></button><button type="button" data-v="2.5">Mini<small> 2,5</small></button><button type="button" data-v="10">Maxi<small> 10</small></button></div>
@@ -267,17 +268,17 @@ function ouvrirImpression() {
   document.body.appendChild(dlg);
   const $d = (s) => dlg.querySelector(s);
   $d('#ipPlus').open = !window.matchMedia('(max-width: 900px)').matches; // grand écran : tout est déplié, comme avant
-  $d('#ipTitre').value = o.titre; $d('#ipPas').value = o.pas;
+  $d('#ipTitre').value = o.titre; $d('#ipPas').value = o.pas; $d('#ipAuteur').value = reglages.auteur || '';
   $d('#ipCouleurs').checked = o.couleurs; $d('#ipSymboles').checked = o.symboles; $d('#ipPicots').checked = o.picots; $d('#ipRepasse').checked = o.repasse;
   $d('#ipLegende').value = o.legende; $d('#ipRegrouper').checked = o.regrouper; $d('#ipEnsemble').checked = o.ensemble;
   const multi = SURF.plaques.length > 1;
   $d('#ipMulti').hidden = !multi;
   let rendu = null;
-  const lireOptions = () => Object.assign(o, {
+  const lireOptions = () => (reglages.auteur = $d('#ipAuteur').value.trim().slice(0, 40), Object.assign(o, {
     titre: $d('#ipTitre').value.trim() || P.nom, pas: +$d('#ipPas').value || P.pas,
     couleurs: $d('#ipCouleurs').checked, symboles: $d('#ipSymboles').checked, picots: $d('#ipPicots').checked, repasse: $d('#ipRepasse').checked,
     legende: $d('#ipLegende').value, regrouper: $d('#ipRegrouper').checked, ensemble: $d('#ipEnsemble').checked,
-  });
+  }));
   const maj = () => {
     lireOptions();
     dlg.querySelectorAll('#ipPasChoix [data-v]').forEach((b) => b.classList.toggle('actif', +b.dataset.v === o.pas));

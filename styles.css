@@ -917,3 +917,5 @@ dialog.partage { width: min(440px, 94vw); }
 
 .mod-liste .mod-famille { grid-column: 1 / -1; margin: 14px 0 2px; color: var(--prune); font-size: 15px; border-bottom: 1px solid var(--bord); padding-bottom: 4px; }
 .mod-liste .mod-famille:first-child { margin-top: 0; }
+.partage-auteur { display: block; margin: 6px 0 2px; font-weight: 600; } .partage-auteur small { font-weight: normal; color: var(--doux); } .partage-auteur input { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; min-height: 40px; }
+.mod-liste .mod-avis { grid-column: 1 / -1; margin: 0 0 6px; background: #fdf0e6; border: 1px solid #e8b48c; color: #7a3a10; border-radius: 8px; padding: 8px 12px; font-weight: 600; font-size: 13px; }
