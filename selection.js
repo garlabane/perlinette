@@ -3,7 +3,8 @@
 // (dans le même motif ou dans un autre), la retourner, la supprimer.
 //  • sélectionner : cliquer un coin puis l'autre, ou glisser ;
 //  • Ctrl+C copier · Ctrl+X couper · Ctrl+V coller · Suppr effacer · Échap annuler ;
-//  • en collage, l'aperçu suit la souris : un clic pose la copie.
+//  • en collage, l'aperçu suit la souris : un clic pose la copie (doigt : on lève le doigt à l'endroit voulu) ;
+//  • ⟲ ⟳ ↔ ↕ tournent / retournent la zone sélectionnée (ou la copie) avant de la poser.
 // Le presse-papiers est gardé dans le navigateur : on peut coller dans un autre motif.
 
 const CLE_PP = 'perlesrep.pressepapier';
@@ -50,11 +51,27 @@ function commencerCollage() {
   message('Déplace la souris et clique pour poser la copie (Échap pour annuler).', 3500);
   majBarreSel(); toutMettreAJour();
 }
-function retournerPP(sens) {
-  const pp = presse(); if (!pp) return;
-  const W = Math.max(...pp.perles.map((p) => p.dx)), H = Math.max(...pp.perles.map((p) => p.dy));
-  pp.perles.forEach((p) => { if (sens === 'h') p.dx = W - p.dx; else p.dy = H - p.dy; });
-  ecrirePP(pp); toutMettreAJour();
+// Retourner / tourner la copie. S'il y a une zone sélectionnée, on la copie d'abord :
+// « sélectionner, ↻, cliquer où poser » suffit (l'original reste en place ; Couper pour le déplacer).
+function transformerPP(op) {
+  if (SEL.rect && !SEL.collage && !copier(false)) return;
+  let pp = presse();
+  if (!pp || !pp.perles.length) { message('Sélectionne d’abord une zone, ou copie-la.'); return; }
+  if ((op === 'd' || op === 'g') && !pp.perles.every((q) => Number.isInteger(q.dx) && Number.isInteger(q.dy))) {
+    message('La rotation marche sur les plaques carrées ; ici, utilise ↔ et ↕.', 3500); return;
+  }
+  pp = { perles: pp.perles.map((q) => ({ dx: q.dx, dy: q.dy, c: q.c })) };
+  const W = Math.max(...pp.perles.map((q) => q.dx)), H = Math.max(...pp.perles.map((q) => q.dy));
+  for (const q of pp.perles) {
+    const { dx, dy } = q;
+    if (op === 'h') q.dx = W - dx;
+    else if (op === 'v') q.dy = H - dy;
+    else if (op === 'd') { q.dx = H - dy; q.dy = dx; }
+    else if (op === 'g') { q.dx = dy; q.dy = W - dx; }
+  }
+  ecrirePP(pp);
+  if (!SEL.collage) commencerCollage();
+  else { if (SEL.dernier) SEL.cible = cibleCollage(SEL.dernier); toutMettreAJour(); }
 }
 // picots visés par le collage (ancre = le picot sous la souris)
 function cibleCollage(e) {
@@ -81,18 +98,25 @@ function poserCollage() {
     P.cases[i] = k;
   }
   const n = SEL.cible.length;
-  SEL.collage = false; SEL.cible = null; toile.classList.remove('attente');
+  SEL.collage = false; SEL.pose = false; SEL.cible = null; toile.classList.remove('attente');
   fini(); majBarreSel();
   message(`${n} perle${n > 1 ? 's' : ''} collée${n > 1 ? 's' : ''}. Ctrl+V pour coller encore.`);
 }
-function annulerSel() { SEL.rect = null; SEL.coin = null; SEL.collage = false; SEL.cible = null; SEL.glisse = false; toile.classList.remove('attente'); majBarreSel(); toutMettreAJour(); }
+function annulerSel() { SEL.rect = null; SEL.coin = null; SEL.collage = false; SEL.pose = false; SEL.cible = null; SEL.glisse = false; toile.classList.remove('attente'); majBarreSel(); toutMettreAJour(); }
 
 // --- évènements : interceptés avant ceux du dessin quand l'outil Sélection est actif ---
 const zone = document.getElementById('zone');
 zone.addEventListener('pointerdown', (e) => {
   if (S.outil !== 'selection' || e.target !== toile || e.button === 1) return;
   e.stopPropagation(); e.preventDefault();
-  if (SEL.collage) { SEL.cible = cibleCollage(e); poserCollage(); return; }
+  if (SEL.collage) {
+    SEL.dernier = { clientX: e.clientX, clientY: e.clientY };
+    SEL.cible = cibleCollage(e);
+    // doigt ou stylet : on voit l'aperçu sous le doigt, la copie se pose quand on le lève
+    if (e.pointerType && e.pointerType !== 'mouse') { SEL.pose = true; try { toile.setPointerCapture(e.pointerId); } catch (x) { /* ignoré */ } toutMettreAJour(); }
+    else poserCollage();
+    return;
+  }
   const p = pos(e);
   if (SEL.coin) { SEL.rect = rectDe(SEL.coin, p); SEL.coin = null; toile.classList.remove('attente'); majBarreSel(); toutMettreAJour(); return; }
   SEL.depart = p; SEL.glisse = true; SEL.rect = rectDe(p, p);
@@ -102,7 +126,11 @@ zone.addEventListener('pointerdown', (e) => {
 zone.addEventListener('pointermove', (e) => {
   if (S.outil !== 'selection' || e.target !== toile) return;
   e.stopPropagation();
-  if (SEL.collage) { SEL.cible = cibleCollage(e); toutMettreAJour(); return; }
+  if (SEL.collage) {
+    SEL.dernier = { clientX: e.clientX, clientY: e.clientY };
+    if (e.pointerType === 'mouse' || SEL.pose) { SEL.cible = cibleCollage(e); toutMettreAJour(); }
+    return;
+  }
   const p = pos(e);
   if (SEL.glisse) { SEL.rect = rectDe(SEL.depart, p); toutMettreAJour(); }
   else if (SEL.coin) { SEL.rect = rectDe(SEL.coin, p); toutMettreAJour(); }
@@ -110,6 +138,7 @@ zone.addEventListener('pointermove', (e) => {
 zone.addEventListener('pointerup', (e) => {
   if (S.outil !== 'selection' || e.target !== toile) return;
   e.stopPropagation();
+  if (SEL.pose) { SEL.pose = false; if (SEL.cible && SEL.cible.length) poserCollage(); else toutMettreAJour(); return; }
   if (!SEL.glisse) return;
   SEL.glisse = false;
   const p = pos(e);
@@ -167,8 +196,10 @@ barreSel.innerHTML = `
   <button type="button" data-sel="copier" title="Copier (Ctrl+C)">Copier</button>
   <button type="button" data-sel="couper" title="Couper (Ctrl+X)">Couper</button>
   <button type="button" data-sel="coller" title="Coller (Ctrl+V)">Coller</button>
-  <button type="button" data-sel="h" title="Retourner la copie gauche/droite">↔</button>
-  <button type="button" data-sel="v" title="Retourner la copie haut/bas">↕</button>
+  <button type="button" data-sel="g" title="Tourner d’un quart de tour vers la gauche">⟲</button>
+  <button type="button" data-sel="d" title="Tourner d’un quart de tour vers la droite">⟳</button>
+  <button type="button" data-sel="h" title="Miroir gauche/droite">↔</button>
+  <button type="button" data-sel="v" title="Miroir haut/bas">↕</button>
   <button type="button" data-sel="effacer" title="Effacer les perles sélectionnées (Suppr)">Effacer</button>
   <button type="button" data-sel="tout" title="Tout sélectionner (Ctrl+A)">Tout</button>`;
 document.body.appendChild(barreSel);
@@ -178,7 +209,7 @@ barreSel.addEventListener('click', (e) => {
   if (a === 'copier') copier(false);
   else if (a === 'couper') copier(true);
   else if (a === 'coller') commencerCollage();
-  else if (a === 'h' || a === 'v') retournerPP(a);
+  else if (a === 'h' || a === 'v' || a === 'g' || a === 'd') transformerPP(a);
   else if (a === 'effacer') effacerSel();
   else if (a === 'tout') { SEL.rect = { x0: 0, y0: 0, x1: SURF.larg, y1: SURF.haut }; majBarreSel(); toutMettreAJour(); }
 });
@@ -189,13 +220,12 @@ function majBarreSel() {
   barreSel.querySelector('[data-sel="couper"]').disabled = !aSel;
   barreSel.querySelector('[data-sel="effacer"]').disabled = !aSel;
   barreSel.querySelector('[data-sel="coller"]').disabled = !pp;
-  barreSel.querySelector('[data-sel="h"]').disabled = !pp;
-  barreSel.querySelector('[data-sel="v"]').disabled = !pp;
+  for (const t of ['h', 'v', 'g', 'd']) barreSel.querySelector(`[data-sel="${t}"]`).disabled = !pp && !aSel;
 }
 // changer d'outil : on range la sélection
 const choisirOutilSansSel = choisirOutil;
 choisirOutil = function (o) {
-  if (o !== 'selection') { SEL.rect = null; SEL.coin = null; SEL.collage = false; SEL.cible = null; toile.classList.remove('attente'); }
+  if (o !== 'selection') { SEL.rect = null; SEL.coin = null; SEL.collage = false; SEL.pose = false; SEL.cible = null; toile.classList.remove('attente'); }
   choisirOutilSansSel(o);
   majBarreSel();
   if (typeof majOptionsForme === 'function') majOptionsForme();

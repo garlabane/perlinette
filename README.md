@@ -10,7 +10,7 @@ Hama · Perler · Artkal — gratuit, en français, sans compte et sans installa
 <p align="center">
   <a href="https://garlabane.github.io/perlinette/app/"><b>Essayer en ligne</b></a> ·
   <a href="https://garlabane.github.io/perlinette/"><b>Présentation et tutoriels</b></a> ·
-  <a href="https://github.com/garlabane/perlinette/archive/refs/heads/main.zip"><b>Télécharger</b></a>
+  <a href="https://github.com/garlabane/perlinette/archive/refs/heads/main.zip"><b>Installer sur ordinateur</b></a>
 </p>
 
 <p align="center"><img src="docs/captures/editeur.jpg" alt="L'éditeur de Perlinette avec un mouton kawaii sur un grand carré" width="760"></p>

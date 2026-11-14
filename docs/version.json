@@ -1,10 +1,9 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.1",
   "date": "2026-11-14",
   "nouveautes": [
-    "PDF du patron à partager ou à enregistrer, depuis la fenêtre d'impression",
-    "Importer une image en noir et blanc, d'un seul toucher",
-    "Sur téléphone : plus rien ne cache la plaque, « Annuler » et « Tout voir » sont dans la barre du bas",
-    "Version en ligne plus rapide à charger"
+    "Sélection : quart de tour à gauche ou à droite et miroir, avec aperçu avant de poser",
+    "Sur téléphone et tablette, l'aperçu de la copie se voit sous le doigt et se pose quand on le lève",
+    "Liens directs vers l'application depuis la page d'accueil"
   ]
 }

@@ -5,7 +5,7 @@
 //    version plus récente existe, un bandeau discret le dit (rien n'est téléchargé tout seul) ;
 //  • sans Internet, rien ne se passe. Le bandeau se ferme, et ne revient pas pour la même version.
 
-const VERSION = '1.4.0';
+const VERSION = '1.4.1';
 const URL_VERSION = 'https://garlabane.github.io/perlinette/version.json';
 const URL_TELECHARGER = 'https://github.com/garlabane/perlinette/archive/refs/heads/main.zip';
 const CLE_MAJ = 'perlesrep.maj';
@@ -74,4 +74,15 @@ afficherVersion();
 // en ligne : Perlinette peut s'installer sur l'écran d'accueil et marcher sans Internet (voir sw.js)
 if (EN_LIGNE && 'serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
 if (EN_LIGNE) setTimeout(rappelEnLigne, 800);
+
+// Compteur de visites (GoatCounter : sans cookie, sans donnée personnelle), uniquement sur la version en ligne.
+// Renseigner le code du compteur ici pour l'activer ; vide = rien n'est envoyé.
+const COMPTEUR_CODE = '';
+if (COMPTEUR_CODE && /\.github\.io$/.test(location.hostname)) {
+  const sc = document.createElement('script');
+  sc.async = true;
+  sc.dataset.goatcounter = 'https://' + COMPTEUR_CODE + '.goatcounter.com/count';
+  sc.src = 'https://gc.zgo.at/count.js';
+  document.head.appendChild(sc);
+}
 else setTimeout(() => verifierMaj(), 1500);

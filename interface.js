@@ -54,7 +54,7 @@ function afficherAide() {
     'SÉLECTION (S)',
     '• Cliquer un coin puis l\'autre (ou glisser) pour choisir une zone.',
     '• Ctrl+C copier · Ctrl+X couper · Ctrl+V coller (l\'aperçu suit la souris, un clic pose) · Suppr effacer · Ctrl+A tout.',
-    '• ↔ ↕ retournent la copie avant de la coller. On peut coller dans un autre motif.',
+    '• Sélectionne une zone puis ⟲ ⟳ (quart de tour) ou ↔ ↕ (miroir) : l’aperçu tourné suit la souris, un clic pose. Au doigt : glisse, puis lève le doigt à l’endroit voulu. On peut coller dans un autre motif.',
     '',
     'ZOOM',
     '• Ctrl + molette (zoome là où est la souris), touches + et −, 0 = voir toute la plaque.',
