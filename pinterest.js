@@ -138,8 +138,12 @@ async function partagerPinterest() {
   const mod = EPINGLES_EN_LIGNE ? modeleDuMotif() : null;
   if (mod) {
     const s = slugModele(mod), e = encodeURIComponent;
-    const adresse = 'https://www.pinterest.com/pin/create/button/?url=' + e(SITE_PERLINETTE + 'app/?modele=' + s)
-      + '&media=' + e(SITE_PERLINETTE + 'epingles/' + s + '.jpg') + '&description=' + e(descriptionPin());
+    const I = infosMotif();
+    // le lien de l'épingle = la page du modèle sur le site : Pinterest y lit le titre et la description de l'épingle,
+    // et la page ouvre le modèle dans Perlinette
+    const adresse = 'https://www.pinterest.com/pin/create/button/?url=' + e(SITE_PERLINETTE + 'modeles/' + s + '/')
+      + '&media=' + e(SITE_PERLINETTE + 'epingles/' + s + '.jpg')
+      + '&description=' + e(`${mod.nom} en perles à repasser : ${I.perles} perles, ${I.util.length} couleurs. Modèle gratuit à imprimer en taille réelle avec Perlinette. #perlesàrepasser #hama #perler #fusebeads #pixelart #DIY`);
     window.open(adresse, '_blank', 'noopener');
     message('Pinterest s’ouvre : choisis ton tableau. Le lien vers Perlinette est déjà mis.', 6000);
     return;

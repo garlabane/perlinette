@@ -1,8 +1,8 @@
 {
-  "version": "1.10.0",
+  "version": "1.11.0",
   "date": "2026-11-14",
   "nouveautes": [
-    "Lien du motif : un lien qui contient tout le motif et le rouvre à l'identique dans Perlinette (bouton « Imprimer et partager »)",
-    "Pinterest : la description d'une création contient ce lien quand il tient dans la limite ; il sert aussi de lien de destination"
+    "Le site a maintenant une page par modèle et une galerie de tous les modèles (garlabane.github.io/perlinette/modeles/)",
+    "Pinterest : l'épingle d'un modèle pointe vers sa page, où Pinterest lit son titre et sa description"
   ]
 }
