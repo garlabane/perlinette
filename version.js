@@ -5,7 +5,7 @@
 //    version plus récente existe, un bandeau discret le dit (rien n'est téléchargé tout seul) ;
 //  • sans Internet, rien ne se passe. Le bandeau se ferme, et ne revient pas pour la même version.
 
-const VERSION = '1.4.1';
+const VERSION = '1.4.2';
 const URL_VERSION = 'https://garlabane.github.io/perlinette/version.json';
 const URL_TELECHARGER = 'https://github.com/garlabane/perlinette/archive/refs/heads/main.zip';
 const CLE_MAJ = 'perlesrep.maj';

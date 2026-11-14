@@ -1,9 +1,7 @@
 {
-  "version": "1.4.1",
+  "version": "1.4.2",
   "date": "2026-11-14",
   "nouveautes": [
-    "Sélection : quart de tour à gauche ou à droite et miroir, avec aperçu avant de poser",
-    "Sur téléphone et tablette, l'aperçu de la copie se voit sous le doigt et se pose quand on le lève",
-    "Liens directs vers l'application depuis la page d'accueil"
+    "Import d'image : les couleurs utilisées sont listées sous l'aperçu, on peut en retirer une et ses perles prennent la couleur la plus proche"
   ]
 }

@@ -690,3 +690,14 @@ dialog.pdf-pret menu { flex-wrap: wrap; }
 /* le petit mot « café », discret */
 .accueil-cafe { margin-top: 6px !important; text-align: right; font-size: 11px; opacity: .8; }
 .accueil-cafe a { color: var(--doux); }
+
+/* couleurs utilisées à l'import d'une image */
+.util-liste { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.puce-util { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 3px 10px 3px 6px; font-size: 13px; border: 1px solid var(--bord); border-radius: 999px; background: var(--panneau); cursor: pointer; }
+.puce-util i { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); flex: none; }
+.puce-util small { color: #6b5a64; }
+.puce-util span { color: #a0707f; font-weight: 700; }
+.puce-util:hover { border-color: var(--prune); }
+.puce-util.retiree { opacity: .65; text-decoration: line-through; }
+.util-retirees { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 4px; }
+#imgPliUtilisees { flex-basis: 100%; width: 100%; max-width: 100%; }

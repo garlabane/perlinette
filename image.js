@@ -45,6 +45,7 @@ function retenirRefs(r) { reglages.refsImage = { palettes: r.palettes, exclues: 
 
 function ouvrirImage() {
   const dlg = $('#dlgImage'), f = dlg.querySelector('form');
+  dlg._retirees = new Set(); // couleurs retirées pour cet import (remplacées automatiquement par les plus proches)
   // plaque : par défaut celle du motif
   remplirChoix(f.format, optionsFormats(), P.format);
   f.w.value = P.cfg.w || 29; f.h.value = P.cfg.h || 29;
@@ -112,7 +113,15 @@ function ouvrirImage() {
       }
       palette = gris;
     }
+    if (dlg._retirees.size) { const reste = palette.filter((x) => !dlg._retirees.has(cleCouleur(x))); if (reste.length) palette = reste; }
     calculerImage(f, palette);
+  };
+  $('#imgUtilisees').onclick = (e) => {
+    if (e.target.closest('.util-tout')) { dlg._retirees.clear(); relancer(); return; }
+    const b = e.target.closest('.puce-util'); if (!b) return;
+    const cle = b.dataset.cle;
+    if (dlg._retirees.has(cle)) dlg._retirees.delete(cle); else dlg._retirees.add(cle);
+    relancer();
   };
   // nettoyage facultatif : options retenues, version choisie au-dessus de l'aperçu
   const optN = Object.assign({}, NETTOYAGE_DEFAUT, reglages.nettoyage || {});
@@ -202,6 +211,7 @@ $('#fichierImage').onchange = (e) => {
   if (!fic) return;
   const img = new Image();
   img.onload = () => {
+    $('#dlgImage')._retirees = new Set();
     imageChargee = img; nomImage = fic.name.replace(/\.[^.]+$/, '').slice(0, 40);
     boiteImage = boiteContenu(img);
     cadreImage = { zoom: 1, dx: 0, dy: 0 };
@@ -214,6 +224,29 @@ $('#fichierImage').onchange = (e) => {
   img.src = URL.createObjectURL(fic);
 };
 
+const cleCouleur = (c) => `${c.marque || ''}|${c.code}|${c.hex}`;
+// Couleurs réellement utilisées par le motif, avec leur nombre de perles : un toucher en retire une,
+// ses perles prennent alors automatiquement la couleur la plus proche parmi les autres.
+function majUtilisees() {
+  const dlg = $('#dlgImage'), zone = $('#imgUtilisees'), retirees = dlg._retirees || new Set();
+  const res = resultatImage;
+  const util = [];
+  if (res) {
+    const nb = new Array(res.couleurs.length).fill(0);
+    for (const v of res.cases) if (v >= 0) nb[v]++;
+    res.couleurs.forEach((c, i) => util.push({ c, n: nb[i] }));
+    util.sort((a, b) => b.n - a.n);
+  }
+  $('#nbUtilisees').textContent = res ? `— ${util.length}` : '';
+  const puce = (c, n, retiree) => `<button type="button" class="puce-util${retiree ? ' retiree' : ''}" data-cle="${echap(cleCouleur(c))}" title="${retiree ? 'Remettre cette couleur' : 'Retirer cette couleur : ses perles prendront la couleur la plus proche'}"><i style="background:${echap(c.hex)}"></i><b>${echap(c.code)}</b> ${echap(c.nom || '')}${n === null ? '' : ` <small>${n}</small>`}<span aria-hidden="true">${retiree ? '↺' : '✕'}</span></button>`;
+  let html = util.map(({ c, n }) => puce(c, n, false)).join('');
+  if (retirees.size) {
+    const tous = [...retirees].map((k) => dlg._tous && dlg._tous.get(k)).filter(Boolean);
+    html += `<div class="util-retirees"><span class="note">Retirées :</span> ${tous.map((c) => puce(c, null, true)).join('')} <button type="button" class="util-tout">Tout remettre</button></div>`;
+  }
+  zone.innerHTML = res ? html : '<span class="note">Choisis une image pour voir les couleurs utilisées.</span>';
+  dlg._utilisees = util.map((u) => u.c);
+}
 function calculerImage(f, palette) {
   const info = $('#infoImage'), apercu = $('#apercuImage'), surf = surfaceImage.surf;
   const cm = (v) => (v * (GAMMES[surfaceImage.format.gamme]?.pas || 5) / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
@@ -223,6 +256,7 @@ function calculerImage(f, palette) {
   if (!imageChargee) { info.textContent = taille + '. Choisis une image pour voir le motif ici.'; return; }
   if (!palette.length) { info.textContent = 'Aucune référence autorisée : coche au moins une couleur.'; return; }
   const brut = convertirImage(imageChargee, surf, { ...cadreImage, boite: boiteUtile(f.rogner.checked), gris: reglages.teintesImage === 'gris' }, +f.max.value || 0, f.tramage.checked, f.transp.value === '1', palette);
+  { const d = $('#dlgImage'); d._tous = d._tous || new Map(); for (const c of palette) d._tous.set(cleCouleur(c), c); }
   const optN = Object.fromEntries(Object.keys(NETTOYAGE_DEFAUT).map((k) => [k, f['n_' + k].checked]));
   const net = nettoyerImage(surf, brut, optN);
   const versionNette = (reglages.versionImage || 'brute') === 'nette';
@@ -242,6 +276,7 @@ function calculerImage(f, palette) {
     g.fillStyle = v >= 0 ? resultatImage.couleurs[v].hex : '#ddd'; g.fill();
   });
   const nb = resultatImage.cases.filter((v) => v >= 0).length;
+  majUtilisees();
   // place réellement occupée par le dessin, en perles
   let gx = Infinity, gy = Infinity, dx = -Infinity, dy = -Infinity;
   surf.picots.forEach((q, i) => { if (resultatImage.cases[i] < 0) return; gx = Math.min(gx, q.x); dx = Math.max(dx, q.x); gy = Math.min(gy, q.y); dy = Math.max(dy, q.y); });
