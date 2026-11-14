@@ -229,8 +229,9 @@ async function ouvrirInstagram() {
     <p class="note">5 images au format Instagram (4:5) et le texte de la publication, prêts à publier.</p>
     <div class="insta-images"><p class="note">Préparation des images…</p></div>
     <label>Texte de la publication <textarea id="igTexte" rows="9"></textarea></label>
+    <p class="note">Sur téléphone : « Enregistrer dans mes photos » ouvre le partage, choisis <b>Enregistrer les images</b>. Ou appuie longtemps sur une image › <b>Enregistrer</b> / <b>Ajouter à Photos</b>. Ensuite, dans Instagram, choisis les 5 images dans ta galerie et colle le texte.</p>
     <p class="note">Sur Instagram, un lien n'est cliquable que dans ta bio : mets-y <b>garlabane.github.io/perlinette</b>.</p>
-    <menu><button value="fermer">Fermer</button><button type="button" id="igCopier">📋 Copier le texte</button><button type="button" id="igTelecharger">⬇️ Enregistrer les 5 images</button><button type="button" id="igEnvoyer" class="principal">📸 Envoyer à Instagram</button></menu></form>`;
+    <menu><button value="fermer">Fermer</button><button type="button" id="igCopier">📋 Copier le texte</button><button type="button" id="igPhotos" class="principal">🖼️ Enregistrer dans mes photos</button></menu></form>`;
   document.body.appendChild(dlg);
   dlg.addEventListener('close', () => dlg.remove());
   dlg.showModal();
@@ -243,20 +244,24 @@ async function ouvrirInstagram() {
     const blobs = await Promise.all(toiles.map((t) => new Promise((r) => t.toBlob(r, 'image/png'))));
     fichiers = blobs.map((b, k) => new File([b], `${base} - instagram ${k + 1}.png`, { type: 'image/png' }));
     $i('.insta-images').innerHTML = '';
-    for (const t of toiles) { const im = document.createElement('img'); im.src = t.toDataURL('image/jpeg', 0.7); im.alt = ''; $i('.insta-images').appendChild(im); }
+    // les vraies images (pleine taille) : un appui long les enregistre dans la galerie du téléphone
+    blobs.forEach((b, k) => { const im = document.createElement('img'); im.src = URL.createObjectURL(b); im.alt = `Image ${k + 1} du carrousel`; $i('.insta-images').appendChild(im); });
+    dlg.addEventListener('close', () => $i('.insta-images').querySelectorAll('img').forEach((im) => URL.revokeObjectURL(im.src)));
   } catch (e) { $i('.insta-images').innerHTML = `<p class="note">⚠ Images impossibles à créer : ${echap(e.message || String(e))}</p>`; return; }
   const copier = async () => { try { await navigator.clipboard.writeText($i('#igTexte').value); return true; } catch (e) { return false; } };
   $i('#igCopier').onclick = async () => message(await copier() ? 'Texte copié : colle-le dans la publication.' : 'Copie refusée : sélectionne le texte à la main.', 4000);
-  $i('#igTelecharger').onclick = async () => {
-    for (const f of fichiers) { telecharger(f.name, f); await new Promise((r) => setTimeout(r, 250)); }
-    await copier();
-    message('5 images enregistrées dans Téléchargements, texte copié.', 5000);
-  };
-  // sur téléphone : le menu de partage envoie les 5 images d'un coup (choisir Instagram) ; le texte est copié avant
-  $i('#igEnvoyer').onclick = async () => {
-    await copier();
-    if (await partagerFichiers(fichiers, ctx.nom)) { message('Texte copié : colle-le dans la publication Instagram.', 6000); return; }
-    $i('#igTelecharger').onclick();
+  // le partage est appelé tout de suite (sans rien attendre avant), sinon certains téléphones le refusent
+  $i('#igPhotos').onclick = () => {
+    const fichiersOk = navigator.canShare && navigator.canShare({ files: fichiers });
+    if (fichiersOk) {
+      navigator.share({ files: fichiers }).then(() => message('Images partagées. Pense à copier le texte.', 5000)).catch((e) => {
+        if (!e || e.name !== 'AbortError') message('Partage impossible : appuie longtemps sur chaque image pour l’enregistrer.', 6000);
+      });
+      return;
+    }
+    // ordinateur : les 5 images vont dans Téléchargements
+    fichiers.forEach((f, k) => setTimeout(() => telecharger(f.name, f), k * 250));
+    message('5 images enregistrées dans Téléchargements.', 5000);
   };
 }
 actions.instagram = ouvrirInstagram;
