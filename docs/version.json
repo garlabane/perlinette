@@ -1,7 +1,8 @@
 {
-  "version": "1.8.1",
+  "version": "1.9.0",
   "date": "2026-11-14",
   "nouveautes": [
-    "Pinterest, pour tes créations : l'adresse de Perlinette est aussi transmise au partage, pour servir de lien quand l'application l'accepte"
+    "Relire une épingle : enregistre une épingle Perlinette et ouvre-la avec « Importer une image », le motif est recréé à l'identique (plaque, perles, références)",
+    "L'épingle porte un petit carré de lecture dans son bandeau ; la vignette « repassé » ne cache plus aucune perle"
   ]
 }

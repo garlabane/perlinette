@@ -42,7 +42,8 @@ function pinPlaque(x, y, taille, F) {
   const k = taille / Math.max(F.larg, F.haut), ox = x + (taille - F.larg * k) / 2 - F.x * k, oy = y + (taille - F.haut * k) / 2 - F.y * k;
   const r2 = (v) => +v.toFixed(2);
   let s = '';
-  if (!F.plaque) s += `<rect x="${r2(x + (taille - F.larg * k) / 2)}" y="${r2(y + (taille - F.haut * k) / 2)}" width="${r2(F.larg * k)}" height="${r2(F.haut * k)}" rx="22" fill="#fffdf9" stroke="#cdbfae" stroke-width="3"/>`;
+  // le cadre déborde d'un demi-picot : son trait ne passe sur aucun picot du motif (il faut pouvoir relire l'épingle)
+  if (!F.plaque) s += `<rect x="${r2(x + (taille - F.larg * k) / 2 - k / 2)}" y="${r2(y + (taille - F.haut * k) / 2 - k / 2)}" width="${r2((F.larg + 1) * k)}" height="${r2((F.haut + 1) * k)}" rx="22" fill="#fffdf9" stroke="#cdbfae" stroke-width="3"/>`;
   for (const pl of F.plaque ? SURF.plaques : []) {
     const px = ox + pl.x * k, py = oy + pl.y * k, w = pl.larg * k, h = pl.haut * k, f = pl.contour.forme;
     const st = 'fill="#fffdf9" stroke="#cdbfae" stroke-width="3"';
@@ -55,7 +56,7 @@ function pinPlaque(x, y, taille, F) {
     const cx = r2(ox + q.x * k), cy = r2(oy + q.y * k), v = P.cases[i];
     if (v < 0) { s += `<circle cx="${cx}" cy="${cy}" r="${r2(k * 0.13)}" fill="#d9cdbd"/>`; return; }
     const c = P.couleurs[v];
-    s += `<circle cx="${cx}" cy="${cy}" r="${r2(k * 0.47)}" fill="${c.hex}" stroke="#0005" stroke-width="${r2(Math.max(1, k * 0.04))}"/><circle cx="${cx}" cy="${cy}" r="${r2(k * 0.17)}" fill="#fffdf9" fill-opacity="0.9" stroke="#0002" stroke-width="1"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${r2(k * 0.47)}" fill="${c.hex}" stroke="${perleTresClaire(c.hex) ? '#0009' : '#0005'}" stroke-width="${r2(Math.max(1, k * 0.04))}"/><circle cx="${cx}" cy="${cy}" r="${r2(k * 0.17)}" fill="#fffdf9" fill-opacity="0.9" stroke="#0002" stroke-width="1"/>`;
   });
   return s;
 }
@@ -70,21 +71,21 @@ function infosMotif() {
 }
 
 function epingleSvg() {
-  const I = infosMotif(), W = PIN.w, H = PIN.h, FEN = pinFenetre();
+  const I = infosMotif(), W = PIN.w, H = PIN.h, FEN = arrondirFenetre(pinFenetre());
   const titre = pinLignes((P.nom || 'Mon motif').trim(), 22);
   let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`
     + `<rect width="${W}" height="${H}" fill="${PIN.ivoire}"/>`
     + pinLogo(150, 56, 5.6, PIN.prune, 42)
     + `<text x="${W / 2}" y="196" font-size="30" font-weight="700" letter-spacing="3" fill="#a07c5b" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">MOTIF POUR PERLES À REPASSER</text>`
     + titre.map((l, i) => `<text x="${W / 2}" y="${262 + i * 70}" font-size="60" font-weight="700" fill="${PIN.encre}" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">${echap(l)}</text>`).join('');
-  const carte = 700, cy = 262 + (titre.length - 1) * 70 + 36;
+  const carte = carteEpingle(titre.length > 1), cy = hautCarteEpingle(titre.length > 1); // mêmes mesures que la relecture (epingle-lecture.js)
   s += `<rect x="${(W - carte) / 2}" y="${cy}" width="${carte}" height="${carte}" rx="40" fill="#f1e8dc"/>`
     + pinPlaque((W - carte) / 2 + 24, cy + 24, carte - 48, FEN);
   // le même motif une fois repassé, en vignette : on voit tout de suite le « avant / après »
-  const vt = 180, vx = 750, vy = cy + carte - vt + 84; // déborde de la plaque : ne cache pas le motif
+  const vt = 140, vx = 780, vy = cy + carte + 22; // sous la plaque : aucune perle n'est cachée (il faut pouvoir relire l'épingle)
   s += `<rect x="${vx - 12}" y="${vy - 12}" width="${vt + 24}" height="${vt + 56}" rx="22" fill="#fff" stroke="#cdbfae" stroke-width="3"/>`
     + svgRepasse(vx, vy, vt, FEN)
-    + `<text x="${vx + vt / 2}" y="${vy + vt + 30}" font-size="30" font-weight="700" fill="${PIN.prune}" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">repassé</text>`;
+    + `<text x="${vx + vt / 2}" y="${vy + vt + 28}" font-size="26" font-weight="700" fill="${PIN.prune}" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">repassé</text>`;
   // pastille « imprimable » : à taille réelle sur A4, avec le guide des couleurs (la fonction qui distingue Perlinette)
   const bw = 350, bx = W - 150 - bw, by = 44, // les coins du haut restent libres : Pinterest y pose ses boutons
      im = (x, y) => `<g transform="translate(${x} ${y}) scale(1.05)" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 14V3h20v11"/><rect x="2" y="14" width="36" height="18" rx="4"/><rect x="10" y="24" width="20" height="14" fill="${PIN.prune}"/><circle cx="32" cy="20" r="1.6" fill="#fff"/></g>`;
@@ -100,8 +101,12 @@ function epingleSvg() {
   const hb = 250, yb = H - hb;
   s += `<rect y="${yb}" width="${W}" height="${hb}" fill="${PIN.prune}"/>`
     + pinLogo(60, yb + 34, 8, '#fff', 92)
-    + `<text x="64" y="${yb + 172}" font-size="38" fill="${PIN.champagne}" font-family="Segoe UI, Inter, system-ui, sans-serif">Crée le tien : gratuit, sans compte</text>`
-    + `<text x="64" y="${yb + 222}" font-size="38" fill="#fff" font-weight="700" font-family="Segoe UI, Inter, system-ui, sans-serif">garlabane.github.io/perlinette</text>`;
+    + `<text x="64" y="${yb + 172}" font-size="33" fill="${PIN.champagne}" font-family="Segoe UI, Inter, system-ui, sans-serif">Crée le tien : gratuit, sans compte</text>`
+    + `<text x="64" y="${yb + 218}" font-size="33" fill="#fff" font-weight="700" font-family="Segoe UI, Inter, system-ui, sans-serif">garlabane.github.io/perlinette</text>`;
+  // le petit carré qui permet de relire l'épingle : « Importer une image » dans Perlinette recrée le motif
+  const code = codeEpingle(FEN, titre.length > 1);
+  if (code) s += svgCodeEpingle(code, yb, PIN.champagne, PIN.prune)
+    + `<text x="${CODE_PIN.x + CODE_PIN.cols * CODE_PIN.c / 2}" y="${yb + 240}" font-size="17" fill="${PIN.champagne}" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">à importer dans Perlinette</text>`;
   return s + '</svg>';
 }
 

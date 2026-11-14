@@ -272,6 +272,10 @@ $('#fichierImage').onchange = (e) => {
   if (!fic) return;
   const img = new Image();
   img.onload = () => {
+    // une épingle Perlinette ? on recrée le motif tel quel, sans passer par la conversion d'image
+    let lue = null;
+    try { lue = typeof lireEpingle === 'function' ? lireEpingle(img) : null; } catch (err) { lue = null; }
+    if (lue) { $('#dlgImage').close(); ouvrirEpingleLue(lue, fic.name.replace(/\.[^.]+$/, '').replace(/-pinterest$/, '').slice(0, 40)); e.target.value = ''; return; }
     $('#dlgImage')._retirees = new Set();
     imageChargee = img; nomImage = fic.name.replace(/\.[^.]+$/, '').slice(0, 40);
     boiteImage = boiteContenu(img);
