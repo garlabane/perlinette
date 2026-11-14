@@ -77,7 +77,8 @@ function ouvrirPartage() {
     ['partagerImage', '🖼️', 'Image du motif', 'Par message, mail… ou l’enregistrer'],
     ['courses', '🛒', 'Liste de courses', 'Sachets à acheter et prix'],
     ['partagerListe', '📋', 'Liste des perles', 'Le nombre de perles par couleur'],
-    ['partagerMotif', '✉️', 'Envoyer le motif', 'Pour l’ouvrir dans Perlinette ailleurs'],
+    ['partagerLien', '🔗', 'Lien du motif', 'Un lien qui rouvre ce motif dans Perlinette'],
+    ['partagerMotif', '✉️', 'Envoyer le fichier du motif', 'Pour l’importer dans Perlinette ailleurs'],
   ];
   dlg.innerHTML = `<form method="dialog"><h3>Imprimer et partager</h3><div class="partage-liste">${l.map(([a, i, t, d]) => `<button type="button" data-partage="${a}"><i>${i}</i><b>${t}</b><small>${d}</small></button>`).join('')}</div><menu><button value="fermer">Fermer</button></menu></form>`;
   document.body.appendChild(dlg);

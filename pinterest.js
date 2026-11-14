@@ -121,10 +121,14 @@ async function epingleCanvas() {
 }
 async function epinglePng() { const c = await epingleCanvas(); return new Promise((r) => c.toBlob(r, 'image/png')); }
 
-function descriptionPin() {
-  const I = infosMotif();
+// lien = l'adresse qui contient tout le motif (lien-motif.js) ; on l'ajoute si la description reste sous la limite de Pinterest
+function descriptionPin(lien) {
+  const I = infosMotif(), tags = '\n#perlesàrepasser #hama #perler #fusebeads #pixelart #DIY';
+  // avec le lien du motif : texte court, pour rester sous la limite de Pinterest (800 caractères)
+  const court = `${P.nom} : motif de perles à repasser (${I.perles} perles, ${I.util.length} couleurs, ${I.taille}), à imprimer en taille réelle. Refais-le dans Perlinette, gratuit et sans compte : ${lien}`;
+  if (lien && court.length + tags.length <= 790) return court + tags;
   return `${P.nom} : un motif de perles à repasser de ${I.perles} perles et ${I.util.length} couleurs (${I.taille}). `
-    + `Patron à imprimer en taille réelle (A4) avec le guide des couleurs. Fait avec Perlinette, gratuit et sans compte : ${LIEN_PERLINETTE}\n#perlesàrepasser #hama #perler #artkal #fusebeads #pixelart #DIY #loisirscréatifs`;
+    + `Patron à imprimer en taille réelle (A4) avec le guide des couleurs. Fait avec Perlinette, gratuit et sans compte : ${LIEN_PERLINETTE}` + tags + ' #loisirscréatifs #artkal';
 }
 
 async function partagerPinterest() {
@@ -140,6 +144,8 @@ async function partagerPinterest() {
     message('Pinterest s’ouvre : choisis ton tableau. Le lien vers Perlinette est déjà mis.', 6000);
     return;
   }
+  let lienM = null;
+  try { lienM = await lienDuMotif(); } catch (e) { lienM = null; }
   let blob;
   try { blob = await epinglePng(); } catch (e) { blob = null; }
   if (!blob) { avertir('Impossible de créer l’image pour Pinterest.'); return; }
@@ -147,10 +153,10 @@ async function partagerPinterest() {
   // Téléphone : un seul geste. Le menu de partage de l'appareil s'ouvre avec l'image, son titre, sa description et le lien ;
   // on choisit Pinterest, puis son tableau. La description est aussi copiée, au cas où l'app ne la reprendrait pas.
   if (window.matchMedia('(pointer: coarse)').matches && navigator.canShare && navigator.canShare({ files: [fichier] })) {
-    const texte = descriptionPin();
+    const texte = descriptionPin(lienM);
     try { await navigator.clipboard.writeText(texte); } catch (e) { /* presse-papiers refusé : tant pis */ }
     // on donne aussi l'adresse du site à part : certaines applications (dont Pinterest) s'en servent comme lien de l'épingle
-    const avecLien = { files: [fichier], title: P.nom, text: texte, url: LIEN_PERLINETTE };
+    const avecLien = { files: [fichier], title: P.nom, text: texte, url: lienM || LIEN_PERLINETTE };
     const complet = navigator.canShare(avecLien) ? avecLien : { files: [fichier], title: P.nom, text: texte };
     try {
       await navigator.share(navigator.canShare(complet) ? complet : { files: [fichier], title: P.nom });
@@ -177,7 +183,7 @@ async function partagerPinterest() {
         <ol class="note pin-etapes">
           <li>Enregistre ou partage l’image (sur téléphone, choisis l’app Pinterest).</li>
           <li>Sur Pinterest, crée une épingle avec cette image, colle la description.</li>
-          <li>Dans « Lien de destination », mets : <b>${LIEN_PERLINETTE}</b></li>
+          <li>Dans « Lien de destination », colle le lien du motif (bouton « Copier le lien ») : il rouvre ce motif dans Perlinette.</li>
         </ol>
         <div class="ligne-boutons"><button type="button" id="pinOuvrir">Ouvrir Pinterest</button> <button type="button" id="pinLien">Copier le lien</button></div>
       </div>
@@ -185,10 +191,10 @@ async function partagerPinterest() {
     <menu><button value="fermer">Fermer</button></menu>
   </form>`;
   document.body.appendChild(dlg);
-  const zone = dlg.querySelector('#pinDescription'); zone.value = descriptionPin();
+  const zone = dlg.querySelector('#pinDescription'); zone.value = descriptionPin(lienM);
   const copier = async (t, ok) => { try { await navigator.clipboard.writeText(t); message(ok); } catch (e) { zone.focus(); zone.select(); message('Copie impossible : le texte est sélectionné, fais Ctrl+C.'); } };
   dlg.querySelector('#pinCopier').onclick = () => copier(zone.value, 'Description copiée.');
-  dlg.querySelector('#pinLien').onclick = () => copier(LIEN_PERLINETTE, 'Lien copié.');
+  dlg.querySelector('#pinLien').onclick = () => copier(lienM || LIEN_PERLINETTE, 'Lien copié.');
   dlg.querySelector('#pinImage').onclick = async () => {
     if (await partagerFichiers([fichier], P.nom)) return;
     telecharger(fichier.name, blob);

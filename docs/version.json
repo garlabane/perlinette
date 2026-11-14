@@ -1,8 +1,8 @@
 {
-  "version": "1.9.0",
+  "version": "1.10.0",
   "date": "2026-11-14",
   "nouveautes": [
-    "Relire une épingle : enregistre une épingle Perlinette et ouvre-la avec « Importer une image », le motif est recréé à l'identique (plaque, perles, références)",
-    "L'épingle porte un petit carré de lecture dans son bandeau ; la vignette « repassé » ne cache plus aucune perle"
+    "Lien du motif : un lien qui contient tout le motif et le rouvre à l'identique dans Perlinette (bouton « Imprimer et partager »)",
+    "Pinterest : la description d'une création contient ce lien quand il tient dans la limite ; il sert aussi de lien de destination"
   ]
 }
