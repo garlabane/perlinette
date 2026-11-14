@@ -1,7 +1,7 @@
 {
-  "version": "1.4.3",
+  "version": "1.4.4",
   "date": "2026-11-14",
   "nouveautes": [
-    "Import d'image : choix « Baril Hama Midi (22 couleurs) » avec ses références cochées, pour un motif plus fidèle dès le départ ; on peut cocher d'autres couleurs en plus"
+    "Import d'image : 22 couleurs par défaut au lieu de 12, pour un motif plus fidèle"
   ]
 }
