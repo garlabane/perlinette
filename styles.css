@@ -759,3 +759,13 @@ body.enfant .btn-repasser { display: flex !important; background: #fff4d6; borde
 #dlgImage.ajout .plaque-choix, #dlg-phrase-ajout .plaque-choix { display: none; }
 dialog.phrase.ajout .phrase-nouveau { display: none; }
 dialog.phrase:not(.ajout) .seulement-ajout { display: none; }
+
+/* partage sur Pinterest */
+dialog.pinterest { width: min(860px, 94vw); max-height: 92dvh; overflow-x: hidden; overflow-y: auto; }
+.pin-etapes b { word-break: break-all; }
+.pin-grille { display: grid; grid-template-columns: minmax(180px, 280px) 1fr; gap: 18px; align-items: start; }
+.pin-apercu { width: 100%; border-radius: 10px; border: 1px solid var(--bord); box-shadow: 0 4px 14px #0002; }
+.pin-texte textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; text-transform: none; letter-spacing: normal; }
+.pin-texte label { text-transform: none; letter-spacing: normal; }
+.pin-etapes { padding-left: 18px; margin: 8px 0; }
+@media (max-width: 640px) { .pin-grille { grid-template-columns: 1fr; } .pin-apercu { max-width: 260px; margin: 0 auto; } }

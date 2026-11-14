@@ -30,9 +30,11 @@ function svgLogo(o, x, y) {
   };
 }
 // miniature du motif entier « repassé à fond » (même rendu que l'aperçu Complète), dans un carré de côté `taille`
-function svgRepasse(x, y, taille) {
-  const d = DEGRES_FUSION[3], k = taille / Math.max(SURF.larg, SURF.haut);
-  const ox = x + (taille - SURF.larg * k) / 2, oy = y + (taille - SURF.haut * k) / 2;
+function svgRepasse(x, y, taille, fen) {
+  // fen (facultatif) : ne montrer qu'une fenêtre { x, y, larg, haut } de la plaque (en pas)
+  const F = fen || { x: 0, y: 0, larg: SURF.larg, haut: SURF.haut };
+  const d = DEGRES_FUSION[3], k = taille / Math.max(F.larg, F.haut);
+  const ox = x + (taille - F.larg * k) / 2 - F.x * k, oy = y + (taille - F.haut * k) / 2 - F.y * k;
   const posee = (i) => P.cases[i] >= 0 && P.couleurs[P.cases[i]], hex = (i) => P.couleurs[P.cases[i]].hex;
   const px = (i) => mm(ox + SURF.picots[i].x * k), py = (i) => mm(oy + SURF.picots[i].y * k);
   let s = `<g stroke-linecap="butt" stroke-width="${mm(d.pont * k)}">`;

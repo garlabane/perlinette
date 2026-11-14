@@ -1,9 +1,7 @@
 {
-  "version": "1.6.0",
+  "version": "1.7.0",
   "date": "2026-11-14",
   "nouveautes": [
-    "Plaques hexagonales : elles s'assemblent en nid d'abeille, sans trou, et l'import d'image marche dessus",
-    "« + Image sur ce motif » : ajoute une image sur le motif en cours ; elle se tient par son milieu, tu la poses où tu veux",
-    "« + Texte sur ce motif » : nouvel alphabet dessiné pour la grille de la plaque (carrée, hexagonale ou ronde), en 3 tailles, avec ou sans contour"
+    "Partager sur Pinterest : une épingle au format 2:3 qui montre ton motif sur sa plaque (picots et perles), une vignette « repassé », un badge « Imprimable A4 taille réelle + guide » et la marque Perlinette en pied, plus une description prête à coller avec le lien"
   ]
 }
