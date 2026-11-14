@@ -5,7 +5,7 @@
 //    version plus récente existe, un bandeau discret le dit (rien n'est téléchargé tout seul) ;
 //  • sans Internet, rien ne se passe. Le bandeau se ferme, et ne revient pas pour la même version.
 
-const VERSION = '1.7.0';
+const VERSION = '1.7.1';
 const URL_VERSION = 'https://garlabane.github.io/perlinette/version.json';
 const URL_TELECHARGER = 'https://github.com/garlabane/perlinette/archive/refs/heads/main.zip';
 const CLE_MAJ = 'perlesrep.maj';
@@ -86,3 +86,9 @@ if (COMPTEUR_CODE && /\.github\.io$/.test(location.hostname)) {
   document.head.appendChild(sc);
 }
 else setTimeout(() => verifierMaj(), 1500);
+
+// Outils personnels : le dossier « modeles-perso » n'est pas publié. S'il existe (version sur l'ordinateur),
+// ses outils se chargent une fois l'application prête ; en ligne, il n'y a rien à charger.
+if (!EN_LIGNE) window.addEventListener('load', () => {
+  const s = document.createElement('script'); s.src = 'modeles-perso/outils.js'; s.onerror = () => s.remove(); document.head.appendChild(s);
+});

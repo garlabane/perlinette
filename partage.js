@@ -67,6 +67,25 @@ async function partagerListe() {
   avertir((copie ? 'Liste copiée : tu peux la coller dans un message ou une note.\n\n' : '') + liste.texte);
 }
 
+// Tout ce qui se partage, au même endroit, en gros boutons (pratique au doigt)
+function ouvrirPartage() {
+  const dlg = document.createElement('dialog');
+  dlg.className = 'partage';
+  const l = [
+    ['pinterest', '📌', 'Pinterest', 'Une épingle prête à publier'],
+    ['partagerImage', '🖼️', 'Image du motif', 'Par message, mail… ou l’enregistrer'],
+    ['imprimer', '📄', 'Patron en PDF', 'Taille réelle, avec la légende'],
+    ['courses', '🛒', 'Liste de courses', 'Sachets à acheter et prix'],
+    ['partagerListe', '📋', 'Liste des perles', 'Le nombre de perles par couleur'],
+    ['partagerMotif', '✉️', 'Envoyer le motif', 'Pour l’ouvrir dans Perlinette ailleurs'],
+  ];
+  dlg.innerHTML = `<form method="dialog"><h3>Partager</h3><div class="partage-liste">${l.map(([a, i, t, d]) => `<button type="button" data-partage="${a}"><i>${i}</i><b>${t}</b><small>${d}</small></button>`).join('')}</div><menu><button value="fermer">Fermer</button></menu></form>`;
+  document.body.appendChild(dlg);
+  dlg.querySelectorAll('[data-partage]').forEach((b) => (b.onclick = () => { dlg.close(); actions[b.dataset.partage](); }));
+  dlg.addEventListener('close', () => dlg.remove());
+  dlg.showModal();
+}
+actions.partager = ouvrirPartage;
 actions.partagerImage = partagerImage;
 actions.partagerListe = partagerListe;
 actions.partagerMotif = partagerMotif;

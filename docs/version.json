@@ -1,7 +1,8 @@
 {
-  "version": "1.7.0",
+  "version": "1.7.1",
   "date": "2026-11-14",
   "nouveautes": [
-    "Partager sur Pinterest : une épingle au format 2:3 qui montre ton motif sur sa plaque (picots et perles), une vignette « repassé », un badge « Imprimable A4 taille réelle + guide » et la marque Perlinette en pied, plus une description prête à coller avec le lien"
+    "Nouveau bouton « Partager » en haut : Pinterest, image, PDF, liste de courses, liste des perles, envoi du motif, en gros boutons",
+    "Menu ☰ sur téléphone et tablette : trois groupes (Fichier, Créer, Mon motif), tout visible sans déplier"
   ]
 }
