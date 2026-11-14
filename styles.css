@@ -919,3 +919,8 @@ dialog.partage { width: min(440px, 94vw); }
 .mod-liste .mod-famille:first-child { margin-top: 0; }
 .partage-auteur { display: block; margin: 6px 0 2px; font-weight: 600; } .partage-auteur small { font-weight: normal; color: var(--doux); } .partage-auteur input { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; min-height: 40px; }
 .mod-liste .mod-avis { grid-column: 1 / -1; margin: 0 0 6px; background: #fdf0e6; border: 1px solid #e8b48c; color: #7a3a10; border-radius: 8px; padding: 8px 12px; font-weight: 600; font-size: 13px; }
+dialog.insta { width: min(760px, 96vw); }
+.insta-images { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 10px; scroll-snap-type: x mandatory; }
+.insta-images img { height: 230px; width: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.15); scroll-snap-align: start; }
+dialog.insta textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px; text-transform: none; }
+dialog.insta menu { flex-wrap: wrap; }

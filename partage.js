@@ -73,6 +73,7 @@ function ouvrirPartage() {
   dlg.className = 'partage';
   const l = [
     ['imprimer', '🖨️', 'Imprimer ou PDF', 'Le patron à taille réelle, avec la légende'],
+    ['instagram', '📸', 'Instagram', 'Un carrousel de 5 images et son texte'],
     ['pinterest', '📌', 'Pinterest', 'Une épingle prête à publier'],
     ['partagerImage', '🖼️', 'Image du motif', 'Par message, mail… ou l’enregistrer'],
     ['courses', '🛒', 'Liste de courses', 'Sachets à acheter et prix'],
