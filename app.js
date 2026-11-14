@@ -380,6 +380,8 @@ const actions = {
   exporter: exporterFichier,
   importerFichier: () => $('#fichierProjet').click(),
   image: () => ouvrirImage(),
+  imageAjout: () => ouvrirImage(true),
+  motAjout: () => ecrirePhrase(true),
   png: exporterPng,
   rendu: () => ouvrirRendu(),
   imprimer: () => ouvrirImpression(),

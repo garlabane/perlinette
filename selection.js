@@ -60,7 +60,7 @@ function transformerPP(op) {
   if ((op === 'd' || op === 'g') && !pp.perles.every((q) => Number.isInteger(q.dx) && Number.isInteger(q.dy))) {
     message('La rotation marche sur les plaques carrées ; ici, utilise ↔ et ↕.', 3500); return;
   }
-  pp = { perles: pp.perles.map((q) => ({ dx: q.dx, dy: q.dy, c: q.c })) };
+  pp = { perles: pp.perles.map((q) => ({ dx: q.dx, dy: q.dy, c: q.c })), centre: pp.centre };
   const W = Math.max(...pp.perles.map((q) => q.dx)), H = Math.max(...pp.perles.map((q) => q.dy));
   for (const q of pp.perles) {
     const { dx, dy } = q;
@@ -76,16 +76,38 @@ function transformerPP(op) {
 // picots visés par le collage (ancre = le picot sous la souris)
 function cibleCollage(e) {
   const pp = presse(); if (!pp) return null;
-  const p = pos(e), a = picotProche(SURF, p.x, p.y, 0.8);
+  const p = pos(e), a = picotProche(SURF, p.x, p.y, pp.centre ? 1.5 : 0.8);
   if (a < 0) return null;
-  const ax = SURF.picots[a].x, ay = SURF.picots[a].y, res = [];
   if (!SEL.seau || SEL.seauDe !== SURF) {
     SEL.seau = new Map(); SEL.seauDe = SURF;
     SURF.picots.forEach((q, i) => SEL.seau.set(Math.round(q.x * 2) + ',' + Math.round(q.y * 2), i));
   }
-  for (const pe of pp.perles) {
-    const i = SEL.seau.get(Math.round((ax + pe.dx) * 2) + ',' + Math.round((ay + pe.dy) * 2));
-    if (i !== undefined) res.push([i, pe.c]);
+  // rangées décalées (plaque hexagonale…) : les pas verticaux valent √3/2 au lieu de 1
+  const decale = pp.perles.some((q) => !Number.isInteger(q.dy)), pasY = decale ? Math.sqrt(3) / 2 : 1;
+  let ax = SURF.picots[a].x, ay = SURF.picots[a].y;
+  // une image ou un texte ajouté se tient par son milieu (la souris est au centre), une copie par son coin
+  if (pp.centre) {
+    if (!pp.larg) { pp.larg = Math.max(...pp.perles.map((q) => q.dx)); pp.haut = Math.max(...pp.perles.map((q) => q.dy)); }
+    // le coin haut-gauche est souvent hors de la plaque (coins d'un hexagone) : on le calcule sur la grille virtuelle,
+    // dont les rangées sont décalées d'un demi-picot une sur deux
+    const kRangs = Math.round(pp.haut / 2 / pasY);
+    ax -= Math.round(pp.larg / 2) - (decale && kRangs % 2 ? 0.5 : 0);
+    ay -= kRangs * pasY;
+  }
+  const poser = (x, y) => {
+    const r = [];
+    for (const pe of pp.perles) {
+      const i = SEL.seau.get(Math.round((x + pe.dx) * 2) + ',' + Math.round((y + pe.dy) * 2));
+      if (i !== undefined) r.push([i, pe.c]);
+    }
+    return r;
+  };
+  // la copie ne tombe sur des picots que si l'ancre est sur une rangée de même parité : on essaie l'ancre et ses voisines
+  let res = poser(ax, ay);
+  if (res.length < pp.perles.length) {
+    for (const [dx, dy] of decale ? [[1, 0], [-1, 0], [0.5, pasY], [-0.5, pasY], [0.5, -pasY], [-0.5, -pasY]] : [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const r = poser(ax + dx, ay + dy); if (r.length > res.length) res = r;
+    }
   }
   return res;
 }
@@ -97,10 +119,10 @@ function poserCollage() {
     if (k < 0) { P.couleurs.push({ ...c, marque: c.marque || (typeof marqueDe === 'function' ? marqueDe(c) : '') }); k = P.couleurs.length - 1; }
     P.cases[i] = k;
   }
-  const n = SEL.cible.length;
+  const n = SEL.cible.length, perdues = (presse()?.perles.length || n) - n;
   SEL.collage = false; SEL.pose = false; SEL.cible = null; toile.classList.remove('attente');
   fini(); majBarreSel();
-  message(`${n} perle${n > 1 ? 's' : ''} collée${n > 1 ? 's' : ''}. Ctrl+V pour coller encore.`);
+  message(`${n} perle${n > 1 ? 's' : ''} collée${n > 1 ? 's' : ''}.` + (perdues > 0 ? ` ${perdues} dépassai${perdues > 1 ? 'ent' : 't'} de la plaque : Annuler, puis recolle plus à gauche ou plus haut.` : ' Ctrl+V pour coller encore.'), perdues > 0 ? 7000 : undefined);
 }
 function annulerSel() { SEL.rect = null; SEL.coin = null; SEL.collage = false; SEL.pose = false; SEL.cible = null; SEL.glisse = false; toile.classList.remove('attente'); majBarreSel(); toutMettreAJour(); }
 

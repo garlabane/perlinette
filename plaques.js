@@ -84,12 +84,25 @@ function construireSurface(f, cfg) {
   const base = picotsFormat(f, cfg.w || f.w, cfg.h || f.h);
   const cols = Math.max(1, cfg.cols || 1), rangs = Math.max(1, cfg.rangs || 1);
   const picots = [], plaques = [];
+  // Les hexagones s'assemblent en nid d'abeille, sans trou : chaque plaque se pose contre sa voisine,
+  // et les picots restent sur la même grille régulière d'une plaque à l'autre.
+  const k = (f.cote || 1) - 1, hexa = f.type === 'hexa';
+  const vers = { x: k * 1.5 + 1, y: k * RAC3 }, vers2 = { x: k * 1.5 + 0.5, y: -(k + 1) * RAC3 }, bas = { x: 0.5, y: (2 * k + 1) * RAC3 };
+  const pos = [];
   for (let br = 0; br < rangs; br++) for (let bc = 0; bc < cols; bc++) {
-    const b = plaques.length, ox = bc * base.larg, oy = br * base.haut;
+    if (!hexa) { pos.push({ x: bc * base.larg, y: br * base.haut }); continue; }
+    const paires = Math.floor(bc / 2), impair = bc % 2;
+    pos.push({ x: paires * (vers.x + vers2.x) + impair * vers.x + br * bas.x, y: paires * (vers.y + vers2.y) + impair * vers.y + br * bas.y });
+  }
+  const dx = hexa ? -Math.min(...pos.map((p) => p.x)) : 0, dy = hexa ? -Math.min(...pos.map((p) => p.y)) : 0;
+  let larg = 0, haut = 0;
+  for (let br = 0; br < rangs; br++) for (let bc = 0; bc < cols; bc++) {
+    const b = plaques.length, ox = pos[b].x + dx, oy = pos[b].y + dy;
     plaques.push({ x: ox, y: oy, larg: base.larg, haut: base.haut, contour: base.contour, etiquette: String.fromCharCode(65 + br) + (bc + 1) });
     for (const q of base.picots) picots.push({ x: q.x + ox, y: q.y + oy, b });
+    larg = Math.max(larg, ox + base.larg); haut = Math.max(haut, oy + base.haut);
   }
-  return { picots, plaques, larg: cols * base.larg, haut: rangs * base.haut, voisins: voisinsDe(picots) };
+  return { picots, plaques, larg, haut, voisins: voisinsDe(picots) };
 }
 
 // Voisins (distance ≤ 1,15 pas) — sert au remplissage et au tramage.

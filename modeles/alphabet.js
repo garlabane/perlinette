@@ -292,19 +292,43 @@ function construirePhrase(r) {
 }
 
 // Fenêtre « Écrire une phrase » : choix par pastilles et aperçu en direct.
-function ecrirePhrase() {
-  const etat = { texte: '', mode: 'separees', couleur: 'jeu:arc', contour: 'H18' };
+// ajout = true : le texte n'ouvre pas de nouveau motif, il se pose sur celui en cours, à l'endroit choisi
+function ecrirePhrase(ajout = false) {
+  const carre = ajout && ['carre', 'perso'].includes(formatParId(P.format).type), tri = ajout && !carre;
+  // plaque seule à contour (hexagone, rond) : largeur disponible au niveau du texte, selon sa hauteur
+  const largeurPlaque = () => {
+    const f = formatParId(P.format);
+    if (!ajout || (P.cfg.cols || 1) * (P.cfg.rangs || 1) > 1) return null;
+    if (f.type === 'hexa') return (h) => (2 * f.cote - 1) - Math.ceil(h / 2) - 1;
+    if (f.type === 'rond') return (h) => Math.floor(2 * Math.sqrt(Math.max(0, f.anneaux * f.anneaux - ((h * 0.866) / 2) ** 2))) - 1;
+    return null;
+  };
+  const etat = { taille: carre ? 'relief' : '1', texte: '', mode: ajout ? 'soudees' : 'separees', couleur: 'jeu:arc', contour: 'H18', relief: true };
   const dlg = document.createElement('dialog');
-  dlg.className = 'tres-large phrase';
+  dlg.className = 'tres-large phrase' + (ajout ? ' ajout' : '');
   const pastilles = (codes) => codes.map((c) => `<i style="background:${hexDe(c)}"></i>`).join('');
   dlg.innerHTML = `<form method="dialog">
-    <h3>Écrire une phrase</h3>
+    <h3>${ajout ? 'Ajouter un texte sur mon motif' : 'Écrire une phrase'}</h3>
     <div class="phrase-grille">
       <div>
         <label>Texte <small>(retour à la ligne = nouvelle ligne ; accents, chiffres et ! ? . - ' ♥ acceptés)</small>
           <textarea id="phTexte" rows="3" placeholder="ex. BRAVO"></textarea></label>
-        <h4>Pièces</h4>
-        <div class="choix-cartes" id="phMode">
+        <h4 class="seulement-ajout">Taille des lettres</h4>
+        <div class="choix-cartes seulement-ajout" id="phTaille">
+          <button type="button" data-v="1"><b>Petites</b><small>7 rangées, traits d’une perle.</small></button>
+          ${carre ? '' : '<button type="button" data-v="2"><b>Moyennes</b><small>13 rangées, traits de 2 perles.</small></button>'}
+          <button type="button" data-v="relief"><b>Police d’origine, en relief</b><small>${carre ? 'Moyennes : 14 rangées, avec ombre, lumière et contour.' : 'Les lettres épaisses d’origine, redessinées sur la grille décalée.'}</small></button>
+          <button type="button" data-v="3"><b>Grandes</b><small>19 rangées, traits de 3 perles.</small></button>
+        </div>
+        <div id="phReliefBloc" class="seulement-ajout">
+          <h4>Relief</h4>
+          <div class="familles" id="phRelief">
+            <button type="button" class="famille" data-v="1"><b>Avec relief</b>&nbsp;<small>lumière et ombre</small></button>
+            <button type="button" class="famille" data-v="0"><b>Sans relief</b>&nbsp;<small>une couleur à plat</small></button>
+          </div>
+        </div>
+        <h4 class="phrase-nouveau">Pièces</h4>
+        <div class="choix-cartes phrase-nouveau" id="phMode">
           <button type="button" data-v="separees"><b>Une pièce par lettre</b><small>Jamais coupée, 2 lettres par plaque. Chaque plaque se repasse seule.</small></button>
           <button type="button" data-v="soudees"><b>Un mot = une pièce</b><small>Lettres soudées entre elles. Plaques assemblées et repassées ensemble.</small></button>
         </div>
@@ -313,22 +337,34 @@ function ecrirePhrase() {
         <h4>Ou une seule couleur</h4>
         <div class="familles" id="phFamilles">${FAMILLES.map((f) => `<button type="button" class="famille mini" data-v="fam:${f.id}" title="${echap(f.nom)}"><span class="tons">${pastilles([f.clair, f.base, f.fonce])}</span>${echap(f.nom)}</button>`).join('')}</div>
         <h4>Contour</h4>
-        <div class="familles" id="phContours">${CONTOURS.map((c) => `<button type="button" class="famille" data-v="${c.code}"><span class="tons">${pastilles([c.code])}</span>${echap(c.nom)}</button>`).join('')}</div>
+        <div class="familles" id="phContours"><button type="button" class="famille seulement-ajout" data-v=""><span class="tons"><i style="background:#fff;border:1px dashed #999"></i></span>Sans contour</button>${CONTOURS.map((c) => `<button type="button" class="famille" data-v="${c.code}"><span class="tons">${pastilles([c.code])}</span>${echap(c.nom)}</button>`).join('')}</div>
       </div>
       <div class="phrase-apercu">
         <canvas id="phApercu"></canvas>
         <p id="phInfo" class="note"></p>
       </div>
     </div>
-    <menu><button value="annuler" formnovalidate>Annuler</button><button value="ok" class="principal" id="phCreer">Créer le motif</button></menu>
+    <menu><button value="annuler" formnovalidate>Annuler</button><button value="ok" class="principal" id="phCreer">${ajout ? 'Choisir où le poser' : 'Créer le motif'}</button></menu>
   </form>`;
   document.body.appendChild(dlg);
   const maj = () => {
     dlg.querySelectorAll('#phMode [data-v]').forEach((b) => b.classList.toggle('choisie', b.dataset.v === etat.mode));
     dlg.querySelectorAll('#phJeux [data-v], #phFamilles [data-v]').forEach((b) => b.classList.toggle('choisie', b.dataset.v === etat.couleur));
     dlg.querySelectorAll('#phContours [data-v]').forEach((b) => b.classList.toggle('choisie', b.dataset.v === etat.contour));
-    const res = etat.texte.trim() ? construirePhrase(etat) : { erreur: 'Tape ton texte : l’aperçu apparaît ici.' };
+    dlg.querySelectorAll('#phTaille [data-v]').forEach((b) => b.classList.toggle('choisie', b.dataset.v === etat.taille));
+    dlg.querySelectorAll('#phRelief [data-v]').forEach((b) => b.classList.toggle('choisie', (b.dataset.v === '1') === etat.relief));
+    const rb = dlg.querySelector('#phReliefBloc'); if (rb) rb.style.display = ajout && etat.taille !== 'relief' ? '' : 'none';
     const cv = dlg.querySelector('#phApercu'), info = dlg.querySelector('#phInfo');
+    if (ajout && etat.taille !== 'relief') {
+      // lettres « réseau » : dessinées pour la grille de la plaque (carrée ou décalée)
+      const rr = etat.texte.trim() ? construireReseau({ texte: etat.texte, taille: +etat.taille, tri, couleur: etat.couleur, contour: etat.contour, relief: etat.relief, largeurMax: largeurPlaque() }) : { erreur: 'Tape ton texte : l’aperçu apparaît ici.' };
+      dlg.querySelector('#phCreer').disabled = !!rr.erreur;
+      if (rr.erreur) { cv.width = cv.height = 0; info.textContent = rr.erreur; return; }
+      vignette(cv, { surf: rr.surf, cases: rr.cases, couleurs: rr.couleurs }, 420);
+      info.innerHTML = `<b>${rr.larg} × ${rr.haut} perles</b> · ${rr.nb} perles. Tu choisis ensuite où le poser sur ta plaque.` + (rr.depasse ? `<br><b>Un peu trop large pour cette plaque</b> (${rr.depasse} perle${rr.depasse > 1 ? 's' : ''} de trop aux bords) : choisis des lettres plus petites, ou un mot plus court, ou assemble plusieurs plaques.` : '') + (rr.ignores.length ? `<br>Caractères ignorés : ${echap(rr.ignores.join(' '))}` : '');
+      return;
+    }
+    const res = etat.texte.trim() ? construirePhrase({ ...etat, contour: etat.contour || 'H18' }) : { erreur: 'Tape ton texte : l’aperçu apparaît ici.' };
     dlg.querySelector('#phCreer').disabled = !!res.erreur;
     if (res.erreur) { cv.width = cv.height = 0; info.textContent = res.erreur; return; }
     const surf = construireSurface(formatParId('midi-carre-grand'), res.motif.cfg);
@@ -339,13 +375,47 @@ function ecrirePhrase() {
   };
   let minuterie = null;
   dlg.querySelector('#phTexte').oninput = (e) => { etat.texte = e.target.value; clearTimeout(minuterie); minuterie = setTimeout(maj, 150); };
+  dlg.querySelectorAll('#phTaille [data-v]').forEach((b) => (b.onclick = () => { etat.taille = b.dataset.v; maj(); }));
+  dlg.querySelectorAll('#phRelief [data-v]').forEach((b) => (b.onclick = () => { etat.relief = b.dataset.v === '1'; maj(); }));
   dlg.querySelectorAll('#phMode [data-v]').forEach((b) => (b.onclick = () => { etat.mode = b.dataset.v; maj(); }));
   dlg.querySelectorAll('#phJeux [data-v], #phFamilles [data-v]').forEach((b) => (b.onclick = () => { etat.couleur = b.dataset.v; maj(); }));
   dlg.querySelectorAll('#phContours [data-v]').forEach((b) => (b.onclick = () => { etat.contour = b.dataset.v; maj(); }));
   dlg.addEventListener('close', () => {
     if (dlg.returnValue === 'ok') {
-      const res = construirePhrase(etat);
-      if (!res.erreur) {
+      const res = ajout && etat.taille !== 'relief' ? {} : construirePhrase({ ...etat, contour: etat.contour || 'H18' });
+      if (ajout && etat.taille !== 'relief') {
+        const rr = construireReseau({ texte: etat.texte, taille: +etat.taille, tri, couleur: etat.couleur, contour: etat.contour, relief: etat.relief, largeurMax: largeurPlaque() });
+        if (!rr.erreur) {
+          const x0 = Math.floor(Math.min(...rr.perles.map((q) => q.dx))); // entier : on garde le décalage d'un demi-picot des rangées
+          ecrirePP({ perles: rr.perles.map((q) => ({ ...q, dx: q.dx - x0 })), centre: true });
+          commencerCollage();
+          message('Clique sur la plaque pour poser le texte (le doigt : appuie, déplace, relève). ⟲ ⟳ ↔ ↕ pour le tourner, Échap pour annuler.', 7000);
+        }
+      } else if (!res.erreur && ajout) {
+        // grandes lettres en relief (plaques carrées) : le texte devient une « copie » à poser d'un clic
+        const surf = construireSurface(formatParId('midi-carre-grand'), res.motif.cfg), ids = [];
+        res.motif.cases.forEach((v, i) => { if (v >= 0) ids.push(i); });
+        const x0 = Math.min(...ids.map((i) => surf.picots[i].x)), y0 = Math.min(...ids.map((i) => surf.picots[i].y));
+        let perles;
+        if (carre) perles = ids.map((i) => ({ dx: surf.picots[i].x - x0, dy: surf.picots[i].y - y0, c: { ...res.motif.couleurs[res.motif.cases[i]] } }));
+        else {
+          // plaque hexagonale ou ronde : les rangées sont décalées d'un demi-picot et plus serrées,
+          // on redessine les lettres d'origine rangée par rangée sur cette grille
+          const cell = new Map(ids.map((i) => [(surf.picots[i].x - x0) + ',' + (surf.picots[i].y - y0), res.motif.cases[i]]));
+          const L = Math.max(...ids.map((i) => surf.picots[i].x - x0)) + 1, H = Math.max(...ids.map((i) => surf.picots[i].y - y0)) + 1, R3 = Math.sqrt(3) / 2;
+          perles = [];
+          for (let j = 0; j * R3 < H - 0.4; j++) {
+            const r = Math.min(H - 1, Math.round(j * R3));
+            for (let c = 0; c < L; c++) {
+              const v = cell.get(c + ',' + r);
+              if (v !== undefined) perles.push({ dx: c + (j % 2 ? 0.5 : 0), dy: j * R3, c: { ...res.motif.couleurs[v] } });
+            }
+          }
+        }
+        ecrirePP({ perles, centre: true });
+        commencerCollage();
+        message('Clique sur la plaque pour poser le texte (le doigt : appuie, déplace, relève). ⟲ ⟳ ↔ ↕ pour le tourner, Échap pour annuler.', 7000);
+      } else if (!res.erreur) {
         charger(res.motif); sauverMaintenant();
         $('#dlgModeles')?.close();
         zoomAjuster();

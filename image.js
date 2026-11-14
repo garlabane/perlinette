@@ -53,14 +53,28 @@ function refsImage() {
 }
 function retenirRefs(r) { reglages.refsImage = { palettes: r.palettes, exclues: [...r.exclues] }; ecrire(CLE.reglages, reglages); }
 
-function ouvrirImage() {
+// ajout = true : l'image n'ouvre pas de nouveau motif, elle se pose sur celui en cours, à l'endroit choisi
+function ouvrirImage(ajout = false) {
   const dlg = $('#dlgImage'), f = dlg.querySelector('form');
   { const m = $('#infoAuto'); if (m) m.textContent = ''; }
   dlg._retirees = new Set(); // couleurs retirées pour cet import (remplacées automatiquement par les plus proches)
+  dlg._ajout = !!ajout;
+  dlg.classList.toggle('ajout', !!ajout);
+  dlg.querySelector('h3').textContent = ajout ? 'Ajouter une image sur mon motif' : 'Transformer une image en motif';
+  $('#imgPlacer legend').textContent = ajout ? 'Placer l’image dans son cadre' : 'Placer l\'image sur les plaques';
+  dlg.querySelector('[data-onglet="plaques"] legend').textContent = ajout ? 'Taille de l’image ajoutée' : 'Plaques';
   // plaque : par défaut celle du motif
   remplirChoix(f.format, optionsFormats(), P.format);
   f.w.value = P.cfg.w || 29; f.h.value = P.cfg.h || 29;
   f.cols.value = P.cfg.cols || 1; f.rangs.value = P.cfg.rangs || 1;
+  if (ajout) {
+    // une petite grille libre, du même réseau de picots que la plaque en cours (carré ou en quinconce)
+    const t = formatParId(P.format).type;
+    f.format.value = t === 'carre' || t === 'perso' ? 'libre-carre' : 'libre-quinconce';
+    f.w.value = 14; f.h.value = 14; f.cols.value = 1; f.rangs.value = 1;
+    cadreImage = { zoom: 1, dx: 0, dy: 0 };
+    if (formatParId(P.format).type === 'rond') message('Sur une plaque ronde, certaines perles de l’image peuvent tomber entre deux picots.', 5000);
+  }
   // références
   const refs = refsImage();
   $('#imgMarques').innerHTML = '<span class="note">Marques :</span>' + PALETTES_FUSIBLES.map((p) =>
@@ -224,6 +238,17 @@ function ouvrirImage() {
 
   dlg.onclose = () => {
     if (dlg.returnValue !== 'ok' || !resultatImage) return;
+    if (dlg._ajout) {
+      // l'image devient une « copie » à poser : on la place d'un clic (ou en levant le doigt) où l'on veut sur le motif
+      const { surf } = surfaceImage, res = resultatImage;
+      const ids = []; res.cases.forEach((v, i) => { if (v >= 0) ids.push(i); });
+      if (!ids.length) return;
+      const x0 = Math.min(...ids.map((i) => surf.picots[i].x)), y0 = Math.min(...ids.map((i) => surf.picots[i].y));
+      ecrirePP({ perles: ids.map((i) => ({ dx: surf.picots[i].x - x0, dy: surf.picots[i].y - y0, c: { ...res.couleurs[res.cases[i]] } })), centre: true });
+      commencerCollage();
+      message('Clique sur la plaque pour poser l’image (le doigt : appuie, déplace, relève). ⟲ ⟳ ↔ ↕ pour la tourner, Échap pour annuler.', 7000);
+      return;
+    }
     // un motif déjà commencé n'est jamais écrasé : l'image s'ouvre dans un nouvel onglet
     if (P.cases.some((v) => v >= 0)) {
       charger(creerMotif(nomImage || 'Image', surfaceImage.format.id, surfaceImage.cfg, P.nuancier || 'hama-midi'));

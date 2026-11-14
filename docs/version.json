@@ -1,8 +1,9 @@
 {
-  "version": "1.5.2",
+  "version": "1.6.0",
   "date": "2026-11-14",
   "nouveautes": [
-    "Patron imprimé : contour net sur les perles très claires (blanc, crème) pour voir où les poser",
-    "Éditeur et aperçu du repassage : retour au dessin d'avant (surface pleine en repassage complet)"
+    "Plaques hexagonales : elles s'assemblent en nid d'abeille, sans trou, et l'import d'image marche dessus",
+    "« + Image sur ce motif » : ajoute une image sur le motif en cours ; elle se tient par son milieu, tu la poses où tu veux",
+    "« + Texte sur ce motif » : nouvel alphabet dessiné pour la grille de la plaque (carrée, hexagonale ou ronde), en 3 tailles, avec ou sans contour"
   ]
 }

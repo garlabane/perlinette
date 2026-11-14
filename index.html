@@ -39,6 +39,8 @@
       <button data-action="modeles" title="Des motifs prêts à l'emploi">Modèles</button>
       <button data-action="mot" title="Lettres, accents et chiffres, sur le moins de plaques possible">Écrire une phrase</button>
       <button data-action="image" title="Transformer une image en motif">Importer une image</button>
+      <button data-action="imageAjout" title="Ajouter une image sur le motif que tu es en train de faire, à l'endroit que tu choisis">+ Image sur ce motif</button>
+      <button data-action="motAjout" title="Ajouter un mot sur le motif que tu es en train de faire, à l'endroit que tu choisis">+ Texte sur ce motif</button>
       <span class="sep"></span>
       <button data-action="plaque" title="Changer de plaque, assembler plusieurs plaques">Plaques</button>
       <button data-action="couleurs" title="Nuancier du motif, mes perles, couleurs des lettres">Couleurs</button>
@@ -211,12 +213,12 @@
         </fieldset>
         <fieldset data-onglet="plaques">
           <legend>Plaques</legend>
-          <label>Plaque <select name="format"></select></label>
+          <label class="plaque-choix">Plaque <select name="format"></select></label>
           <div class="deux" id="imgTailleLibre">
             <label>Largeur (picots) <input name="w" type="number" min="1" max="200" value="29"></label>
             <label>Hauteur (picots) <input name="h" type="number" min="1" max="200" value="29"></label>
           </div>
-          <div class="deux">
+          <div class="deux plaque-choix">
             <label>Plaques côte à côte <span class="pas-a-pas"><button type="button" data-pas="-1" aria-label="Une de moins">−</button><input name="cols" type="number" min="1" max="10" value="1"><button type="button" data-pas="1" aria-label="Une de plus">+</button></span></label>
             <label>Rangées de plaques <span class="pas-a-pas"><button type="button" data-pas="-1" aria-label="Une de moins">−</button><input name="rangs" type="number" min="1" max="10" value="1"><button type="button" data-pas="1" aria-label="Une de plus">+</button></span></label>
           </div>
@@ -327,6 +329,7 @@
 <script src="modeles/theme-ecole-sport.js"></script>
 <script src="modeles/theme-plage-camping.js"></script>
 <script src="modeles/alphabet.js"></script>
+<script src="modeles/lettres-reseau.js"></script>
 <script src="couleurs-lettres.js"></script>
 <script src="couleurs-panneau.js"></script>
 <script src="image-nettoyage.js"></script>

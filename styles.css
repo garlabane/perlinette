@@ -754,3 +754,8 @@ body.enfant .btn-repasser { display: flex !important; background: #fff4d6; borde
 @media (max-width: 900px) { #dlgImage details .img-version { margin: 6px 0 10px; } }
 
 .img-grille .apercu { align-content: flex-start; }
+
+/* ajout d une image ou d un texte sur le motif en cours : la plaque est celle du motif, on ne la choisit pas */
+#dlgImage.ajout .plaque-choix, #dlg-phrase-ajout .plaque-choix { display: none; }
+dialog.phrase.ajout .phrase-nouveau { display: none; }
+dialog.phrase:not(.ajout) .seulement-ajout { display: none; }
