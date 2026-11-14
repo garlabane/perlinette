@@ -1,7 +1,7 @@
 {
-  "version": "1.8.0",
+  "version": "1.8.1",
   "date": "2026-11-14",
   "nouveautes": [
-    "Pinterest, pour les modèles de Perlinette : l'épingle part avec le lien « Visiter le site », qui rouvre le modèle dans Perlinette"
+    "Pinterest, pour tes créations : l'adresse de Perlinette est aussi transmise au partage, pour servir de lien quand l'application l'accepte"
   ]
 }

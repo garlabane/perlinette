@@ -144,7 +144,9 @@ async function partagerPinterest() {
   if (window.matchMedia('(pointer: coarse)').matches && navigator.canShare && navigator.canShare({ files: [fichier] })) {
     const texte = descriptionPin();
     try { await navigator.clipboard.writeText(texte); } catch (e) { /* presse-papiers refusé : tant pis */ }
-    const complet = { files: [fichier], title: P.nom, text: texte };
+    // on donne aussi l'adresse du site à part : certaines applications (dont Pinterest) s'en servent comme lien de l'épingle
+    const avecLien = { files: [fichier], title: P.nom, text: texte, url: LIEN_PERLINETTE };
+    const complet = navigator.canShare(avecLien) ? avecLien : { files: [fichier], title: P.nom, text: texte };
     try {
       await navigator.share(navigator.canShare(complet) ? complet : { files: [fichier], title: P.nom });
       message('Si la description manque dans Pinterest, colle-la : elle est copiée.', 6000);
