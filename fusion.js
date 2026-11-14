@@ -13,6 +13,7 @@ const DEGRES_FUSION = {
   3: { rayon: 0.56, pont: 1.04, trou: 0 },
 };
 
+let CACHE_FUSION = null; // la dernière pièce calculée : on ne la refait que si le motif, le zoom ou le degré change
 function dessinerFusion(g, z, M, surf, motif, degre, soudure) {
   const d = DEGRES_FUSION[degre], hex = (i) => motif.couleurs[motif.cases[i]]?.hex;
   const tombe = new Set([...(soudure?.isolees || []), ...(soudure?.coins || [])]);
@@ -24,6 +25,25 @@ function dessinerFusion(g, z, M, surf, motif, degre, soudure) {
     if (posee(i)) return;
     g.beginPath(); g.arc(M + q.x * z, M + q.y * z, Math.max(1, z * 0.13), 0, Math.PI * 2); g.fillStyle = '#d9d0c5'; g.fill();
   });
+  // la pièce en relief (même rendu que « Rendu repassé », sans reflet) ; les perles qui tomberont restent à part
+  if (typeof pieceRepassee === 'function' && z >= 4) {
+    const ids = surf.picots.map((q, i) => i).filter((i) => posee(i) && !tombe.has(i));
+    if (ids.length) {
+      const fonte = ['', 'legere', 'moyenne', 'complete'][degre] || 'complete', m = Math.ceil(z * 0.9);
+      const cle = [fonte, z, ids.join(','), ids.map((i) => hex(i)).join('')].join('|');
+      if (!CACHE_FUSION || CACHE_FUSION.cle !== cle) {
+        const r = pieceRepassee(surf, motif, ids, z, m, { fonte, brillant: false });
+        CACHE_FUSION = { cle, toile: poserPiece(r.piece, z, false), x: r.x0 * z - m, y: r.y0 * z - m };
+      }
+      g.drawImage(CACHE_FUSION.toile, M + CACHE_FUSION.x, M + CACHE_FUSION.y);
+    }
+    surf.picots.forEach((q, i) => {
+      if (!tombe.has(i) || !posee(i)) return;
+      const [cx, cy] = pos(i);
+      g.globalAlpha = 0.5; g.beginPath(); g.arc(cx, cy, d.rayon * z, 0, Math.PI * 2); g.fillStyle = hex(i); g.fill(); g.globalAlpha = 1;
+    });
+    return;
+  }
   // ponts de plastique fondu (chaque moitié de la couleur de sa perle)
   g.lineCap = 'butt';
   surf.picots.forEach((q, i) => {

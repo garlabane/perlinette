@@ -61,6 +61,9 @@ function poserModele(m, formatId) {
     // R = rayon utile de la plaque (en pas) : les recettes récentes s'en servent pour s'adapter à la taille
     const cx = surf.larg / 2, cy = surf.haut / 2, R = Math.min(surf.larg, surf.haut) / 2 - 0.5;
     lettres = surf.picots.map((q) => { const x = q.x - cx, y = q.y - cy, l = m.f(x, y, Math.hypot(x, y), Math.atan2(y, x), R); return !l || l === '.' ? null : l; });
+  } else if (m.perles && m.perles.length === surf.picots.length) {
+    // modèle « picot par picot » (hexagones, ronds) : une lettre par picot, dans l'ordre des picots de la plaque
+    lettres = [...m.perles].map((l) => (l === '.' ? null : l));
   } else {
     const gh = m.grille.length, gw = m.grille[0].length;
     const ox = (surf.larg - gw) / 2, oy = (surf.haut - gh) / 2;
@@ -232,7 +235,7 @@ function majModeles() {
   // les familles ne servent que si le thème s'y prête (Noël…) ; sinon on range simplement par nom
   if (tri === 'familles' && choisis.filter(({ m }) => familleModele(m) === 'Autres').length > choisis.length / 3) tri = 'nom';
   const alpha = (a, b) => a.m.nom.localeCompare(b.m.nom, 'fr', { sensitivity: 'base' });
-  const taille = (m) => m.grille ? m.grille.join('').replace(/\./g, '').length : 0;
+  const taille = (m) => (m.grille ? m.grille.join('') : m.perles || '').replace(/\./g, '').length;
   if (tri === 'nom') choisis.sort(alpha);
   else if (tri === 'petit') choisis.sort((a, b) => taille(a.m) - taille(b.m) || alpha(a, b));
   else if (tri === 'nouveaux') choisis.sort((a, b) => b.i - a.i);

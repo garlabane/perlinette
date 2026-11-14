@@ -1,7 +1,10 @@
 {
-  "version": "1.13.1",
-  "date": "2026-11-14",
+  "version": "1.14.0",
+  "date": "2026-11-15",
   "nouveautes": [
-    "Noël : 4 modèles retouchés (contour noir allégé) et 7 modèles retirés"
+    "Nouveau rendu repassé : un vrai relief de plastique fondu, en repassage léger, moyen ou complet, sur la plaque et dans l'image sans fond",
+    "87 nouveaux modèles : 60 animaux kawaii, 10 grands hexagones et 10 grands ronds de Noël, 7 modèles de Noël de retour",
+    "4 planches des saisons (printemps, été, automne, hiver) sur quatre grands carrés",
+    "Noël : 4 modèles au contour noir allégé"
   ]
 }
