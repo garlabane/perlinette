@@ -122,11 +122,34 @@ function ouvrirAjoutCouleur() {
         <select id="ajoutTri" title="Classer par">${optionsTri('quantite')}</select>
         <input id="ajoutCherche" type="search" placeholder="Chercher (réf. ou nom)…">
       </div>
+      <button type="button" id="ajoutTout" class="principal ajout-tout"></button>
       <div id="ajoutPastilles" class="nu-liste"></div>
       <menu><button value="fermer">Fermer</button></menu></form>`;
     document.body.appendChild(dlg);
-    const maj = () => dessinerNuancier($('#ajoutPastilles'), couleursDesPalettes($('#ajoutPal').value === 'tout' ? ['biblio', ...PALETTES_FUSIBLES.map((p) => p.id)] : [$('#ajoutPal').value]),
-      { tri: $('#ajoutTri').value, recherche: $('#ajoutCherche').value, clic: (c) => ajouterAuMotif({ code: c.code, nom: c.nom, hex: c.hex, marque: c.marque }) });
+    // les couleurs affichées (marque choisie + recherche) qui ne sont pas encore dans le motif
+    const affichees = () => {
+      const q = $('#ajoutCherche').value.trim().toLowerCase();
+      return couleursDesPalettes($('#ajoutPal').value === 'tout' ? ['biblio', ...PALETTES_FUSIBLES.map((p) => p.id)] : [$('#ajoutPal').value])
+        .filter((c) => !q || (c.code + ' ' + c.nom + ' ' + c.marque).toLowerCase().includes(q))
+        .filter((c) => !P.couleurs.some((x) => x.code === c.code && x.hex === c.hex));
+    };
+    const maj = () => {
+      dessinerNuancier($('#ajoutPastilles'), couleursDesPalettes($('#ajoutPal').value === 'tout' ? ['biblio', ...PALETTES_FUSIBLES.map((p) => p.id)] : [$('#ajoutPal').value]),
+        { tri: $('#ajoutTri').value, recherche: $('#ajoutCherche').value, clic: (c) => { ajouterAuMotif({ code: c.code, nom: c.nom, hex: c.hex, marque: c.marque }); maj(); } });
+      // tout ajouter d'un coup : pratique pour avoir toutes ses perles sous la main dans la bande des couleurs
+      const n = affichees().length, b = $('#ajoutTout'), mes = $('#ajoutPal').value === 'biblio';
+      b.hidden = !n || n > 150;
+      b.textContent = mes ? `＋ Ajouter toutes mes perles (${n})` : `＋ Ajouter ces ${n} couleurs`;
+    };
+    $('#ajoutTout').onclick = () => {
+      const l = affichees(); if (!l.length) return;
+      memoriser();
+      for (const c of l) P.couleurs.push({ code: c.code, nom: c.nom, hex: c.hex, marque: marqueDe(c) });
+      fini(); maj();
+      message(`${l.length} couleur${l.length > 1 ? 's' : ''} ajoutée${l.length > 1 ? 's' : ''} : fais défiler la bande des couleurs.`, 5000);
+      dlg.close();
+      if (document.body.classList.contains('cote-ouverte') && typeof basculerCote === 'function') basculerCote(false); // retour au dessin, les couleurs sont dans la bande
+    };
     $('#ajoutPal').onchange = $('#ajoutTri').onchange = maj;
     $('#ajoutCherche').oninput = maj;
     dlg._maj = maj;

@@ -881,3 +881,36 @@ dialog.partage { width: min(440px, 94vw); }
   body.cote-ouverte .cote > section:first-child h2 { order: 6; margin-top: 12px; }
   body.cote-ouverte #infoPlaque { order: 7; }
 }
+
+.ajout-tout { width: 100%; min-height: 44px; margin: 8px 0; }
+
+/* impression sur téléphone : aperçu plus petit, réglages en pastilles à toucher, tout tient sur un écran */
+@media (max-width: 900px) {
+  dialog.impr .impr-pages { padding: 8px; }
+  dialog.impr .impr-page.portrait { width: 150px; height: 212px; }
+  dialog.impr .impr-page.paysage { width: 212px; height: 150px; }
+  dialog.impr #ipInfo { margin: 0 0 8px; }
+  dialog.impr .impr-titre-perles { display: none; }
+  dialog.impr .impr-cases { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  dialog.impr .impr-cases .case { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; margin: 0; padding: 4px 8px; border: 1px solid var(--bord); border-radius: 22px; background: #fff; font-weight: 600; text-align: center; }
+  dialog.impr .impr-cases .case small { display: none; }
+  dialog.impr .impr-cases .case input { position: absolute; opacity: 0; pointer-events: none; }
+  dialog.impr .impr-cases .case::before { content: ''; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bord); flex: 0 0 auto; }
+  dialog.impr .impr-cases .case:has(input:checked) { background: var(--prune-clair); border-color: var(--prune); color: var(--prune); }
+  dialog.impr .impr-cases .case:has(input:checked)::before { background: var(--prune); border-color: var(--prune); }
+  dialog.impr .impr-options h4 { margin: 10px 0 4px; }
+  dialog.impr .impr-options select { min-height: 44px; }
+  dialog.impr details.pli { margin-top: 10px; }
+}
+/* téléphone : « Imprimer » est dans « Partager » (PDF ou imprimante), la barre du haut respire */
+@media (max-width: 600px) {
+  .barre > [data-action="imprimer"] { display: none; }
+  .barre > .partage-bouton { background: var(--prune); color: #fff; border-color: var(--prune); min-width: 52px; }
+}
+
+.impr-pas { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.impr-pas .segment { flex: 1 1 200px; display: flex; gap: 4px; }
+.impr-pas .segment button { flex: 1 1 0; min-height: 40px; }
+.impr-pas-autre { display: flex !important; flex-direction: row !important; align-items: center; gap: 6px; margin: 0 !important; color: var(--doux); }
+.impr-pas-autre input { width: 76px; min-height: 40px; text-align: center; }
+.impr-pas .segment button.actif small { color: inherit; opacity: .85; }

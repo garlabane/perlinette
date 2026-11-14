@@ -1,10 +1,9 @@
 {
-  "version": "1.7.2",
+  "version": "1.7.3",
   "date": "2026-11-14",
   "nouveautes": [
-    "Téléphone : menu ☰ en tuiles avec icônes (Créer, Mon motif, Fichier)",
-    "Téléphone : panneau des couleurs plus compact, sur deux colonnes, avec les boutons toujours visibles",
-    "Téléphone : l'impression montre d'abord les feuilles, les réglages rares sont repliés",
-    "Épingle Pinterest : le logo et le badge ne sont plus cachés par les boutons de Pinterest, la vignette « repassé » ne recouvre plus les couleurs"
+    "« + Couleur » : un bouton ajoute d'un coup toutes tes perles (ou toutes les couleurs affichées) au motif ; elles défilent ensuite dans la bande des couleurs",
+    "Téléphone : « Imprimer ou PDF » est dans le bouton « Imprimer et partager » ; les réglages d'impression tiennent sur un écran, en pastilles à toucher",
+    "Patron imprimé : le logo Perlinette et l'adresse du site sont toujours en haut de page ; la taille des perles se choisit en un bouton (Midi, Mini, Maxi)"
   ]
 }

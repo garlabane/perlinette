@@ -17,16 +17,12 @@ function optionsParDefaut() {
 
 // ---------- éléments de page ----------
 function svgLogo(o, x, y) {
-  if (o.logo === 'aucun') return { svg: '', largeur: 0 };
-  if (o.logo === 'perso') {
-    const img = lire(CLE_LOGO, null);
-    if (img) return { svg: `<image href="${img}" x="${x}" y="${y}" width="34" height="13" preserveAspectRatio="xMinYMid meet"/>`, largeur: 36 };
-  }
   const p = (cx, cy, c) => `<circle cx="${mm(x + cx)}" cy="${mm(y + cy)}" r="2.6" fill="${c}"/><circle cx="${mm(x + cx)}" cy="${mm(y + cy)}" r="0.9" fill="#fff"/>`;
   return {
     svg: p(6.5, 2.8, '#E8A498') + p(2.8, 6.5, '#E9C704') + p(10.2, 6.5, '#49AE89') + p(6.5, 10.2, '#6e2f5c')
-      + `<text x="${mm(x + 15)}" y="${mm(y + 8.4)}" font-size="5" font-weight="700" fill="#6e2f5c" font-family="Segoe UI, sans-serif">Perlinette</text>`,
-    largeur: 45,
+      + `<text x="${mm(x + 15)}" y="${mm(y + 8.4)}" font-size="5" font-weight="700" fill="#6e2f5c" font-family="Segoe UI, sans-serif">Perlinette</text>`
+      + `<text x="${mm(x + 15)}" y="${mm(y + 12.2)}" font-size="2.3" fill="#6e2f5c" font-family="Segoe UI, sans-serif">garlabane.github.io/perlinette</text>`,
+    largeur: 52,
   };
 }
 // miniature du motif entier « repassé à fond » (même rendu que l'aperçu Complète), dans un carré de côté `taille`
@@ -238,23 +234,31 @@ function ouvrirImpression() {
   dlg.innerHTML = `<form method="dialog"><h3>Aperçu avant impression</h3>
     <div class="impr-grille">
       <div class="impr-options">
-        <label>Titre sur les feuilles <input id="ipTitre"></label>
         <p id="ipInfo" class="note"></p>
-        <h4>Perles</h4>
-        <label class="case"><input type="checkbox" id="ipCouleurs"> En couleur (sinon : à colorier)</label>
-        <label class="case"><input type="checkbox" id="ipSymboles"> Symboles dans les perles</label>
-        <label class="case"><input type="checkbox" id="ipPicots"> Picots vides visibles</label>
-        <label class="case"><input type="checkbox" id="ipRepasse"> Miniature « après repassage » en haut</label>
+        <h4 class="impr-titre-perles">Perles</h4>
+        <div class="impr-cases">
+        <label class="case"><input type="checkbox" id="ipCouleurs"> <span>En couleur <small>(sinon : à colorier)</small></span></label>
+        <label class="case"><input type="checkbox" id="ipSymboles"> <span>Symboles <small>dans les perles</small></span></label>
+        <label class="case"><input type="checkbox" id="ipPicots"> <span>Picots vides <small>visibles</small></span></label>
+        <label class="case"><input type="checkbox" id="ipRepasse"> <span>Miniature <small>« après repassage » en haut</small></span></label>
+        </div>
         <h4>Légende des couleurs</h4>
         <select id="ipLegende"><option value="page">Sur chaque feuille</option><option value="fin">Tableau à la fin (avec le stock)</option><option value="non">Aucune</option></select>
-        <details class="pli" id="ipPlus"><summary>Plus de réglages <small>(taille des picots, plusieurs plaques, logo)</small></summary>
-        <label>Écart entre deux picots (mm) <input id="ipPas" type="number" min="1" max="20" step="0.05"><small>Midi 5 · Mini 2,5 · Maxi 10. Mesure 10 picots et divise par 10.</small></label>
+        <details class="pli" id="ipPlus"><summary>Plus de réglages <small>(titre, taille des perles${SURF.plaques.length > 1 ? ', plusieurs plaques' : ''})</small></summary>
+        <label>Titre sur les feuilles <input id="ipTitre"></label>
+        <h4>Taille des perles <small>(écart entre deux picots)</small></h4>
+        <div class="impr-pas">
+          <div class="segment" id="ipPasChoix"><button type="button" data-v="5">Midi<small> 5 mm</small></button><button type="button" data-v="2.5">Mini<small> 2,5</small></button><button type="button" data-v="10">Maxi<small> 10</small></button></div>
+          <label class="impr-pas-autre">ou <input id="ipPas" type="number" min="1" max="20" step="0.05" inputmode="decimal"> mm</label>
+        </div>
+        <p class="note">Si le patron imprimé ne tombe pas juste sur ta plaque : mesure 10 picots, divise par 10, et tape le résultat.</p>
+        <div id="ipMulti">
         <h4>Plusieurs plaques</h4>
-        <label class="case"><input type="checkbox" id="ipRegrouper"> Plusieurs plaques par feuille si elles tiennent</label>
-        <label class="case"><input type="checkbox" id="ipEnsemble"> Page d'ensemble au début</label>
-        <h4>Logo en haut de page</h4>
-        <div class="segment" id="ipLogo"><button type="button" data-v="perlinette">Perlinette</button><button type="button" data-v="perso">Le mien</button><button type="button" data-v="aucun">Aucun</button></div>
-        <div id="ipLogoPerso" class="nu-outils"><button type="button" id="ipChoisirLogo">Choisir mon logo…</button><img id="ipLogoApercu" alt=""></div>
+        <div class="impr-cases">
+        <label class="case"><input type="checkbox" id="ipRegrouper"> <span>Regrouper <small>les plaques sur une feuille si elles tiennent</small></span></label>
+        <label class="case"><input type="checkbox" id="ipEnsemble"> <span>Page d'ensemble <small>au début</small></span></label>
+        </div>
+        </div>
         </details>
       </div>
       <div class="impr-pages" id="ipPages"></div>
@@ -267,7 +271,7 @@ function ouvrirImpression() {
   $d('#ipCouleurs').checked = o.couleurs; $d('#ipSymboles').checked = o.symboles; $d('#ipPicots').checked = o.picots; $d('#ipRepasse').checked = o.repasse;
   $d('#ipLegende').value = o.legende; $d('#ipRegrouper').checked = o.regrouper; $d('#ipEnsemble').checked = o.ensemble;
   const multi = SURF.plaques.length > 1;
-  $d('#ipEnsemble').closest('label').hidden = !multi;
+  $d('#ipMulti').hidden = !multi;
   let rendu = null;
   const lireOptions = () => Object.assign(o, {
     titre: $d('#ipTitre').value.trim() || P.nom, pas: +$d('#ipPas').value || P.pas,
@@ -276,9 +280,7 @@ function ouvrirImpression() {
   });
   const maj = () => {
     lireOptions();
-    dlg.querySelectorAll('#ipLogo [data-v]').forEach((b) => b.classList.toggle('actif', b.dataset.v === o.logo));
-    $d('#ipLogoPerso').hidden = o.logo !== 'perso';
-    const img = lire(CLE_LOGO, null); $d('#ipLogoApercu').src = img || ''; $d('#ipLogoApercu').hidden = !img;
+    dlg.querySelectorAll('#ipPasChoix [data-v]').forEach((b) => b.classList.toggle('actif', +b.dataset.v === o.pas));
     rendu = preparerPages(o);
     $d('#ipPages').innerHTML = rendu.svgs.map((s, k) => `<div class="impr-page ${rendu.orient}" title="Page ${k + 1}">${s}</div>`).join('');
     const cm = (v) => (v / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
@@ -289,32 +291,12 @@ function ouvrirImpression() {
   };
   let minuterie = null;
   dlg.querySelectorAll('.impr-options input, .impr-options select').forEach((el) => (el.oninput = el.onchange = () => { clearTimeout(minuterie); minuterie = setTimeout(maj, 120); }));
-  dlg.querySelectorAll('#ipLogo [data-v]').forEach((b) => (b.onclick = () => {
-    o.logo = b.dataset.v;
-    if (o.logo === 'perso' && !lire(CLE_LOGO, null)) $d('#ipChoisirLogo').click(); else maj();
-  }));
-  $d('#ipChoisirLogo').onclick = () => {
-    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
-    inp.onchange = () => {
-      const fic = inp.files[0]; if (!fic) return;
-      const img = new Image();
-      img.onload = () => {
-        // logo réduit (largeur 600 px au plus) pour rester léger dans la mémoire du navigateur
-        const e = Math.min(1, 600 / img.naturalWidth), c = document.createElement('canvas');
-        c.width = Math.round(img.naturalWidth * e); c.height = Math.round(img.naturalHeight * e);
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        if (!ecrire(CLE_LOGO, c.toDataURL('image/png'))) { message('Logo trop lourd pour être retenu.'); return; }
-        o.logo = 'perso'; maj();
-      };
-      img.src = URL.createObjectURL(fic);
-    };
-    inp.click();
-  };
+  dlg.querySelectorAll('#ipPasChoix [data-v]').forEach((b) => (b.onclick = () => { $d('#ipPas').value = b.dataset.v; maj(); }));
   dlg.addEventListener('close', () => {
     if (dlg.returnValue === 'ok' || dlg.returnValue === 'pdf') {
       lireOptions();
       if (o.pas !== P.pas) { P.pas = o.pas; sauverAuto(); }
-      reglages.impression = { couleurs: o.couleurs, symboles: o.symboles, picots: o.picots, legende: o.legende, regrouper: o.regrouper, ensemble: o.ensemble, logo: o.logo, repasse: o.repasse };
+      reglages.impression = { couleurs: o.couleurs, symboles: o.symboles, picots: o.picots, legende: o.legende, regrouper: o.regrouper, ensemble: o.ensemble, repasse: o.repasse };
       ecrire(CLE.reglages, reglages);
       if (dlg.returnValue === 'pdf') proposerPdf(preparerPages(o));
       else imprimerPages(preparerPages(o));
