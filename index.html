@@ -17,8 +17,8 @@
     <button id="nomProjet" class="nom-projet" title="Renommer le motif"></button>
     <button id="btnMenu" class="menu-bouton" aria-label="Menu" aria-expanded="false" title="Menu">☰</button>
     <nav>
-      <span class="nav-titre">Fichier</span>
-      <div class="menu">
+      <span class="nav-titre" data-g="f">Fichier</span>
+      <div class="menu" data-g="f">
         <button id="btnFichier" aria-haspopup="true" aria-expanded="false">Fichier ▾</button>
         <div class="menu-liste" id="menuFichier" hidden>
           <button data-action="nouveau">Nouveau motif</button>
@@ -38,18 +38,18 @@
         </div>
       </div>
       <span class="sep"></span>
-      <span class="nav-titre">Créer</span>
-      <button data-action="modeles" title="Des motifs prêts à l'emploi">Modèles</button>
-      <button data-action="mot" title="Lettres, accents et chiffres, sur le moins de plaques possible">Écrire une phrase</button>
-      <button data-action="image" title="Transformer une image en motif">Importer une image</button>
-      <button data-action="imageAjout" title="Ajouter une image sur le motif que tu es en train de faire, à l'endroit que tu choisis">+ Image sur ce motif</button>
-      <button data-action="motAjout" title="Ajouter un mot sur le motif que tu es en train de faire, à l'endroit que tu choisis">+ Texte sur ce motif</button>
+      <span class="nav-titre" data-g="c">Créer</span>
+      <button data-g="c" data-action="modeles" title="Des motifs prêts à l'emploi">Modèles</button>
+      <button data-g="c" data-action="mot" title="Lettres, accents et chiffres, sur le moins de plaques possible">Écrire une phrase</button>
+      <button data-g="c" data-action="image" title="Transformer une image en motif">Importer une image</button>
+      <button data-g="c" data-action="imageAjout" title="Ajouter une image sur le motif que tu es en train de faire, à l'endroit que tu choisis">+ Image sur ce motif</button>
+      <button data-g="c" data-action="motAjout" title="Ajouter un mot sur le motif que tu es en train de faire, à l'endroit que tu choisis">+ Texte sur ce motif</button>
       <span class="sep"></span>
-      <span class="nav-titre">Mon motif</span>
-      <button data-action="plaque" title="Changer de plaque, assembler plusieurs plaques">Plaques</button>
-      <button data-action="couleurs" title="Nuancier du motif, mes perles, couleurs des lettres">Couleurs</button>
+      <span class="nav-titre" data-g="m">Mon motif</span>
+      <button data-g="m" data-action="plaque" title="Changer de plaque, assembler plusieurs plaques">Plaques</button>
+      <button data-g="m" data-action="couleurs" title="Nuancier du motif, mes perles, couleurs des lettres">Couleurs</button>
       <span class="sep"></span>
-      <button data-action="poser" title="L'écran te guide pendant que tu poses les perles : couleur par couleur ou rangée par rangée">Poser mes perles</button>
+      <button data-g="m" data-action="poser" title="L'écran te guide pendant que tu poses les perles : couleur par couleur ou rangée par rangée">Poser mes perles</button>
     </nav>
     <span class="espace"></span>
     <button id="btnEnfant" class="enfant-bouton" title="Version simplifiée pour les enfants">🧒 Mode enfant</button>

@@ -798,3 +798,86 @@ dialog.partage { width: min(440px, 94vw); }
   body.menu-ouvert .barre nav .menu-liste small { display: block; }
   body.enfant.menu-ouvert .barre nav .nav-titre, body.enfant.menu-ouvert .barre nav .sep { display: none; }
 }
+
+/* ===== Téléphone et tablette debout : menu en tuiles, panneau des couleurs compact, impression avec l'aperçu d'abord ===== */
+@media (max-width: 900px) {
+  /* --- menu ☰ : on crée d'abord, le fichier vient en dernier ; tuiles avec une icône --- */
+  body.menu-ouvert .barre nav { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 10px; }
+  body.menu-ouvert .barre nav .menu-liste, body.menu-ouvert .barre nav .menu-liste[hidden] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  body.menu-ouvert .barre nav > .sep { display: none; }
+  body.menu-ouvert .barre nav [data-g="c"] { order: 1; }
+  body.menu-ouvert .barre nav [data-g="m"] { order: 2; }
+  body.menu-ouvert .barre nav [data-g="f"] { order: 3; }
+  body.menu-ouvert .barre nav .nav-titre { padding: 6px 2px 0; }
+  body.menu-ouvert .barre nav .nav-titre[data-g="c"] { padding-top: 0; }
+  body.menu-ouvert .barre nav > button, body.menu-ouvert .barre nav .menu-liste button {
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px;
+    min-height: 74px; padding: 8px 4px; text-align: center; font-size: 13px; line-height: 1.2;
+  }
+  body.menu-ouvert .barre nav [data-action]::before { font-size: 24px; line-height: 1; }
+  body.menu-ouvert .barre nav .menu-liste small { display: none; }
+  body.menu-ouvert .barre nav [data-action="modeles"]::before { content: '🧩'; }
+  body.menu-ouvert .barre nav [data-action="mot"]::before { content: '🔤'; }
+  body.menu-ouvert .barre nav [data-action="image"]::before { content: '📷'; }
+  body.menu-ouvert .barre nav [data-action="imageAjout"]::before { content: '🖼️'; }
+  body.menu-ouvert .barre nav [data-action="motAjout"]::before { content: '✏️'; }
+  body.menu-ouvert .barre nav [data-action="plaque"]::before { content: '🔲'; }
+  body.menu-ouvert .barre nav [data-action="couleurs"]::before { content: '🎨'; }
+  body.menu-ouvert .barre nav [data-action="poser"]::before { content: '👆'; }
+  body.menu-ouvert .barre nav [data-action="nouveau"]::before { content: '✨'; }
+  body.menu-ouvert .barre nav [data-action="ouvrir"]::before { content: '📂'; }
+  body.menu-ouvert .barre nav [data-action="enregistrer"]::before { content: '💾'; }
+  body.menu-ouvert .barre nav [data-action="exporter"]::before { content: '⬇️'; }
+  body.menu-ouvert .barre nav [data-action="importerFichier"]::before { content: '⬆️'; }
+  body.menu-ouvert .barre nav [data-action="png"]::before { content: '🖼️'; }
+  body.menu-ouvert .barre nav [data-action="rendu"]::before { content: '🔥'; }
+
+  /* --- panneau des couleurs ouvert : rien de perdu en haut, couleurs sur deux colonnes, boutons toujours visibles --- */
+  body.cote-ouverte .cote section:first-child { padding-top: 10px; }
+  /* les couleurs d'abord (c'est pour elles qu'on ouvre ce panneau), la plaque et le repassage ensuite */
+  body.cote-ouverte .couleurs-section { order: 1; padding-top: 10px; }
+  body.cote-ouverte .cote section:first-child { order: 2; border-bottom: none; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+  body.cote-ouverte .couleurs-section h2 { order: 0; margin: 0 118px 6px 0; min-height: 44px; display: flex; align-items: center; gap: 6px; }
+  body.cote-ouverte .couleurs-section .ligne-boutons { order: 1; }
+  body.cote-ouverte .couleurs-section .tri { order: 2; }
+  body.cote-ouverte #listeCouleurs { order: 3; }
+  body.cote-ouverte .cote h2 { margin: 6px 0 4px; }
+  body.cote-ouverte #infoPlaque { margin: 0 0 6px; font-size: 13px; }
+  body.cote-ouverte #segFusion { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  body.cote-ouverte #segFusion .note { grid-column: 1 / -1; }
+  body.cote-ouverte #segFusion button { min-height: 40px; padding: 4px 2px; font-size: 14px; }
+  body.cote-ouverte .couleurs-section { display: flex; flex-direction: column; flex: 0 0 auto; }
+  body.cote-ouverte #listeCouleurs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 8px; align-content: start; }
+  body.cote-ouverte .coul { min-height: 44px; min-width: 0; }
+  body.cote-ouverte .coul .lib { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.cote-ouverte .couleurs-section .ligne-boutons { display: flex; gap: 8px; margin: 0 0 8px; }
+  body.cote-ouverte .couleurs-section .ligne-boutons button { flex: 1 1 0; min-height: 44px; }
+
+  /* --- impression : les feuilles d'abord (elles défilent de côté), l'essentiel ensuite, le reste replié --- */
+  dialog.impr .impr-grille { display: flex; flex-direction: column; gap: 10px; }
+  dialog.impr .impr-pages { order: -1; justify-content: safe center; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; max-height: none; padding: 10px; gap: 10px; scroll-snap-type: x proximity; }
+  dialog.impr .impr-page { flex: 0 0 auto; scroll-snap-align: center; }
+  dialog.impr .impr-page.portrait { width: 184px; height: 260px; }
+  dialog.impr .impr-page.paysage { width: 260px; height: 184px; }
+  dialog.impr .impr-options { max-height: none; overflow: visible; padding: 0; }
+  dialog.impr .impr-options .case { min-height: 36px; }
+  dialog.impr h3 { margin: 0 0 8px; }
+  dialog.impr menu { position: sticky; bottom: -14px; margin: 10px -14px -14px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--panneau); border-top: 1px solid var(--bord); display: grid; grid-template-columns: auto 1fr 1fr; gap: 8px; }
+  dialog.impr menu button { min-height: 48px; padding: 6px 8px; }
+}
+
+/* panneau des couleurs ouvert (téléphone) : le repassage tout en haut, puis les couleurs, la plaque en dernier */
+@media (max-width: 900px) {
+  body.cote-ouverte .cote { padding: 10px 12px calc(14px + env(safe-area-inset-bottom, 0px)); }
+  body.cote-ouverte .cote > section { display: contents; }
+  body.cote-ouverte #segFusion { order: 0; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--bord); }
+  body.cote-ouverte #segFusion .note { margin-right: 118px; min-height: 44px; display: flex; align-items: center; font-weight: 700; font-size: 15px; color: var(--texte, inherit); }
+  body.cote-ouverte #segFusion .note::before { content: '🔥'; margin-right: 6px; font-size: 20px; }
+  body.cote-ouverte .couleurs-section h2 { order: 1; margin: 0 0 6px; min-height: 0; }
+  body.cote-ouverte .couleurs-section .ligne-boutons { order: 2; }
+  body.cote-ouverte .couleurs-section .tri { order: 3; }
+  body.cote-ouverte #listeCouleurs { order: 4; }
+  body.cote-ouverte #soudure { order: 5; margin: 14px 0 0; }
+  body.cote-ouverte .cote > section:first-child h2 { order: 6; margin-top: 12px; }
+  body.cote-ouverte #infoPlaque { order: 7; }
+}

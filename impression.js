@@ -239,7 +239,7 @@ function ouvrirImpression() {
     <div class="impr-grille">
       <div class="impr-options">
         <label>Titre sur les feuilles <input id="ipTitre"></label>
-        <label>Écart entre deux picots (mm) <input id="ipPas" type="number" min="1" max="20" step="0.05"><small>Midi 5 · Mini 2,5 · Maxi 10. Mesure 10 picots et divise par 10.</small></label>
+        <p id="ipInfo" class="note"></p>
         <h4>Perles</h4>
         <label class="case"><input type="checkbox" id="ipCouleurs"> En couleur (sinon : à colorier)</label>
         <label class="case"><input type="checkbox" id="ipSymboles"> Symboles dans les perles</label>
@@ -247,19 +247,22 @@ function ouvrirImpression() {
         <label class="case"><input type="checkbox" id="ipRepasse"> Miniature « après repassage » en haut</label>
         <h4>Légende des couleurs</h4>
         <select id="ipLegende"><option value="page">Sur chaque feuille</option><option value="fin">Tableau à la fin (avec le stock)</option><option value="non">Aucune</option></select>
+        <details class="pli" id="ipPlus"><summary>Plus de réglages <small>(taille des picots, plusieurs plaques, logo)</small></summary>
+        <label>Écart entre deux picots (mm) <input id="ipPas" type="number" min="1" max="20" step="0.05"><small>Midi 5 · Mini 2,5 · Maxi 10. Mesure 10 picots et divise par 10.</small></label>
         <h4>Plusieurs plaques</h4>
         <label class="case"><input type="checkbox" id="ipRegrouper"> Plusieurs plaques par feuille si elles tiennent</label>
         <label class="case"><input type="checkbox" id="ipEnsemble"> Page d'ensemble au début</label>
         <h4>Logo en haut de page</h4>
         <div class="segment" id="ipLogo"><button type="button" data-v="perlinette">Perlinette</button><button type="button" data-v="perso">Le mien</button><button type="button" data-v="aucun">Aucun</button></div>
         <div id="ipLogoPerso" class="nu-outils"><button type="button" id="ipChoisirLogo">Choisir mon logo…</button><img id="ipLogoApercu" alt=""></div>
-        <p id="ipInfo" class="note"></p>
+        </details>
       </div>
       <div class="impr-pages" id="ipPages"></div>
     </div>
-    <menu><button value="annuler" formnovalidate>Annuler</button><button value="pdf" title="Un fichier PDF à partager ou à enregistrer, pour imprimer ailleurs">📄 PDF à partager</button><button value="ok" class="principal">Imprimer</button></menu></form>`;
+    <menu><button value="annuler" formnovalidate>Annuler</button><button value="pdf" title="Un fichier PDF à partager ou à enregistrer, pour imprimer ailleurs">📄 PDF</button><button value="ok" class="principal">Imprimer</button></menu></form>`;
   document.body.appendChild(dlg);
   const $d = (s) => dlg.querySelector(s);
+  $d('#ipPlus').open = !window.matchMedia('(max-width: 900px)').matches; // grand écran : tout est déplié, comme avant
   $d('#ipTitre').value = o.titre; $d('#ipPas').value = o.pas;
   $d('#ipCouleurs').checked = o.couleurs; $d('#ipSymboles').checked = o.symboles; $d('#ipPicots').checked = o.picots; $d('#ipRepasse').checked = o.repasse;
   $d('#ipLegende').value = o.legende; $d('#ipRegrouper').checked = o.regrouper; $d('#ipEnsemble').checked = o.ensemble;

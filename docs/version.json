@@ -1,8 +1,10 @@
 {
-  "version": "1.7.1",
+  "version": "1.7.2",
   "date": "2026-11-14",
   "nouveautes": [
-    "Nouveau bouton « Partager » en haut : Pinterest, image, PDF, liste de courses, liste des perles, envoi du motif, en gros boutons",
-    "Menu ☰ sur téléphone et tablette : trois groupes (Fichier, Créer, Mon motif), tout visible sans déplier"
+    "Téléphone : menu ☰ en tuiles avec icônes (Créer, Mon motif, Fichier)",
+    "Téléphone : panneau des couleurs plus compact, sur deux colonnes, avec les boutons toujours visibles",
+    "Téléphone : l'impression montre d'abord les feuilles, les réglages rares sont repliés",
+    "Épingle Pinterest : le logo et le badge ne sont plus cachés par les boutons de Pinterest, la vignette « repassé » ne recouvre plus les couleurs"
   ]
 }

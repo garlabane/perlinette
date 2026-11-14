@@ -74,27 +74,28 @@ function epingleSvg() {
   const titre = pinLignes((P.nom || 'Mon motif').trim(), 22);
   let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`
     + `<rect width="${W}" height="${H}" fill="${PIN.ivoire}"/>`
-    + pinLogo(60, 50, 7, PIN.prune, 52)
+    + pinLogo(150, 56, 5.6, PIN.prune, 42)
     + `<text x="${W / 2}" y="196" font-size="30" font-weight="700" letter-spacing="3" fill="#a07c5b" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif">MOTIF POUR PERLES À REPASSER</text>`
     + titre.map((l, i) => `<text x="${W / 2}" y="${262 + i * 70}" font-size="60" font-weight="700" fill="${PIN.encre}" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif">${echap(l)}</text>`).join('');
   const carte = 700, cy = 262 + (titre.length - 1) * 70 + 36;
   s += `<rect x="${(W - carte) / 2}" y="${cy}" width="${carte}" height="${carte}" rx="40" fill="#f1e8dc"/>`
     + pinPlaque((W - carte) / 2 + 24, cy + 24, carte - 48, FEN);
   // le même motif une fois repassé, en vignette : on voit tout de suite le « avant / après »
-  const vt = 190, vx = (W + carte) / 2 - vt + 44, vy = cy + carte - vt + 40; // déborde de la plaque : ne cache pas le motif
+  const vt = 180, vx = 750, vy = cy + carte - vt + 84; // déborde de la plaque : ne cache pas le motif
   s += `<rect x="${vx - 12}" y="${vy - 12}" width="${vt + 24}" height="${vt + 56}" rx="22" fill="#fff" stroke="#cdbfae" stroke-width="3"/>`
     + svgRepasse(vx, vy, vt, FEN)
     + `<text x="${vx + vt / 2}" y="${vy + vt + 30}" font-size="30" font-weight="700" fill="${PIN.prune}" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif">repassé</text>`;
   // pastille « imprimable » : à taille réelle sur A4, avec le guide des couleurs (la fonction qui distingue Perlinette)
-  const bw = 450, bx = W - 44 - bw, by = 40, im = (x, y) => `<g transform="translate(${x} ${y}) scale(1.35)" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 14V3h20v11"/><rect x="2" y="14" width="36" height="18" rx="4"/><rect x="10" y="24" width="20" height="14" fill="${PIN.prune}"/><circle cx="32" cy="20" r="1.6" fill="#fff"/></g>`;
-  s += `<g><rect x="${bx}" y="${by}" width="${bw}" height="124" rx="62" fill="${PIN.prune}"/>`
-    + im(bx + 30, by + 32)
-    + `<text x="${bx + 108}" y="${by + 56}" font-size="46" font-weight="700" fill="#fff" font-family="Segoe UI, system-ui, sans-serif">Imprimable A4</text>`
-    + `<text x="${bx + 108}" y="${by + 96}" font-size="30" fill="${PIN.champagne}" font-family="Segoe UI, system-ui, sans-serif">taille réelle + guide</text></g>`;
+  const bw = 350, bx = W - 150 - bw, by = 44, // les coins du haut restent libres : Pinterest y pose ses boutons
+     im = (x, y) => `<g transform="translate(${x} ${y}) scale(1.05)" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 14V3h20v11"/><rect x="2" y="14" width="36" height="18" rx="4"/><rect x="10" y="24" width="20" height="14" fill="${PIN.prune}"/><circle cx="32" cy="20" r="1.6" fill="#fff"/></g>`;
+  s += `<g><rect x="${bx}" y="${by}" width="${bw}" height="96" rx="48" fill="${PIN.prune}"/>`
+    + im(bx + 24, by + 26)
+    + `<text x="${bx + 84}" y="${by + 44}" font-size="34" font-weight="700" fill="#fff" font-family="Segoe UI, system-ui, sans-serif">Imprimable A4</text>`
+    + `<text x="${bx + 84}" y="${by + 76}" font-size="23" fill="${PIN.champagne}" font-family="Segoe UI, system-ui, sans-serif">taille réelle + guide</text></g>`;
   // les couleurs les plus utilisées
-  const yc = cy + carte + 62, pastilles = I.util.slice(0, 8), pas = 62, x0 = (W - (pastilles.length - 1) * pas) / 2;
+  const yc = cy + carte + 62, pastilles = I.util.slice(0, 8), pas = 62, xm = 385, x0 = xm - (pastilles.length - 1) * pas / 2; // centré à gauche de la vignette « repassé »
   s += pastilles.map((u, i) => `<circle cx="${x0 + i * pas}" cy="${yc}" r="25" fill="${u.c.hex}" stroke="#0003" stroke-width="2"/>`).join('');
-  s += `<text x="${W / 2}" y="${yc + 76}" font-size="36" fill="#6b5a66" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif">${I.perles} perles · ${I.util.length} couleurs · ${echap(I.taille)}</text>`;
+  s += `<text x="${xm}" y="${yc + 76}" font-size="36" fill="#6b5a66" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif">${I.perles} perles · ${I.util.length} couleurs · ${echap(I.taille)}</text>`;
   // bandeau de marque : jamais rogné, lisible en miniature
   const hb = 250, yb = H - hb;
   s += `<rect y="${yb}" width="${W}" height="${hb}" fill="${PIN.prune}"/>`
@@ -127,6 +128,20 @@ async function partagerPinterest() {
   try { blob = await epinglePng(); } catch (e) { blob = null; }
   if (!blob) { avertir('Impossible de créer l’image pour Pinterest.'); return; }
   const fichier = new File([blob], nomFichier('-pinterest.png'), { type: 'image/png' });
+  // Téléphone : un seul geste. Le menu de partage de l'appareil s'ouvre avec l'image, son titre, sa description et le lien ;
+  // on choisit Pinterest, puis son tableau. La description est aussi copiée, au cas où l'app ne la reprendrait pas.
+  if (window.matchMedia('(pointer: coarse)').matches && navigator.canShare && navigator.canShare({ files: [fichier] })) {
+    const texte = descriptionPin();
+    try { await navigator.clipboard.writeText(texte); } catch (e) { /* presse-papiers refusé : tant pis */ }
+    const complet = { files: [fichier], title: P.nom, text: texte };
+    try {
+      await navigator.share(navigator.canShare(complet) ? complet : { files: [fichier], title: P.nom });
+      message('Si la description manque dans Pinterest, colle-la : elle est copiée.', 6000);
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return; // partage refermé
+    }
+  }
   const apercu = URL.createObjectURL(blob);
   const dlg = document.createElement('dialog');
   dlg.className = 'pinterest';
