@@ -37,6 +37,14 @@ function boiteUtile(rogner) {
 }
 
 // choix des références, retenu d'une fois sur l'autre
+// Baril Hama Midi « mélange n° 67 » (22 couleurs) : références 01 à 12, 17, 18, 20, 21 et 26 à 31
+// (liste donnée par les vendeurs du mélange 67 ; à vérifier sur ton baril si le contenu a changé).
+const BARIL_MIDI = ['H01', 'H02', 'H03', 'H04', 'H05', 'H06', 'H07', 'H08', 'H09', 'H10', 'H11', 'H12', 'H17', 'H18', 'H20', 'H21', 'H26', 'H27', 'H28', 'H29', 'H30', 'H31'];
+function appliquerBaril(refs) {
+  refs.palettes = ['hama-midi'];
+  refs.exclues = new Set(couleursDesPalettes(refs.palettes).filter((x) => !BARIL_MIDI.includes(x.code)).map((x) => x.cle));
+  retenirRefs(refs);
+}
 function refsImage() {
   const r = reglages.refsImage || {};
   return { palettes: Array.isArray(r.palettes) && r.palettes.length ? r.palettes : ['hama-midi'], exclues: new Set(r.exclues || []) };
@@ -72,15 +80,22 @@ function ouvrirImage() {
   };
   // source des références : ma bibliothèque, ou un choix fait ici
   const nbBiblio = couleursBiblio().length, source = $('#imgSource');
-  source.value = reglages.sourceImage && (reglages.sourceImage !== 'biblio' || nbBiblio) ? reglages.sourceImage : (nbBiblio ? 'biblio' : 'manuel');
+  source.value = reglages.sourceImage && (reglages.sourceImage !== 'biblio' || nbBiblio) ? reglages.sourceImage : (nbBiblio ? 'biblio' : 'baril');
+  // premier usage avec le baril : on coche ses 22 couleurs
+  if (source.value === 'baril' && !reglages.refsImage) appliquerBaril(refs);
+  if (source.value === 'baril') f.max.value = 22;
   const majSource = () => {
     $('#refsManuel').hidden = source.value === 'biblio';
-    $('#imgNoteBiblio').innerHTML = source.value !== 'biblio' ? '' : nbBiblio
+    $('#imgNoteBiblio').innerHTML = source.value === 'baril' ? 'Les 22 couleurs du baril Hama Midi (mélange n° 67) sont cochées. Si tu as d’autres perles, coche-les ci-dessous : elles s’ajoutent.' : source.value !== 'biblio' ? '' : nbBiblio
       ? 'Seules les couleurs que tu as chez toi seront utilisées. Pour changer la liste : bouton « Mes perles ».'
       : '<b>Ta bibliothèque est vide</b> : remplis-la avec le bouton « Mes perles », ou choisis « Un choix fait ici ».';
     majCompte();
   };
-  source.onchange = () => { reglages.sourceImage = source.value; ecrire(CLE.reglages, reglages); majSource(); relancer(); };
+  source.onchange = () => {
+    reglages.sourceImage = source.value; ecrire(CLE.reglages, reglages);
+    if (source.value === 'baril') { appliquerBaril(refs); f.max.value = 22; majRefs(); $$('#imgMarques input').forEach((cb) => (cb.checked = refs.palettes.includes(cb.value))); }
+    majSource(); relancer();
+  };
   $$('#imgMarques input').forEach((cb) => (cb.onchange = () => {
     refs.palettes = $$('#imgMarques input').filter((x) => x.checked).map((x) => x.value);
     retenirRefs(refs); majRefs(); relancer();
