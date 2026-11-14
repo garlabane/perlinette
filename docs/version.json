@@ -1,10 +1,8 @@
 {
-  "version": "1.5.1",
+  "version": "1.5.2",
   "date": "2026-11-14",
   "nouveautes": [
-    "Import d'image sur téléphone : réglages en onglets sous l'aperçu, qui reste visible ; toutes les options sont de nouveau accessibles",
-    "Aperçu de l'import repassé par défaut (bouton Repassé / Perles)",
-    "Contour fin sur les perles très claires pour mieux les voir",
-    "Retour aux perles rondes simples"
+    "Patron imprimé : contour net sur les perles très claires (blanc, crème) pour voir où les poser",
+    "Éditeur et aperçu du repassage : retour au dessin d'avant (surface pleine en repassage complet)"
   ]
 }

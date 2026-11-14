@@ -96,7 +96,7 @@ function svgPlaque(k, x0, y0, o) {
     if (v < 0 || !P.couleurs[v]) { if (o.picots) s += `<circle cx="${cx}" cy="${cy}" r="${mm(pas * 0.09)}" fill="#bbb"/>`; return; }
     const hex = P.couleurs[v].hex;
     s += o.couleurs
-      ? `<circle cx="${cx}" cy="${cy}" r="${mm(r)}" fill="${hex}" stroke="#0005" stroke-width="0.15"/>` + (o.symboles ? '' : `<circle cx="${cx}" cy="${cy}" r="${mm(pas * 0.16)}" fill="#fff8"/>`)
+      ? `<circle cx="${cx}" cy="${cy}" r="${mm(r)}" fill="${hex}" ${perleTresClaire(hex) ? 'stroke="#000b" stroke-width="0.3"' : 'stroke="#0005" stroke-width="0.15"'}/>` + (o.symboles ? '' : `<circle cx="${cx}" cy="${cy}" r="${mm(pas * 0.16)}" fill="#fff8"/>`)
       : `<circle cx="${cx}" cy="${cy}" r="${mm(r)}" fill="none" stroke="#333" stroke-width="0.25"/>`;
     if (o.symboles) s += `<text x="${cx}" y="${cy}" font-size="${mm(pas * 0.55)}" fill="${o.couleurs && !clair(hex) ? '#fff' : '#000'}" text-anchor="middle" dominant-baseline="central" font-family="Consolas,monospace" font-weight="700">${echap(SYMBOLES[v % SYMBOLES.length])}</text>`;
   });
@@ -126,7 +126,7 @@ function svgLegende(comptesListe, x, y, largeur, titre) {
   let s = `<text x="${mm(x)}" y="${mm(y + 3)}" font-size="3.2" font-weight="700" fill="#333">${echap(titre)}</text>`;
   comptesListe.forEach(([v, nb], k) => {
     const c = P.couleurs[v], cx = x + (k % parLigne) * lc, cy = y + 9 + Math.floor(k / parLigne) * 6.4;
-    s += `<circle cx="${mm(cx + 2.4)}" cy="${mm(cy)}" r="2.3" fill="${c.hex}" stroke="#0006" stroke-width="0.2"/>`
+    s += `<circle cx="${mm(cx + 2.4)}" cy="${mm(cy)}" r="2.3" fill="${c.hex}" ${perleTresClaire(c.hex) ? 'stroke="#000b" stroke-width="0.3"' : 'stroke="#0006" stroke-width="0.2"'}/>`
       + `<text x="${mm(cx + 2.4)}" y="${mm(cy)}" font-size="2.4" font-weight="700" fill="${clair(c.hex) ? '#000' : '#fff'}" text-anchor="middle" dominant-baseline="central" font-family="Consolas,monospace">${echap(SYMBOLES[v % SYMBOLES.length])}</text>`
       + `<text x="${mm(cx + 6)}" y="${mm(cy)}" font-size="2.6" fill="#333" dominant-baseline="central"><tspan font-weight="700">${echap(c.code || '')}</tspan> ${echap((c.nom || '').slice(0, 20))}</text>`
       + `<text x="${mm(cx + lc - 3)}" y="${mm(cy)}" font-size="2.6" fill="#333" text-anchor="end" dominant-baseline="central" font-weight="700">${nb}</text>`;
@@ -213,7 +213,7 @@ function preparerPages(o) {
       lignes.slice(d, d + parPage).forEach(([c, i, nb], k) => {
         const yy = y + 7 + k * 7, st = stockDe(c), manque = st !== null && nb > st;
         const t = (x, txt, a = 'start', g = false) => `<text x="${mm(x)}" y="${mm(yy)}" font-size="3" fill="#222" text-anchor="${a}" dominant-baseline="central"${g ? ' font-weight="700"' : ''}>${txt}</text>`;
-        s += `<circle cx="${mm(Z.x + 3)}" cy="${mm(yy)}" r="2.4" fill="${c.hex}" stroke="#0006" stroke-width="0.2"/>`
+        s += `<circle cx="${mm(Z.x + 3)}" cy="${mm(yy)}" r="2.4" fill="${c.hex}" ${perleTresClaire(c.hex) ? 'stroke="#000b" stroke-width="0.3"' : 'stroke="#0006" stroke-width="0.2"'}/>`
           + t(Z.x + 8, echap(SYMBOLES[i % SYMBOLES.length]), 'start', true) + t(Z.x + 20, echap(marqueDe(c))) + t(Z.x + 58, echap(c.code || '—'), 'start', true)
           + t(Z.x + 78, echap(c.nom)) + t(Z.x + Z.w - 30, nb, 'end', true) + t(Z.x + Z.w, st === null ? '' : st + (manque ? ` (manque ${nb - st})` : ''), 'end');
         s += `<line x1="${Z.x}" y1="${mm(yy + 3.5)}" x2="${Z.x + Z.w}" y2="${mm(yy + 3.5)}" stroke="#eee" stroke-width="0.2"/>`;

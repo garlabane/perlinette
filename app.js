@@ -156,8 +156,7 @@ function rendu() {
     ctx.globalAlpha = transp ? 0.62 : 1;
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = hex; ctx.fill();
     ctx.globalAlpha = 1;
-    if (perleTresClaire(hex) && z >= 4) { ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = Math.max(1, z * 0.07); ctx.stroke(); }
-    else if (z >= 8) { ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = 1; ctx.stroke(); }
+    if (z >= 8) { ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = 1; ctx.stroke(); }
     if (transp && z >= 8) { ctx.beginPath(); ctx.arc(cx - r * 0.35, cy - r * 0.35, r * 0.22, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.fill(); }
     if (estPhospho(P.couleurs[v]) && z >= 8) { ctx.strokeStyle = 'rgba(120,230,120,.8)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(cx, cy, r * 0.8, 0, Math.PI * 2); ctx.stroke(); }
     if (symb) { ctx.fillStyle = clair(hex) ? '#000' : '#fff'; ctx.fillText(SYMBOLES[v % SYMBOLES.length], cx, cy + 1); }

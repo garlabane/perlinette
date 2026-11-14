@@ -42,7 +42,6 @@ function dessinerFusion(g, z, M, surf, motif, degre, soudure) {
     const [cx, cy] = pos(i);
     g.globalAlpha = tombe.has(i) ? 0.5 : estTransparente(motif.couleurs[motif.cases[i]]) ? 0.7 : 1;
     g.beginPath(); g.arc(cx, cy, d.rayon * z, 0, Math.PI * 2); g.fillStyle = hex(i); g.fill();
-    if (typeof perleTresClaire === 'function' && perleTresClaire(hex(i)) && z >= 4) { g.beginPath(); g.arc(cx, cy, d.rayon * z, 0, Math.PI * 2); g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = Math.max(1, z * 0.06); g.stroke(); }
     if (d.trou > 0) { g.beginPath(); g.arc(cx, cy, d.trou * z, 0, Math.PI * 2); g.fillStyle = '#f7f3ee'; g.fill(); }
     g.globalAlpha = 1;
   });

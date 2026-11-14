@@ -340,8 +340,6 @@ function calculerImage(f, palette) {
     const v = resultatImage.cases[i];
     g.beginPath(); g.arc(q.x * t, q.y * t, v >= 0 ? t * 0.47 : Math.max(0.6, t * 0.12), 0, Math.PI * 2);
     g.fillStyle = v >= 0 ? resultatImage.couleurs[v].hex : '#ddd'; g.fill();
-    // les perles très claires (blanc, crème) reçoivent un fin contour : sinon on ne les voit pas sur le fond
-    if (v >= 0 && t >= 4 && perleTresClaire(resultatImage.couleurs[v].hex)) { g.strokeStyle = 'rgba(0,0,0,.42)'; g.lineWidth = Math.max(1, t * 0.07); g.stroke(); }
   });
   const nb = resultatImage.cases.filter((v) => v >= 0).length;
   majUtilisees();
