@@ -1,9 +1,7 @@
 {
-  "version": "1.7.3",
+  "version": "1.8.0",
   "date": "2026-11-14",
   "nouveautes": [
-    "« + Couleur » : un bouton ajoute d'un coup toutes tes perles (ou toutes les couleurs affichées) au motif ; elles défilent ensuite dans la bande des couleurs",
-    "Téléphone : « Imprimer ou PDF » est dans le bouton « Imprimer et partager » ; les réglages d'impression tiennent sur un écran, en pastilles à toucher",
-    "Patron imprimé : le logo Perlinette et l'adresse du site sont toujours en haut de page ; la taille des perles se choisit en un bouton (Midi, Mini, Maxi)"
+    "Pinterest, pour les modèles de Perlinette : l'épingle part avec le lien « Visiter le site », qui rouvre le modèle dans Perlinette"
   ]
 }
