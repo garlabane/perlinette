@@ -914,3 +914,6 @@ dialog.partage { width: min(440px, 94vw); }
 .impr-pas-autre { display: flex !important; flex-direction: row !important; align-items: center; gap: 6px; margin: 0 !important; color: var(--doux); }
 .impr-pas-autre input { width: 76px; min-height: 40px; text-align: center; }
 .impr-pas .segment button.actif small { color: inherit; opacity: .85; }
+
+.mod-liste .mod-famille { grid-column: 1 / -1; margin: 14px 0 2px; color: var(--prune); font-size: 15px; border-bottom: 1px solid var(--bord); padding-bottom: 4px; }
+.mod-liste .mod-famille:first-child { margin-top: 0; }

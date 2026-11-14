@@ -146,6 +146,30 @@ function vignette(canvas, pose, taille) {
   });
 }
 
+// Familles pour classer les modèles d'un thème, d'après leur nom (mots-clés) ; « Autres » sinon.
+const FAMILLES_MODELES = ['Personnages', 'Animaux', 'Sapins et décorations', 'Gourmandises', 'Cadeaux et jouets', 'Vêtements et accessoires', 'Maisons et paysages', 'Autres'];
+const MOTS_FAMILLES = [
+  ['Personnages', /(^|[^a-zà-ÿ])(p[eè]re no[eë]l|m[eè]re no[eë]l|lutin|ange|bonhomme|casse-noisette|soldat|princesse|f[ée]e|sorci[eè]re|fant[oô]me|elfe|pirate|robot|momie|vampire|zombie)(?![a-zà-ÿ])/i],
+  ['Animaux', /(^|[^a-zà-ÿ])(renne|renard|ours|ourson|hibou|chouette|lapin|chat|chaton|chien|chiot|corgi|panda|pingouin|manchot|phoque|morse|cerf|biche|[ée]cureuil|mulot|souris|oiseau|oiseaux|cardinal|rouge-gorge|harfang|flamant|cygne|oie|canard|poussin|poule|mouton|agneau|cochon|vache|cheval|licorne|dragon|poisson|baleine|dauphin|tortue|grenouille|abeille|papillon|loup|h[ée]risson|koala|lion|tigre|girafe|[ée]l[ée]phant|singe|chauve-souris|araign[ée]e)s?(?![a-zà-ÿ])/i],
+  ['Gourmandises', /biscuit|sabl[ée]|chocolat|sucre d|bonbon|b[uû]che|cupcake|pudding|pain d.[ée]pice|bretzel|macaron|cl[ée]mentine|orange|g[aâ]teau|tarte|glace|beignet|donut|cookie|caf[ée]|th[ée]|mug|tasse|fruit|pomme(?! de pin)|cerise|fraise|citrouille|bonbonni|noix/i],
+  ['Cadeaux et jouets', /cadeau|paquet|jouet|train|tra[iî]neau|toupie|tambour|hotte|luge|ballon|panier|poup[ée]e|peluche/i],
+  ['Vêtements et accessoires', /chaussette|moufle|mitaine|bonnet|pull|[ée]charpe|botte|chaussure|patin|ski|manteau|gant|chapeau|lunettes|n(oe|œ|o)ud|cl[ée]|foulard|collier/i],
+  ['Maisons et paysages', /maison|chalet|cabane|village|igloo|montagne|lune|soleil|nuage|ch[aâ]teau|[ée]glise/i],
+  ['Sapins et décorations', /sapin|boule|[ée]toile|flocon|couronne|houx|gui|cloche|clochette|grelot|guirlande|lanterne|bougie|poinsettia|pomme de pin|branche|lettre|goutte|c(oe|œ|o)ur|ruban|gland|rosace/i],
+];
+// la famille du PREMIER mot reconnu dans le nom : « Boule renne » est une décoration, « Renne en chaussettes » un animal,
+// « Botte du Père Noël » un vêtement
+function familleModele(m) {
+  let best = 'Autres', pos = Infinity;
+  for (const [f, re] of MOTS_FAMILLES) {
+    const r = re.exec(m.nom);
+    if (!r) continue;
+    const k = r.index + (r[1] && /^[^a-zà-ÿ]$/i.test(r[1]) ? 1 : 0);
+    if (k < pos) { pos = k; best = f; }
+  }
+  return best;
+}
+
 function ouvrirModeles() {
   let dlg = $('#dlgModeles');
   if (!dlg) {
@@ -154,6 +178,7 @@ function ouvrirModeles() {
       <div class="nu-outils">
         <label class="case">Thème <select id="modTheme"></select></label>
         <label class="case">Plaque <select id="modPlaque"></select></label>
+        <label class="case">Classer <select id="modTri"><option value="familles">par famille</option><option value="nom">par nom (A → Z)</option><option value="petit">du plus petit au plus grand</option><option value="nouveaux">les nouveaux d'abord</option></select></label>
         <label class="case" id="modMesPerlesLbl"><input type="checkbox" id="modMesPerles"> Avec mes perles</label>
         <span style="flex:1"></span>
         <button type="button" id="modMot" class="principal">✏️ Écrire une phrase…</button>
@@ -163,6 +188,8 @@ function ouvrirModeles() {
       <menu><button value="fermer">Fermer</button></menu></form>`;
     document.body.appendChild(dlg);
     $('#modPlaque').onchange = majModeles;
+    $('#modTri').value = reglages.modTri || 'familles';
+    $('#modTri').onchange = (e) => { reglages.modTri = e.target.value; ecrire(CLE.reglages, reglages); majModeles(); };
     $('#modTheme').onchange = () => { majPlaquesTheme(); majModeles(); };
     $('#modMot').onclick = () => ecrirePhrase();
     $('#modMesPerles').onchange = (e) => { reglages.modMesPerles = e.target.checked; ecrire(CLE.reglages, reglages); majModeles(); };
@@ -194,7 +221,22 @@ function majModeles() {
   liste.innerHTML = '';
   const mesPerles = $('#modMesPerles').checked ? perlesCibles('biblio') : null;
   // chaque modèle dit sur quelles plaques il est prévu (par défaut : le grand carré)
-  for (const m of MODELES.filter((x) => x.theme === theme && (x.plaques || ['midi-carre-grand']).includes(plaque))) {
+  let choisis = MODELES.map((m, i) => ({ m, i })).filter(({ m }) => m.theme === theme && (m.plaques || ['midi-carre-grand']).includes(plaque));
+  let tri = $('#modTri').value || 'familles';
+  // les familles ne servent que si le thème s'y prête (Noël…) ; sinon on range simplement par nom
+  if (tri === 'familles' && choisis.filter(({ m }) => familleModele(m) === 'Autres').length > choisis.length / 3) tri = 'nom';
+  const alpha = (a, b) => a.m.nom.localeCompare(b.m.nom, 'fr', { sensitivity: 'base' });
+  const taille = (m) => m.grille ? m.grille.join('').replace(/\./g, '').length : 0;
+  if (tri === 'nom') choisis.sort(alpha);
+  else if (tri === 'petit') choisis.sort((a, b) => taille(a.m) - taille(b.m) || alpha(a, b));
+  else if (tri === 'nouveaux') choisis.sort((a, b) => b.i - a.i);
+  else choisis.sort((a, b) => FAMILLES_MODELES.indexOf(familleModele(a.m)) - FAMILLES_MODELES.indexOf(familleModele(b.m)) || alpha(a, b));
+  let familleEnCours = null;
+  for (const { m } of choisis) {
+    if (tri === 'familles') {
+      const f = familleModele(m);
+      if (f !== familleEnCours) { familleEnCours = f; const h = document.createElement('h4'); h.className = 'mod-famille'; h.textContent = f; liste.appendChild(h); }
+    }
     const pose = poserModele(m, plaque), nb = pose.cases.filter((v) => v >= 0).length;
     const carte = document.createElement('button');
     carte.type = 'button'; carte.className = 'mod-carte';
