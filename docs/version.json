@@ -1,8 +1,7 @@
 {
-  "version": "1.11.0",
+  "version": "1.12.0",
   "date": "2026-11-14",
   "nouveautes": [
-    "Le site a maintenant une page par modèle et une galerie de tous les modèles (garlabane.github.io/perlinette/modeles/)",
-    "Pinterest : l'épingle d'un modèle pointe vers sa page, où Pinterest lit son titre et sa description"
+    "Nouveau thème « Noël kawaii » : 100 modèles de Noël pour le grand carré"
   ]
 }
