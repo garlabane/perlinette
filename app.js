@@ -245,9 +245,9 @@ function majInfos() {
   const f = formatParId(P.format), nb = SURF.plaques.length;
   const cm = (v) => (v * P.pas / 10).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 1 });
   $('#nomProjet').textContent = P.nom;
-  $('#infoPlaque').innerHTML = `${echap(f.nom)}${nb > 1 ? ` × ${nb} (${P.cfg.cols || 1} × ${P.cfg.rangs || 1})` : ''}<br>
-    ${SURF.picots.length} picots · ${cm(SURF.larg)} × ${cm(SURF.haut)} cm (écart ${String(P.pas).replace('.', ',')} mm)<br>
-    <small>Source : ${echap(f.source || 'ma plaque')}</small>`;
+  // une ligne : la plaque et sa taille (le détail des picots est dans la fenêtre Plaques)
+  $('#infoPlaque').innerHTML = `<span>${echap(f.nom)}${nb > 1 ? ` × ${nb}` : ''} · ${cm(SURF.larg)} × ${cm(SURF.haut)} cm</span> <button type="button" class="lien-plaque" data-action="plaque">Changer</button>`;
+  $('#infoPlaque').title = `${SURF.picots.length} picots · écart ${String(P.pas).replace('.', ',')} mm · source : ${f.source || 'ma plaque'}`;
   const t = texteSoudure(S.soudure || analyserSoudure(SURF, P.cases)), el = $('#soudure');
   el.textContent = t; el.className = 'soudure ' + (t.startsWith('⚠') ? 'pb' : 'ok');
   el.title = t.startsWith('⚠') ? 'Au repassage, seules les perles qui se touchent par le côté se soudent. Les perles entourées de rouge risquent de tomber ou de se détacher.' : '';

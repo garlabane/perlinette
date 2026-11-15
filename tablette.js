@@ -249,10 +249,10 @@ function largeurTexteMax() {
 function ouvrirPanneauTexte() {
   fermerBulle();
   $('#panneauTexte')?.remove();
-  const st = styleLettres(), etat = { texte: TB.dernierTexte || '', taille: reglages.texteTaille || '1', couleur: reglages.texteCouleur || 'jeu:arc', relief: reglages.texteRelief !== false };
+  const st = styleLettres(), etat = { texte: TB.dernierTexte || '', taille: reglages.texteTaille || '1', couleur: reglages.texteCouleur || 'jeu:arc', relief: reglages.texteRelief !== false, lettres: reglages.texteLettres || 'soudees', contour: reglages.texteContour ?? 'H18' };
   const p = document.createElement('div');
   p.id = 'panneauTexte'; p.className = 'panneau-texte';
-  const jeux = JEUX.slice(0, 4).map((j) => `<button type="button" class="tx-coul" data-c="jeu:${j.id}" title="${echap(j.nom)}">${j.familles.slice(0, 4).map((f) => `<i style="background:${hexDe(famille(f).base)}"></i>`).join('')}<span>${echap(j.nom)}</span></button>`).join('');
+  const jeux = JEUX.map((j) => `<button type="button" class="tx-coul" data-c="jeu:${j.id}" title="${echap(j.nom)}">${j.familles.slice(0, 4).map((f) => `<i style="background:${hexDe(famille(f).base)}"></i>`).join('')}<span>${echap(j.nom)}</span></button>`).join('');
   const fams = FAMILLES.map((f) => `<button type="button" class="tx-fam" data-c="fam:${f.id}" title="${echap(f.nom)}" style="background:${hexDe(f.base)}"></button>`).join('');
   p.innerHTML = `
     <div class="tx-haut"><b>Texte</b><small>${echap(st.info)}</small><button type="button" class="tx-fermer" aria-label="Fermer">✕</button></div>
@@ -260,6 +260,8 @@ function ouvrirPanneauTexte() {
     <div class="tx-ligne" id="txTaille">${[['1', 'Petites'], ['2', 'Moyennes'], ['3', 'Grandes']].map(([v, m]) => `<button type="button" data-v="${v}">${m}</button>`).join('')}</div>
     <div class="tx-ligne tx-jeux">${jeux}</div>
     <div class="tx-familles">${fams}</div>
+    <div class="tx-ligne" id="txLettres"><button type="button" data-v="soudees">Un mot = une pièce</button><button type="button" data-v="separees">Une pièce par lettre</button></div>
+    <div class="tx-contours"><span>Contour</span><button type="button" class="tx-cont" data-v="" title="Sans contour"><i style="background:#fff;border:1px dashed #999"></i></button>${CONTOURS.map((c) => `<button type="button" class="tx-cont" data-v="${c.code}" title="${echap(c.nom)}"><i style="background:${hexDe(c.code)}"></i></button>`).join('')}</div>
     <div class="tx-ligne"><button type="button" id="txRelief">Relief</button></div>
     <div class="tx-apercu"><canvas id="txApercu"></canvas><small id="txInfo"></small></div>
     <div class="tx-ligne tx-actions"><button type="button" class="tx-fermer">Fermer</button><button type="button" class="principal" id="txPlacer">Placer sur la plaque</button></div>`;
@@ -271,8 +273,10 @@ function ouvrirPanneauTexte() {
     p.querySelectorAll('#txTaille [data-v]').forEach((b) => b.classList.toggle('actif', b.dataset.v === etat.taille));
     p.querySelectorAll('[data-c]').forEach((b) => b.classList.toggle('actif', b.dataset.c === etat.couleur));
     p.querySelector('#txRelief').classList.toggle('actif', etat.relief);
+    p.querySelectorAll('#txLettres [data-v]').forEach((b) => b.classList.toggle('actif', b.dataset.v === etat.lettres));
+    p.querySelectorAll('.tx-cont').forEach((b) => b.classList.toggle('actif', b.dataset.v === etat.contour));
     p.querySelector('#txRelief').textContent = etat.relief ? 'Avec relief' : 'Sans relief';
-    rr = etat.texte.trim() ? construireReseau({ texte: etat.texte, taille: +etat.taille, tri: st.tri, couleur: etat.couleur, contour: 'H18', relief: etat.relief, largeurMax: largeurTexteMax() }) : null;
+    rr = etat.texte.trim() ? construireReseau({ texte: etat.texte, taille: +etat.taille, tri: st.tri, couleur: etat.couleur, contour: etat.contour, lettres: etat.lettres, relief: etat.relief, largeurMax: largeurTexteMax() }) : null;
     p.querySelector('#txPlacer').disabled = !rr || !!rr.erreur;
     if (!rr || rr.erreur) { cv.width = cv.height = 0; info.textContent = rr ? rr.erreur : 'Tape ton texte : l’aperçu apparaît ici.'; return; }
     vignette(cv, { surf: rr.surf, cases: rr.cases, couleurs: rr.couleurs }, 300);
@@ -284,6 +288,8 @@ function ouvrirPanneauTexte() {
   saisie.onkeydown = (e) => { if (e.key === 'Enter' && rr && !rr.erreur) p.querySelector('#txPlacer').click(); if (e.key === 'Escape') fermer(); };
   p.querySelectorAll('#txTaille [data-v]').forEach((b) => (b.onclick = () => { etat.taille = b.dataset.v; reglages.texteTaille = etat.taille; ecrire(CLE.reglages, reglages); maj(); }));
   p.querySelectorAll('[data-c]').forEach((b) => (b.onclick = () => { etat.couleur = b.dataset.c; reglages.texteCouleur = etat.couleur; ecrire(CLE.reglages, reglages); maj(); }));
+  p.querySelectorAll('#txLettres [data-v]').forEach((b) => (b.onclick = () => { etat.lettres = b.dataset.v; reglages.texteLettres = etat.lettres; ecrire(CLE.reglages, reglages); maj(); }));
+  p.querySelectorAll('.tx-cont').forEach((b) => (b.onclick = () => { etat.contour = b.dataset.v; reglages.texteContour = etat.contour; ecrire(CLE.reglages, reglages); maj(); }));
   p.querySelector('#txRelief').onclick = () => { etat.relief = !etat.relief; reglages.texteRelief = etat.relief; ecrire(CLE.reglages, reglages); maj(); };
   // « Placer » : le texte devient une copie qui suit le doigt ; on le pose en relevant le doigt
   p.querySelector('#txPlacer').onclick = () => {

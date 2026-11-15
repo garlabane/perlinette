@@ -1,10 +1,9 @@
 {
-  "version": "1.18.0",
+  "version": "1.18.1",
   "date": "2026-11-15",
   "nouveautes": [
-    "Tablette : une disposition pensée pour le doigt, outils sous le pouce gauche, couleurs sous le pouce droit, réglages dans un tiroir",
-    "Nouveaux outils partout : Texte (écrire sur la plaque), Formes regroupées, palette en éventail (couleurs récentes)",
-    "Poser mes perles : zoom sur l’étape en cours, grandes zones précédent / suivant, cadenas, écran « Bravo »",
-    "Ordinateur : l’en-tête tient sur tous les écrans (menus Créer et Mon motif), Imprimer toujours visible"
+    "Panneau des couleurs réorganisé : la couleur en cours en grand, la liste au centre, la plaque et l’aperçu en bas",
+    "Texte : lettres soudées ou séparées, choix du contour, tous les jeux de couleurs",
+    "Menu ☰ plus léger, en trois colonnes"
   ]
 }

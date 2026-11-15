@@ -364,7 +364,7 @@ body.enfant .barre-sel { display: none !important; }
 .mod-carte .approchee { color: #a3561c; font-weight: 600; }
 
 /* onglets : plusieurs motifs ouverts (onglets.js) */
-.onglets { position: sticky; top: -16px; z-index: 5; display: flex; gap: 4px; align-items: flex-end; overflow-x: auto; margin: -16px -16px 12px; padding: 8px 16px 0; background: var(--fond); border-bottom: 1px solid var(--bord); scrollbar-width: thin; }
+.onglets { position: sticky; top: -16px; z-index: 5; display: flex; gap: 4px; align-items: flex-end; overflow-x: auto; overflow-y: hidden; margin: -16px -16px 12px; padding: 8px 16px 0; background: var(--fond); border-bottom: 1px solid var(--bord); scrollbar-width: thin; }
 .onglet { flex: none; display: flex; align-items: center; max-width: 220px; border: 1px solid var(--bord); border-bottom: none; border-radius: 9px 9px 0 0; background: var(--panneau); opacity: .75; }
 .onglet.actif { opacity: 1; background: #fff; box-shadow: 0 -2px 0 var(--prune) inset; margin-bottom: -1px; padding-bottom: 1px; }
 .onglet-nom { border: none; background: none; padding: 7px 4px 7px 12px; font: inherit; font-size: 13px; color: var(--texte); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; min-width: 0; }
@@ -1168,3 +1168,81 @@ body.tablette:not(.tiroir-ouvert) .tb-dispo { display: none !important; }
 .grille-outils > button.a-options::after { right: 3px; bottom: 3px; border-width: 4px; }
 .ligne-boutons .a-options::after { display: none; }
 @media (max-width: 600px) { .grille-outils > button[data-options="formes"] { display: flex !important; } }
+/* panneau Texte : tous les jeux de couleurs et toutes les couleurs, en grille (rien à faire défiler de côté) */
+.panneau-texte .tx-jeux { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.panneau-texte .tx-jeux .tx-coul { min-height: 52px; padding: 5px 2px; }
+.panneau-texte .tx-jeux .tx-coul span { font-size: 11.5px; line-height: 1.15; text-align: center; }
+.panneau-texte .tx-familles { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; overflow: visible; padding: 2px; }
+.panneau-texte .tx-fam { width: 40px; height: 40px; justify-self: center; }
+
+/* ===== Menu ☰ allégé ===== */
+/* le menu « Créer ▾ » de l'en-tête large n'a rien à faire dans le ☰ (ses actions y sont déjà) */
+body.menu-ouvert .barre nav .menu-bureau { display: none !important; }
+/* petit ordinateur (901 à 1280 px, à la souris) : un menu en 3 colonnes — Fichier · Créer · Mon motif —
+   en simples lignes (pas de tuiles), comme le menu d'un logiciel */
+@media (min-width: 901px) and (max-width: 1280px) {
+  body.menu-ouvert:not(.tablette) .barre nav {
+    display: grid; grid-template-columns: repeat(3, minmax(190px, 1fr)); grid-auto-flow: row dense; gap: 0 14px;
+    left: 8px; right: auto; width: min(680px, calc(100vw - 16px)); padding: 10px 12px 12px; border-radius: 14px; align-content: start;
+  }
+  body.menu-ouvert:not(.tablette) .barre nav > .sep { display: none; }
+  body.menu-ouvert:not(.tablette) .barre nav > [data-g="f"] { grid-column: 1; }
+  body.menu-ouvert:not(.tablette) .barre nav > [data-g="c"] { grid-column: 2; }
+  body.menu-ouvert:not(.tablette) .barre nav > [data-g="m"] { grid-column: 3; }
+  body.menu-ouvert:not(.tablette) .barre nav > .menu[data-g="f"] { grid-row: 2 / span 12; }
+  body.menu-ouvert:not(.tablette) .barre nav .nav-titre { padding: 4px 8px 6px; font-size: 11px; }
+  body.menu-ouvert:not(.tablette) .barre nav .menu-liste,
+  body.menu-ouvert:not(.tablette) .barre nav .menu-liste[hidden] { display: flex !important; flex-direction: column; gap: 0; }
+  body.menu-ouvert:not(.tablette) .barre nav > button,
+  body.menu-ouvert:not(.tablette) .barre nav .menu-liste button {
+    display: block; border: none; background: none; text-align: left; min-height: 34px; padding: 6px 8px;
+    border-radius: 8px; font-size: 14px; line-height: 1.25; white-space: normal;
+  }
+  body.menu-ouvert:not(.tablette) .barre nav > button:hover,
+  body.menu-ouvert:not(.tablette) .barre nav .menu-liste button:hover { background: var(--prune-clair); }
+  body.menu-ouvert:not(.tablette) .barre nav .menu-liste small { display: inline; margin-left: 4px; font-size: 12px; }
+  body.menu-ouvert:not(.tablette) .barre nav [data-action="poser"] { margin-top: 6px; border: 1px solid var(--bord); }
+}
+@media (min-width: 901px) and (max-width: 1280px) { body.menu-ouvert:not(.tablette) .barre nav .menu-liste :is([data-action="partagerImage"], [data-action="pinterest"], [data-action="partagerListe"], [data-action="courses"], [data-action="partagerMotif"]) { display: none; } }
+
+/* panneau Texte : contour des lettres */
+.panneau-texte .tx-contours { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.panneau-texte .tx-contours > span { font-size: 13px; color: var(--doux); margin-right: 4px; }
+.panneau-texte .tx-cont { width: 40px; height: 40px; padding: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.panneau-texte .tx-cont i { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(0,0,0,.2); }
+.panneau-texte .tx-cont.actif { box-shadow: 0 0 0 3px var(--prune); border-color: var(--prune); }
+/* menu ☰ du petit ordinateur : il s'ouvre à droite, sous son bouton, comme avant */
+@media (min-width: 901px) and (max-width: 1280px) { body.menu-ouvert:not(.tablette) .barre nav { left: auto; right: 8px; } }
+
+/* ===== Panneau de droite réorganisé (panneau.js) : couleur en cours, couleurs du motif, plaque en bas ===== */
+.coul-encours, .coul-entete .a-options { display: none; }
+.coul-entete { display: flex; align-items: center; gap: 6px; }
+.coul-entete h2 { flex: 1 1 auto; min-width: 0; }
+.lien-plaque { border: none; background: none; padding: 0 2px; color: var(--prune); text-decoration: underline; font-size: 12px; cursor: pointer; }
+@media (min-width: 901px) {
+  body:not(.enfant) .cote section:first-child { order: 2; border-top: 1px solid var(--bord); border-bottom: none; padding-top: 10px; }
+  body:not(.enfant) .couleurs-section { order: 1; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; border-bottom: none; }
+  body:not(.enfant) .tb-dispo { order: 3; }
+  body:not(.enfant) .couleurs-section .tri, body:not(.enfant) .couleurs-section .ligne-boutons { display: none; }
+  body:not(.enfant) .couleurs { max-height: none; flex: 1 1 auto; min-height: 0; }
+  body:not(.enfant) .coul-encours { display: flex; align-items: center; gap: 12px; padding: 6px 2px 12px; margin-bottom: 6px; border-bottom: 1px solid var(--bord); }
+  body:not(.enfant) .coul-entete .a-options { display: flex; }
+  body:not(.enfant) .coul .pastille { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset -3px -3px 0 rgba(0,0,0,.12); }
+  body:not(.enfant) .coul { padding: 4px 6px; min-height: 34px; }
+  body:not(.enfant) .cote .soudure { margin: 0 0 8px; }
+  body:not(.enfant) .cote section:first-child h2 { display: none; }
+  body:not(.enfant) #infoPlaque { margin: 0 0 8px; }
+}
+.coul-encours-perle { width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(0,0,0,.2); box-shadow: inset -4px -4px 0 rgba(0,0,0,.12); flex: 0 0 auto; }
+.coul-encours-texte { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.coul-encours-texte b { font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.coul-encours-texte small { color: var(--doux); font-size: 12px; }
+.coul-remplacer { width: 36px; height: 36px; padding: 0; border-radius: 8px; font-size: 18px; color: var(--prune); flex: 0 0 auto; }
+.coul-entete .coul-ajout, .coul-entete .coul-plus { position: relative; width: 32px; height: 32px; padding: 0; align-items: center; justify-content: center; border-radius: 8px; }
+.coul-entete .coul-ajout { background: var(--prune); border-color: var(--prune); }
+.coul-entete svg { width: 18px; height: 18px; fill: none; stroke: var(--prune); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.coul-entete .coul-ajout svg { stroke: #fff; }
+.coul-entete .a-options::after { display: none; }
+body.tablette:not(.tiroir-ouvert) .coul-encours, body.tablette:not(.tiroir-ouvert) .coul-entete { display: none !important; }
+body.tablette.tiroir-ouvert .coul-entete .coul-ajout, body.tablette.tiroir-ouvert .coul-entete .coul-plus { width: 44px; height: 44px; }
+.bulle-options .bulle-sep { height: 1px; background: var(--bord); margin: 4px 6px; }

@@ -158,7 +158,10 @@ function construireReseau(r) {
   const ignores = new Set();
   const lignes = t.split(/\r?\n/).map((l) => l.split(/\s+/).filter(Boolean).map((mot) => [...mot].filter((c) => (connuReseau(c) ? true : (ignores.add(c), false)))).filter((m) => m.length)).filter((l) => l.length);
   if (!lignes.length) return { erreur: 'Tape au moins une lettre ou un chiffre.' };
-  const gap = s, espace = 3 * s, pas = 2 * Math.ceil((11 * s + 2) / 2);
+  // écart entre deux lettres : « soudées » = elles se touchent (par leur contour s'il y en a un) et le mot fait
+  // une seule pièce ; « séparées » = un picot vide entre elles (entre leurs contours), chaque lettre est une pièce
+  const gap = r.lettres === 'soudees' ? (r.contour ? 1 : 0) : r.lettres === 'separees' ? (r.contour ? 3 : 1) : s;
+  const espace = 3 * s, pas = 2 * Math.ceil((11 * s + 2) / 2);
   const glyphes = (mot) => mot.map((ch) => lettreReseau(ch, s, tri));
   const largeurMot = (mot) => glyphes(mot).reduce((a, g) => a + Math.ceil(g.x1) - g.x0 + 1 + gap, -gap);
   // mise en page : à la main (retours à la ligne) et, sur une plaque à contour (hexagone, rond), les mots passent
