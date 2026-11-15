@@ -123,7 +123,7 @@ function traduireSvg(svg) {
 }
 
 // ---------- traduction de la page, au fil de l'eau ----------
-const ATTRS_TRAD = ['title', 'placeholder', 'aria-label', 'alt'];
+const ATTRS_TRAD = ['title', 'placeholder', 'aria-label', 'alt', 'data-court']; // data-court : mot court affiché par le style (::after)
 function horsTraduction(el) {
   return !el || el.closest('script,style,textarea,[translate="no"],[contenteditable="true"]');
 }

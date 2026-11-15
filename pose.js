@@ -7,7 +7,7 @@
 // Rien n'est modifié dans le motif : seule l'avancée est retenue, par motif, dans le navigateur.
 
 const CLE_POSE = 'perlesrep.pose';
-const POSE = { mode: 'couleur', etape: 0, plaque: -1, zoom: 0, verrou: null, reel: false };
+const POSE = { mode: 'couleur', etape: 0, plaque: -1, zoom: 0, verrou: null, reel: false, focus: true };
 
 // ---------- taille réelle : la plaque transparente se pose sur l'écran ----------
 // Un écran ne connaît pas sa vraie taille : on la règle une fois, avec une carte bancaire
@@ -115,18 +115,36 @@ function cadrePose() {
   return { x: 0, y: 0, larg: SURF.larg, haut: SURF.haut };
 }
 
+// « étape en grand » : on cadre la rangée en cours (avec une rangée au-dessus et au-dessous),
+// ou la zone où se trouve la couleur en cours ; « tout voir » montre de nouveau toute la plaque
+function cadreEtape(et) {
+  const base = cadrePose();
+  if (POSE.mode === 'rangee') return { x: base.x, y: et.y - 1.5, larg: base.larg, haut: 3 };
+  const ids = picotsPose().filter((i) => P.cases[i] === et.couleur);
+  if (!ids.length) return base;
+  let x0 = Math.min(...ids.map((i) => SURF.picots[i].x)) - 1.5, x1 = Math.max(...ids.map((i) => SURF.picots[i].x)) + 1.5;
+  let y0 = Math.min(...ids.map((i) => SURF.picots[i].y)) - 1.5, y1 = Math.max(...ids.map((i) => SURF.picots[i].y)) + 1.5;
+  // pas trop serré : au moins 9 picots de côté, pour garder des repères autour
+  if (x1 - x0 < 9) { const m = (x0 + x1) / 2; x0 = m - 4.5; x1 = m + 4.5; }
+  if (y1 - y0 < 9) { const m = (y0 + y1) / 2; y0 = m - 4.5; y1 = m + 4.5; }
+  return { x: x0, y: y0, larg: x1 - x0, haut: y1 - y0 };
+}
+
 function dessinerPose() {
   const cv = $('#poseToile'), boite = $('#poseVue');
   if (!cv) return;
   const etapes = etapesPose();
   POSE.etape = Math.max(0, Math.min(etapes.length - 1, POSE.etape));
-  const et = etapes[POSE.etape], c = cadrePose();
+  const et = etapes[POSE.etape], c = POSE.focus && !POSE.reel && et ? cadreEtape(et) : cadrePose();
   majPanneauPose(etapes, et); // d'abord le panneau du bas : sa hauteur fixe la place laissée au dessin
   const ajuste = Math.max(4, Math.min((boite.clientWidth - 16) / c.larg, (boite.clientHeight - 16) / c.haut));
   const t = POSE.reel ? (P.pas || 5) * pxParMm() : Math.max(4, Math.min(60, ajuste * (POSE.zoom ? Math.pow(1.3, POSE.zoom) : 1)));
   $('#pose').classList.toggle('reel', POSE.reel);
   $('#poseReel').classList.toggle('actif', POSE.reel);
   $('#poseReel').textContent = POSE.reel ? '📏 Taille réelle ✓' : '📏 Taille réelle';
+  $('#poseFocus').classList.toggle('actif', POSE.focus && !POSE.reel);
+  $('#poseFocus').disabled = POSE.reel;
+  $('#poseFocus').textContent = POSE.focus ? '🔍 Étape en grand ✓' : '🔍 Étape en grand';
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   cv.width = Math.ceil(c.larg * t * dpr); cv.height = Math.ceil(c.haut * t * dpr);
   cv.style.width = Math.ceil(c.larg * t) + 'px'; cv.style.height = Math.ceil(c.haut * t) + 'px';
@@ -172,7 +190,8 @@ function nomCouleurPose(v) { const c = P.couleurs[v]; return c ? (c.nom || c.cod
 function majPanneauPose(etapes, et) {
   const total = etapes.length;
   $('#poseTitre').textContent = P.nom;
-  $('#poseAvance').style.width = total ? Math.round(((POSE.etape + 1) / total) * 100) + '%' : '0%';
+  const pct = total ? Math.round(((POSE.etape + 1) / total) * 100) : 0;
+  $('#poseAvance').style.width = pct + '%';
   $('#posePrec').disabled = POSE.etape <= 0;
   $('#poseSuiv').textContent = POSE.etape >= total - 1 ? '✓ Terminé' : 'Suivant ▶';
   $$('#poseMode button').forEach((b) => b.classList.toggle('actif', b.dataset.mode === POSE.mode));
@@ -182,13 +201,13 @@ function majPanneauPose(etapes, et) {
     const c = P.couleurs[et.couleur];
     info.innerHTML = `<span class="pose-pastille" style="background:${c.hex}"></span>
       <span class="pose-texte"><b>${echap(c.nom || c.code)}</b>
-      <small>${echap(c.code || '')} · ${et.nb} perle${et.nb > 1 ? 's' : ''} · couleur ${POSE.etape + 1} sur ${total}</small></span>`;
+      <small>${echap(c.code || '')} · ${et.nb} perle${et.nb > 1 ? 's' : ''} · couleur ${POSE.etape + 1} sur ${total}</small></span><span class="pose-pct">${pct} %</span>`;
     // toutes les couleurs, pour sauter de l'une à l'autre
     $('#poseSuite').innerHTML = etapes.map((e, k) => `<button type="button" data-etape="${k}" class="pose-puce${k === POSE.etape ? ' actif' : ''}${k < POSE.etape ? ' fait' : ''}" title="${echap(nomCouleurPose(e.couleur))}">
       <span style="background:${P.couleurs[e.couleur].hex}"></span>${e.nb}</button>`).join('');
   } else {
     info.innerHTML = `<span class="pose-texte"><b>Rangée ${et.numero} sur ${total}</b>
-      <small>${et.nb} perle${et.nb > 1 ? 's' : ''}, de gauche à droite</small></span>`;
+      <small>${et.nb} perle${et.nb > 1 ? 's' : ''}, de gauche à droite</small></span><span class="pose-pct">${pct} %</span>`;
     $('#poseSuite').innerHTML = suiteRangee(et).map((s) => (s.vide
       ? `<span class="pose-puce vide" title="Picots laissés vides">${s.vide} vide${s.vide > 1 ? 's' : ''}</span>`
       : `<span class="pose-puce" title="${echap(nomCouleurPose(s.couleur))}"><span style="background:${P.couleurs[s.couleur].hex}"></span>${s.nb} × ${echap(nomCouleurPose(s.couleur))}</span>`)).join('');
@@ -242,14 +261,26 @@ function ouvrirPose() {
         </div>
       </header>
       <div class="pose-outils">
+        <button type="button" id="poseFocus" title="Agrandit la rangée ou la couleur en cours ; touche encore pour revoir toute la plaque">🔍 Étape en grand</button>
         <button type="button" id="poseReel" title="Affiche le motif à sa vraie taille, pour poser la plaque transparente sur l'écran">📏 Taille réelle</button>
         <button type="button" id="poseMoins" class="pose-loupe" title="Plus petit" aria-label="Plus petit">−</button>
         <button type="button" id="posePlus" class="pose-loupe" title="Plus grand" aria-label="Plus grand">+</button>
         <button type="button" id="poseRegler" class="reel-seul" title="Refaire le réglage avec une carte">Régler</button>
-        <button type="button" id="poseVerrou" class="reel-seul">🔒 Verrouiller</button>
+        <button type="button" id="poseVerrou">🔒 Verrouiller</button>
         <div class="pose-plaques" id="posePlaques" hidden></div>
       </div>
-      <div class="pose-vue" id="poseVue"><canvas id="poseToile"></canvas></div>
+      <div class="pose-milieu">
+        <button type="button" class="pose-cote" id="poseZonePrec" aria-label="Précédent">‹</button>
+        <div class="pose-vue" id="poseVue"><canvas id="poseToile"></canvas></div>
+        <button type="button" class="pose-cote" id="poseZoneSuiv" aria-label="Suivant">›</button>
+      </div>
+      <div class="pose-bravo" id="poseBravo" hidden>
+        <div class="pose-bravo-carte">
+          <div class="pose-bravo-titre">🎉 Bravo, tout est posé !</div>
+          <p>Pose une feuille de papier cuisson sur les perles, puis repasse doucement, sans vapeur, en petits cercles.</p>
+          <div class="pose-boutons"><button type="button" id="poseBravoRepasse">✨ Voir le rendu repassé</button><button type="button" id="poseBravoFin" class="principal">Terminer</button></div>
+        </div>
+      </div>
       <footer class="pose-bas">
         <div class="pose-barre"><div id="poseAvance"></div></div>
         <div class="pose-info" id="poseInfo"></div>
@@ -264,11 +295,17 @@ function ouvrirPose() {
     $('#posePrec').onclick = () => allerPose(POSE.etape - 1);
     $('#poseSuiv').onclick = () => {
       const total = etapesPose().length;
-      if (POSE.etape >= total - 1) { fermerPose(); message('Bravo, tout est posé ! Il ne reste plus qu’à repasser.', 5000); return; }
+      if (POSE.etape >= total - 1) { $('#poseBravo').hidden = false; return; }
       allerPose(POSE.etape + 1);
     };
     $$('#poseMode button').forEach((b) => (b.onclick = () => { POSE.mode = b.dataset.mode; POSE.etape = 0; retenirPose(); dessinerPose(); }));
     $('#poseReel').onclick = basculerReel;
+    $('#poseFocus').onclick = () => { POSE.focus = !POSE.focus; reglages.poseFocus = POSE.focus; ecrire(CLE.reglages, reglages); POSE.zoom = 0; dessinerPose(); };
+    // les grandes zones des bords : précédent / suivant sans viser un bouton (et sans toucher la plaque)
+    $('#poseZonePrec').onclick = () => { if (POSE.etape > 0) allerPose(POSE.etape - 1); };
+    $('#poseZoneSuiv').onclick = () => $('#poseSuiv').click();
+    $('#poseBravoFin').onclick = () => { $('#poseBravo').hidden = true; fermerPose(); };
+    $('#poseBravoRepasse').onclick = () => { $('#poseBravo').hidden = true; fermerPose(); if (actions.repasser) actions.repasser(); };
     $('#poseRegler').onclick = async () => { if (await reglerTailleReelle()) dessinerPose(); };
     // cadenas : un toucher verrouille ; pour déverrouiller, rester appuyé une seconde
     let appui = null;
@@ -331,7 +368,8 @@ function ouvrirPose() {
   POSE.mode = retenue?.mode === 'rangee' ? 'rangee' : 'couleur';
   POSE.plaque = Number.isInteger(retenue?.plaque) && retenue.plaque < SURF.plaques.length ? retenue.plaque : -1;
   POSE.etape = retenue?.etape || 0;
-  POSE.zoom = 0; POSE.reel = false;
+  POSE.zoom = 0; POSE.reel = false; POSE.focus = reglages.poseFocus !== false;
+  $('#poseBravo').hidden = true;
   verrouillerPose(false);
   el.hidden = false;
   document.body.classList.add('pose-ouverte');

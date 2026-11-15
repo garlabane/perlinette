@@ -396,7 +396,7 @@ body.enfant .barre-sel { display: none !important; }
   .barre > button { min-height: 40px; flex: 0 0 auto; }
   .barre > .nom-projet { flex: 1 1 0; min-width: 0; }
   .barre > .principal { font-size: 0; padding: 0 12px; }
-  .barre > .principal::after { content: 'Imprimer'; font-size: 15px; }
+  .barre > .principal::after { content: attr(data-court); font-size: 15px; }
   .enfant-bouton { font-size: 0 !important; padding: 0 10px; }
   .enfant-bouton::after { content: '🧒'; font-size: 20px; }
   body.enfant .enfant-bouton::after { content: '↩'; }
@@ -932,3 +932,239 @@ dialog.insta { width: min(760px, 96vw); }
 .insta-images img { height: 230px; width: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.15); scroll-snap-align: start; }
 dialog.insta textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px; text-transform: none; }
 dialog.insta menu { flex-wrap: wrap; }
+
+/* ===== Tablettes et écrans tactiles (tablette.js) =====
+   body.tactile : l'écran se pilote au doigt — tout ce qu'on touche fait au moins 44 px.
+   body.tablette : tactile ET plus de 900 px de large — rail d'outils à gauche, couleurs à droite,
+   en-tête en icônes, tiroir « Réglages ». body.gaucher inverse les deux rails. */
+.rail-tactile, .tb, .rail-plus { display: none; }
+.rail-tactile svg, .tb svg, .bulle-options svg, .rail-plus svg { width: 26px; height: 26px; fill: none; stroke: var(--prune); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+.rail-tactile svg .f, .tb svg .f, .bulle-options svg .f { fill: #f6e6ef; stroke: none; }
+.rail-tactile .actif svg .f, .tb.actif svg .f, .bulle-options .actif svg .f { fill: #e8c9dc; }
+
+/* tactile : de vraies zones à toucher */
+body.tactile .onglet-nom { padding: 11px 6px 11px 14px; font-size: 14px; }
+body.tactile .onglet-fermer { width: 40px; height: 40px; font-size: 18px; }
+body.tactile .onglet-plus { width: 46px; height: 44px; }
+body.tactile .cote-plaque button { width: 44px; height: 44px; font-size: 22px; }
+body.tactile .cote-plaque { opacity: 1; }
+body.tactile .zoom-barre button { min-width: 44px; min-height: 44px; font-size: 18px; }
+body.tactile .outils button span { font-size: 12px; }
+
+/* tablette : la grille de l'écran */
+body.tablette #app { grid-template-columns: 84px minmax(0, 1fr) 72px; grid-template-areas: "barre barre barre" "outils zone cote"; }
+body.tablette.tiroir-ouvert #app { grid-template-columns: 84px minmax(0, 1fr) 300px; }
+body.tablette.gaucher #app { grid-template-columns: 72px minmax(0, 1fr) 84px; grid-template-areas: "barre barre barre" "cote zone outils"; }
+body.tablette.gaucher.tiroir-ouvert #app { grid-template-columns: 300px minmax(0, 1fr) 84px; }
+body.tablette .outils { display: none; }
+body.tablette .zone { text-align: center; }
+body.tablette .onglets { text-align: left; }
+
+/* le rail des outils, poussé vers le bas (sous le pouce), qui défile s'il manque de hauteur */
+body.tablette .rail-tactile { grid-area: outils; display: flex; flex-direction: column; gap: 6px; padding: 8px 8px 12px; overflow-y: auto; background: var(--panneau); border-right: 1px solid var(--bord); scrollbar-width: none; }
+body.tablette.gaucher .rail-tactile { border-right: none; border-left: 1px solid var(--bord); }
+body.tablette .rail-tactile::-webkit-scrollbar { display: none; }
+body.tablette .rail-tactile > :first-child { margin-top: auto; }
+.rail-tactile button { position: relative; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 66px; min-height: 58px; padding: 5px 2px; border-radius: 14px; font-size: 12px; line-height: 1.1; color: var(--texte); }
+.rail-tactile button.actif { background: var(--prune-clair); border-color: var(--prune); color: var(--prune); font-weight: 600; }
+.rail-tactile .rail-sep { flex: 0 0 auto; height: 1px; background: var(--bord); margin: 2px 6px; }
+/* le petit triangle des boutons qui ont des options */
+.a-options::after { content: ''; position: absolute; right: 5px; bottom: 5px; border: 5px solid transparent; border-right-color: var(--doux); border-bottom-color: var(--doux); opacity: .6; }
+.rail-plus.a-options::after { right: 3px; bottom: 3px; border-width: 4px; }
+
+/* l'en-tête : des icônes avec un mot */
+body.tablette .tb { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-width: 58px; min-height: 50px; padding: 3px 6px; border-radius: 12px; font-size: 11.5px; line-height: 1.1; color: var(--texte); }
+body.tablette .tb.actif { background: var(--prune-clair); border-color: var(--prune); }
+body.tablette .barre { flex-wrap: nowrap; gap: 6px; padding: 6px 10px; position: relative; }
+body.tablette .marque { font-size: 0; gap: 0; }
+body.tablette .version-app { display: none; }
+body.tablette .barre nav { display: none; }
+body.tablette .barre .espace { display: none; }
+body.tablette .nom-projet { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; font-size: 15px; }
+body.tablette .menu-bouton { display: inline-flex; align-items: center; justify-content: center; min-width: 54px; min-height: 50px; font-size: 22px; padding: 0; border-radius: 12px; }
+body.tablette .barre > .principal { font-size: 0; min-height: 50px; padding: 0 14px; border-radius: 12px; }
+body.tablette .barre > .principal::after { content: attr(data-court); font-size: 15px; }
+body.tablette .partage-bouton { min-height: 50px; border-radius: 12px; }
+body.tablette .barre [data-action="aide"] { min-width: 44px; min-height: 44px; }
+body.tablette .enfant-bouton { font-size: 0 !important; min-height: 50px; padding: 0 12px; border-radius: 12px; }
+body.tablette .enfant-bouton::after { content: '🧒'; font-size: 22px; }
+/* le menu ☰ en tablette (aussi au-delà de 1280 px) */
+body.tablette.menu-ouvert .barre nav {
+  display: flex; flex-direction: column; flex-wrap: nowrap; gap: 4px; margin: 0;
+  position: absolute; top: 100%; left: 70px; width: 340px; z-index: 30;
+  max-height: calc(100dvh - 80px); overflow-y: auto;
+  background: var(--panneau); border: 1px solid var(--bord); border-radius: 14px; padding: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+}
+body.tablette.menu-ouvert .barre nav button { min-height: 48px; text-align: left; padding: 8px 12px; }
+body.tablette.menu-ouvert .barre nav .sep { width: auto; height: 1px; margin: 2px 0; }
+body.tablette.menu-ouvert .barre nav .menu { display: flex; flex-direction: column; }
+body.tablette.menu-ouvert .barre nav .menu-liste { position: static; box-shadow: none; border: none; padding: 0 0 0 14px; min-width: 0; }
+
+/* le rail des couleurs (tiroir fermé) : de grosses pastilles, en bas, sous le pouce */
+body.tablette:not(.tiroir-ouvert) .cote { border-left: 1px solid var(--bord); }
+body.tablette.gaucher:not(.tiroir-ouvert) .cote { border-left: none; border-right: 1px solid var(--bord); }
+body.tablette:not(.tiroir-ouvert) .cote section:first-child { display: none; }
+body.tablette:not(.tiroir-ouvert) .couleurs-section { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 4px 12px; border-bottom: none; }
+body.tablette:not(.tiroir-ouvert) .couleurs-section h2,
+body.tablette:not(.tiroir-ouvert) .couleurs-section .tri,
+body.tablette:not(.tiroir-ouvert) .couleurs-section .ligne-boutons,
+body.tablette:not(.tiroir-ouvert) .coul-titre,
+body.tablette .cote-bascule { display: none !important; }
+body.tablette:not(.tiroir-ouvert) #listeCouleurs { flex: 1 1 auto; min-height: 0; max-height: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; overflow-y: auto; scrollbar-width: none; padding: 4px 0; }
+body.tablette:not(.tiroir-ouvert) #listeCouleurs::-webkit-scrollbar { display: none; }
+body.tablette:not(.tiroir-ouvert) #listeCouleurs > :first-child { margin-top: auto; }
+body.tablette:not(.tiroir-ouvert) .coul { display: flex; flex: 0 0 auto; padding: 2px; border-radius: 50%; border: 3px solid transparent; }
+body.tablette:not(.tiroir-ouvert) .coul .lib, body.tablette:not(.tiroir-ouvert) .coul .nb, body.tablette:not(.tiroir-ouvert) .coul .sym { display: none; }
+body.tablette:not(.tiroir-ouvert) .coul .pastille { width: 44px; height: 44px; border-radius: 50%; box-shadow: inset -3px -3px 0 rgba(0,0,0,.12); }
+body.tablette:not(.tiroir-ouvert) .coul.choisie { border-color: var(--prune); background: none; }
+body.tablette:not(.tiroir-ouvert) .rail-plus { display: flex; position: relative; align-items: center; justify-content: center; flex: 0 0 auto; width: 52px; height: 52px; border-radius: 50%; padding: 0; }
+/* le tiroir « Réglages » : le panneau complet, avec de vraies lignes à toucher */
+body.tablette.tiroir-ouvert .coul { min-height: 46px; }
+body.tablette.tiroir-ouvert .coul .pastille { width: 30px; height: 24px; }
+body.tablette.tiroir-ouvert .couleurs { max-height: none; flex: 1 1 auto; }
+body.tablette.tiroir-ouvert .couleurs-section { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+body.tablette.tiroir-ouvert .cote { overflow-y: auto; }
+body.tablette .segment button { min-height: 44px; }
+body.tablette .ligne-boutons button { min-height: 44px; font-size: 14px; padding: 6px 12px; }
+body.tablette .tri select { min-height: 40px; }
+
+/* le zoom, juste à côté du rail des couleurs */
+body.tablette .zoom-barre { right: 88px; bottom: 14px; }
+body.tablette.tiroir-ouvert .zoom-barre { right: 316px; }
+body.tablette.gaucher .zoom-barre { right: auto; left: 100px; }
+body.tablette .zoom-barre #zoomValeur, body.tablette .zoom-barre .zoom-annuler { display: none; }
+
+/* les bulles d'options, à côté du doigt */
+.bulle-options { position: fixed; z-index: 60; display: flex; flex-direction: column; gap: 4px; min-width: 200px; max-width: 300px; padding: 8px; background: var(--panneau); border: 1px solid var(--bord); border-radius: 16px; box-shadow: 0 10px 30px rgba(60,30,50,.22); }
+.bulle-options button { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 12px; border-radius: 12px; text-align: left; font-size: 15px; border-color: transparent; background: none; }
+.bulle-options button.actif { background: var(--prune-clair); border-color: var(--prune); }
+.bulle-options button.danger { color: #b3261e; }
+.bulle-options button.danger svg { stroke: #b3261e; }
+.bulle-options .bulle-segment { display: flex; gap: 4px; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--bord); }
+.bulle-options .bulle-segment button { flex: 1; justify-content: center; border-color: var(--bord); }
+@media print { .rail-tactile, .bulle-options { display: none !important; } }
+.rail-tactile button:focus:not(:focus-visible), .tb:focus:not(:focus-visible), .rail-plus:focus:not(:focus-visible) { outline: none; }
+/* tablette 7–8″ à l'horizontale : peu de hauteur, des boutons un peu moins hauts pour que tout tienne */
+@media (max-height: 700px) {
+  body.tablette .rail-tactile { gap: 4px; padding: 6px 8px 8px; }
+  body.tablette .rail-tactile button { min-height: 48px; padding: 3px 2px; }
+  body.tablette .rail-tactile svg { width: 22px; height: 22px; }
+  body.tablette .tb, body.tablette .menu-bouton, body.tablette .barre > .principal, body.tablette .partage-bouton, body.tablette .enfant-bouton { min-height: 44px; }
+}
+@media (max-width: 900px) { body.tactile .zoom-barre { display: none !important; } }
+
+/* bulle « Taille des lettres » (appui long sur Texte) */
+.bulle-options .bulle-titre { font-size: 13px; font-weight: 600; color: var(--prune); padding: 4px 8px 2px; display: flex; flex-direction: column; }
+.bulle-options .bulle-titre small { font-weight: normal; color: var(--doux); font-size: 12px; }
+.bulle-options .bulle-a { width: 26px; text-align: center; color: var(--prune); }
+.bulle-options button small { color: var(--doux); font-size: 12px; margin-left: 4px; }
+
+/* panneau Texte : en haut de l'écran, pour rester au-dessus du clavier */
+.panneau-texte { position: fixed; z-index: 61; top: 70px; left: 50%; transform: translateX(-50%); width: min(440px, calc(100vw - 24px)); max-height: calc(100dvh - 90px); overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--panneau); border: 1px solid var(--bord); border-radius: 18px; box-shadow: 0 12px 34px rgba(60,30,50,.25); }
+.panneau-texte .tx-haut { display: flex; align-items: baseline; gap: 10px; }
+.panneau-texte .tx-haut b { color: var(--prune); font-size: 17px; }
+.panneau-texte .tx-haut small { color: var(--doux); font-size: 13px; flex: 1; }
+.panneau-texte .tx-haut .tx-fermer { width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 18px; }
+.panneau-texte input { font-size: 20px; padding: 10px 12px; border-radius: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.panneau-texte .tx-ligne { display: flex; gap: 6px; flex-wrap: wrap; }
+.panneau-texte .tx-ligne button { flex: 1 1 auto; min-height: 46px; border-radius: 12px; font-size: 15px; }
+.panneau-texte .tx-ligne button.actif, .panneau-texte .tx-coul.actif { background: var(--prune-clair); border-color: var(--prune); color: var(--prune); font-weight: 600; }
+.panneau-texte .tx-coul { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 4px; }
+.panneau-texte .tx-coul i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 0 1px; border: 1px solid rgba(0,0,0,.15); }
+.panneau-texte .tx-coul span { font-size: 12px; }
+.panneau-texte .tx-familles { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
+.panneau-texte .tx-familles::-webkit-scrollbar { display: none; }
+.panneau-texte .tx-fam { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; padding: 0; border: 3px solid #fff; box-shadow: 0 0 0 1px var(--bord); }
+.panneau-texte .tx-fam.actif { box-shadow: 0 0 0 3px var(--prune); }
+.panneau-texte .tx-apercu { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 40px; }
+.panneau-texte .tx-apercu canvas { max-width: 100%; height: auto; image-rendering: pixelated; }
+.panneau-texte .tx-apercu small { color: var(--doux); font-size: 12px; }
+.panneau-texte .tx-actions button.principal { flex: 2 1 auto; }
+
+/* palette en éventail */
+.bulle-options.eventail { width: 300px; max-width: calc(100vw - 24px); }
+.eventail-onglets { display: flex; gap: 4px; }
+.eventail-onglets button { flex: 1; justify-content: center; min-height: 40px; font-size: 13px; padding: 4px 6px; border: 1px solid var(--bord) !important; }
+.eventail-grille { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; max-height: min(320px, 50dvh); overflow-y: auto; padding: 6px 2px; }
+.eventail-grille .eventail-perle { width: 40px; height: 40px; min-height: 0; padding: 0; border-radius: 50%; border: 1px solid rgba(0,0,0,.18) !important; box-shadow: inset -3px -3px 0 rgba(0,0,0,.12); }
+.eventail-grille .note { grid-column: 1 / -1; margin: 6px 4px; }
+.bulle-options .eventail-tout { justify-content: center; color: var(--prune); border: 1px solid var(--bord) !important; }
+body.tactile .barre-sel { top: 72px; gap: 6px; padding: 6px 8px; border-radius: 14px; }
+body.tactile .barre-sel button { min-height: 44px; min-width: 44px; font-size: 15px; border-radius: 10px; }
+.eventail-grille { grid-template-columns: repeat(6, minmax(0, 1fr)); overflow-x: hidden; }
+.eventail-grille .eventail-perle { width: 100%; height: auto; aspect-ratio: 1; }
+
+/* « Poser mes perles » v2 : zones précédent / suivant sur les bords, pourcentage, fin */
+.pose-milieu { flex: 1 1 auto; min-height: 0; display: flex; align-items: stretch; }
+.pose-milieu .pose-vue { flex: 1 1 auto; min-width: 0; }
+.pose-cote { flex: 0 0 64px; border: none; border-radius: 0; background: transparent; color: var(--doux); font-size: 44px; line-height: 1; padding: 0; }
+.pose-cote#poseZoneSuiv { background: rgba(110,47,92,.06); color: var(--prune); }
+@media (hover: hover) { .pose-cote:hover { background: rgba(110,47,92,.1); } }
+.pose-cote:active { background: rgba(110,47,92,.18); }
+@media (max-width: 600px) { .pose-cote { flex-basis: 40px; font-size: 32px; } }
+.pose-pct { margin-left: auto; font-weight: 700; color: var(--prune); font-size: 16px; }
+.pose-bravo { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center; background: rgba(40,30,35,.4); padding: 16px; }
+.pose-bravo[hidden] { display: none; }
+.pose-bravo-carte { background: var(--panneau); border-radius: 18px; padding: 20px; max-width: 440px; box-shadow: 0 12px 34px rgba(0,0,0,.25); text-align: center; }
+.pose-bravo-titre { font-size: 22px; font-weight: 700; color: var(--prune); margin-bottom: 8px; }
+.pose-bravo-carte p { color: var(--texte); margin: 0 0 14px; }
+.pose-bravo-carte .pose-boutons button { font-size: 15px; }
+/* le verrou : la plaque et les menus ne réagissent plus, mais les zones des bords et le bas restent actifs */
+.pose.verrouille .pose-milieu .pose-vue { pointer-events: none; }
+/* les messages s'affichent en haut pendant la pose, pour ne jamais cacher Suivant */
+body.pose-ouverte #toast { bottom: auto !important; top: 64px; }
+body.tactile .pose-outils > button, body.tactile .pose-mode button, body.tactile .pose-haut button { min-height: 44px; }
+/* réglages de disposition (tiroir) et astuces */
+.tb-dispo { display: none; }
+body.tablette.tiroir-ouvert .tb-dispo { display: flex; flex-direction: column; gap: 8px; }
+.tb-dispo .case { font-size: 14px; min-height: 44px; }
+.tb-dispo .case input { width: 22px; height: 22px; }
+.tb-dispo button { min-height: 44px; text-align: left; }
+body.tactile #tbVersTactile { display: none; }
+.astuce { position: fixed; z-index: 70; background: #2f2a26; color: #fff; border-radius: 16px; padding: 14px 16px; box-shadow: 0 12px 30px rgba(0,0,0,.3); font-size: 15px; line-height: 1.4; }
+.astuce p { margin: 0 0 10px; }
+.astuce div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.astuce small { color: #cbbfc7; }
+.astuce button { min-height: 44px; padding: 6px 16px; border-radius: 12px; }
+body.tablette:not(.tiroir-ouvert) .tb-dispo { display: none !important; }
+/* bouton Imprimer : une imprimante + le mot */
+.bouton-imprimer { display: inline-flex; align-items: center; gap: 7px; }
+.bouton-imprimer svg { width: 19px; height: 19px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ===== En-tête ordinateur regroupé (entete.js) ===== */
+.menu-bureau { display: none; }
+.menu-liste .menu-aide { display: block; font-size: 12px; color: var(--doux); font-weight: normal; line-height: 1.3; margin-top: 1px; white-space: normal; }
+.menu-bureau .menu-liste { min-width: 300px; max-width: 360px; }
+.menu-bureau .menu-liste button { padding: 7px 10px; }
+@media (min-width: 1281px) {
+  body:not(.tablette) .menu-bureau { display: block; }
+  body:not(.tablette) .barre nav > [data-action="mot"], body:not(.tablette) .barre nav > [data-action="image"],
+  body:not(.tablette) .barre nav > [data-action="imageAjout"], body:not(.tablette) .barre nav > [data-action="motAjout"],
+  body:not(.tablette) .barre nav > [data-action="plaque"], body:not(.tablette) .barre nav > [data-action="couleurs"] { display: none; }
+  body:not(.tablette) .barre { flex-wrap: nowrap; }
+  body:not(.tablette) .nom-projet { flex: 0 1 auto; min-width: 120px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body:not(.tablette) .barre nav { flex-wrap: nowrap; flex: 0 0 auto; }
+  body:not(.tablette) .barre nav > *, body:not(.tablette) .barre > button { white-space: nowrap; flex: 0 0 auto; }
+}
+@media (min-width: 1281px) {
+  body:not(.tablette) .nom-projet { flex: 1 1 auto; }
+}
+/* portables (1281 à 1700 px) : des libellés plus courts pour que tout tienne */
+@media (min-width: 1281px) and (max-width: 1700px) {
+  body:not(.tablette) .barre { gap: 8px; }
+  body:not(.tablette) .barre nav { gap: 4px; }
+  body:not(.tablette) .version-app { display: none; }
+  body:not(.tablette) .enfant-bouton { font-size: 0 !important; padding: 5px 10px; }
+  body:not(.tablette) .enfant-bouton::after { content: '🧒'; font-size: 18px; }
+  body:not(.tablette) .bouton-imprimer span { display: none; }
+  body:not(.tablette) .bouton-imprimer::after { content: attr(data-court); }
+  body:not(.tablette) .barre nav .sep { margin: 0 2px; }
+}
+
+/* les mêmes outils partout : Formes regroupées, Texte (tablette.js) */
+.grille-outils > .forme-seule { display: none !important; }
+.grille-outils > button.a-options, .ligne-boutons .a-options { position: relative; }
+.grille-outils > button.a-options::after { right: 3px; bottom: 3px; border-width: 4px; }
+.ligne-boutons .a-options::after { display: none; }
+@media (max-width: 600px) { .grille-outils > button[data-options="formes"] { display: flex !important; } }

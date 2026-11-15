@@ -1,8 +1,10 @@
 {
-  "version": "1.17.0",
+  "version": "1.18.0",
   "date": "2026-11-15",
   "nouveautes": [
-    "Impression : choix du papier A4 ou Letter (format américain)",
-    "Version anglaise : tailles en pouces, liste de courses en dollars, Instagram et Pinterest en anglais, et tous les modèles en anglais sur le site"
+    "Tablette : une disposition pensée pour le doigt, outils sous le pouce gauche, couleurs sous le pouce droit, réglages dans un tiroir",
+    "Nouveaux outils partout : Texte (écrire sur la plaque), Formes regroupées, palette en éventail (couleurs récentes)",
+    "Poser mes perles : zoom sur l’étape en cours, grandes zones précédent / suivant, cadenas, écran « Bravo »",
+    "Ordinateur : l’en-tête tient sur tous les écrans (menus Créer et Mon motif), Imprimer toujours visible"
   ]
 }
