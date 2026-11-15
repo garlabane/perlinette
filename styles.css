@@ -1326,7 +1326,7 @@ body.tactile .onglets-liste { height: 44px; padding: 0 14px; }
 :root { --reserve-zoom: 0px; }
 @media (min-width: 1281px) { body:not(.tablette):not(.enfant) { --reserve-zoom: 330px; } }
 @media (min-width: 901px) and (max-width: 1280px) { body:not(.tablette):not(.enfant) { --reserve-zoom: 150px; } body:not(.tablette):not(.enfant) .zoom-barre #zoomValeur, body:not(.tablette):not(.enfant) .zoom-barre #btnSymboles { display: none; } }
-@media (min-width: 901px) { body:not(.tablette):not(.enfant) .onglets { padding-right: var(--reserve-zoom); } body:not(.tablette):not(.enfant) .onglets-liste, body:not(.tablette):not(.enfant) .onglet-plus { right: var(--reserve-zoom); } }
+@media (min-width: 901px) { body:not(.tablette):not(.enfant) .onglets { padding-right: var(--reserve-zoom); } }
 
 /* À propos */
 dialog.apropos { max-width: 520px; }
@@ -1340,3 +1340,18 @@ dialog.apropos .bouton-lien { margin-right: auto; color: var(--prune); text-deco
 dialog.apropos menu { justify-content: flex-end; gap: 10px; }
 .bouton-cafe { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 999px; background: #FFDD00; color: #1a1a1a; font-weight: 700; text-decoration: none; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
 @media (hover: hover) { .bouton-cafe:hover { filter: brightness(.95); } }
+
+/* le « + » reste collé au bout des onglets ; s'ils débordent, « + » et « ▾ » se calent à droite (la marge réservée au zoom compte déjà) */
+.onglet-plus { right: 0; }
+.onglets-liste { right: var(--larg-plus, 38px); }
+body.tactile .onglets-liste { --larg-plus: 52px; }
+
+/* « Montrer mes touches » (vidéos) : un rond sous le doigt, un anneau qui se remplit à l'appui long */
+.touche-rond { position: fixed; z-index: 100000; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; pointer-events: none;
+  background: rgba(110, 47, 92, .28); border: 3px solid rgba(255, 255, 255, .95); box-shadow: 0 0 0 2px rgba(110, 47, 92, .55), 0 4px 14px rgba(0, 0, 0, .25);
+  transform: scale(.4); opacity: 0; transition: transform .15s ease-out, opacity .15s ease-out; }
+.touche-rond.appui { transform: scale(1); opacity: 1; }
+.touche-rond::after { content: ''; position: absolute; inset: -9px; border-radius: 50%; border: 4px solid transparent; }
+.touche-rond.long::after { border-color: #f4c95d; clip-path: inset(0 0 0 0); animation: touche-anneau .33s linear forwards; }
+@keyframes touche-anneau { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: scale(1); } }
+.touche-rond.fin { transform: scale(1.6); opacity: 0; transition: transform .4s ease-out, opacity .4s ease-out; }

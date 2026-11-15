@@ -1,10 +1,10 @@
 {
-  "version": "1.18.4",
+  "version": "1.18.5",
   "date": "2026-11-15",
   "nouveautes": [
-    "Les images et textes partagés portent la signature Perlinette (#perlinetteapp)",
-    "Un drapeau pour changer de langue, en haut de l’écran",
-    "Les motifs ouverts tiennent tous dans la barre, sans défilement",
-    "Nouveau : « À propos », l’histoire de Perlinette"
+    "Import d’image : les petites couleurs (nez, joues) ne disparaissent plus quand on limite les couleurs",
+    "« Montrer mes touches à l’écran » pour filmer une vidéo (Réglages › Disposition)",
+    "Le « + » des onglets est revenu au bout des onglets",
+    "En anglais : les thèmes des modèles sont traduits"
   ]
 }

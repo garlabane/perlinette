@@ -185,7 +185,7 @@ function ouvrirModeles() {
     dlg = document.createElement('dialog'); dlg.id = 'dlgModeles'; dlg.className = 'tres-large';
     dlg.innerHTML = `<form method="dialog"><h3>Modèles prêts à l'emploi</h3>
       <div class="nu-outils">
-        <label class="case">Thème <select id="modTheme"></select></label>
+        <label class="case">Thème <select id="modTheme" translate="no"></select></label>
         <label class="case">Plaque <select id="modPlaque"></select></label>
         <label class="case">Classer <select id="modTri"><option value="familles">par famille</option><option value="nom">par nom (A → Z)</option><option value="petit">du plus petit au plus grand</option><option value="nouveaux">les nouveaux d'abord</option></select></label>
         <label class="case" id="modMesPerlesLbl"><input type="checkbox" id="modMesPerles"> Avec mes perles</label>
@@ -209,7 +209,10 @@ function ouvrirModeles() {
   caseMP.checked = !!nbPerles && !!reglages.modMesPerles;
   $('#modMesPerlesLbl').title = nbPerles ? `Les modèles s'affichent avec tes ${nbPerles} couleurs de « Mes perles »` : 'Ta liste « Mes perles » est vide (bouton Couleurs → Gérer mes perles)';
   const themes = [...new Set(MODELES.map((m) => m.theme))];
-  remplirChoix($('#modTheme'), themes.map((t) => `<option>${echap(t)}</option>`).join(''), $('#modTheme').value || themes[0]);
+  // la valeur reste le thème en français (c'est elle qui filtre) ; seul le libellé est traduit
+  const nomTheme = (th) => (typeof t === 'function' ? t(th) : th);
+  const avant = $('#modTheme').value;
+  remplirChoix($('#modTheme'), themes.map((th) => `<option value="${echap(th)}">${echap(nomTheme(th))}</option>`).join(''), themes.includes(avant) ? avant : themes[0]);
   majPlaquesTheme();
   majModeles();
   dlg.showModal();

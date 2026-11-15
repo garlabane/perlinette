@@ -403,10 +403,13 @@ function construireReglagesDisposition() {
   sec.id = 'tbDispo'; sec.className = 'tb-dispo';
   sec.innerHTML = `<h2>Disposition</h2>
     <label class="case"><input type="checkbox" id="tbGaucher"> <span>Je suis gaucher <small>(outils à droite, couleurs à gauche)</small></span></label>
+    <label class="case"><input type="checkbox" id="tbTouches"> <span>Montrer mes touches à l’écran <small>(pour filmer une vidéo)</small></span></label>
     <button type="button" id="tbOrdi">Passer en disposition ordinateur</button>
     <button type="button" id="tbRevoirAide">Revoir les astuces</button>`;
   $('.cote').append(sec); // à la fin : la mise en page « téléphone » cache la 1re section (la plaque) dans la bande
   $('#tbGaucher').checked = !!reglages.gaucher;
+  $('#tbTouches').checked = !!reglages.montrerTouches;
+  $('#tbTouches').onchange = (e) => { reglages.montrerTouches = e.target.checked; ecrire(CLE.reglages, reglages); if (typeof majTouchesVisibles === 'function') majTouchesVisibles(); };
   $('#tbGaucher').onchange = (e) => { reglages.gaucher = e.target.checked; ecrire(CLE.reglages, reglages); majDisposition(true); };
   $('#tbOrdi').onclick = () => { reglages.disposition = 'ordinateur'; ecrire(CLE.reglages, reglages); TB.tactile = false; majDisposition(true); message('Disposition ordinateur. Pour revenir : menu ☰ › Fichier › « Disposition tactile ».', 6000); };
   $('#tbRevoirAide').onclick = () => { basculerTiroir(false); montrerAstuces(true); };

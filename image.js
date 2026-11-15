@@ -382,6 +382,66 @@ function calculerImage(f, palette) {
     (versionNette ? `Nettoyage : ${pl(net.changees, 'perle')} ${net.changees > 1 ? 'modifiées' : 'modifiée'}.` : `(Le nettoyage modifierait ${pl(net.changees, 'perle')}.)`);
 }
 
+// Choisir « max » couleurs pour l'image. Avant : les « max » références Hama les plus nombreuses —
+// mais un même trait sombre se répartit sur 3 références voisines (marron, bordeaux, rouge marron)
+// qui prenaient 3 places, et une petite tache bien à part (nez orange, joues roses) sautait.
+// Maintenant : on regroupe d'abord les VRAIES couleurs de l'image en « max » familles
+// (on part de la plus présente, puis on ajoute à chaque fois la couleur qui réduit le plus l'écart
+// total, écart au carré × nombre de perles, et on affine), puis chaque famille prend sa référence.
+function couleursDistinctes(px, labs, cands, max) {
+  const d2 = (x, y) => (x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2;
+  // 1) couleurs des PIXELS de l'image (pas des perles : une perle à cheval sur un trait mélange deux
+  //    couleurs, ce qui inventait des teintes boueuses), rangées par petites cases de teinte
+  const cases = new Map(), memo = new Map();
+  for (let o = 0; o < px.length; o += 4) {
+    if (px[o + 3] < 200) continue;
+    const cle = (px[o] >> 2) << 12 | (px[o + 1] >> 2) << 6 | (px[o + 2] >> 2);
+    let L = memo.get(cle);
+    if (!L) { L = rgbLab([px[o], px[o + 1], px[o + 2]]); memo.set(cle, L); }
+    const k = `${Math.round(L[0] / 3)},${Math.round(L[1] / 3)},${Math.round(L[2] / 3)}`;
+    const c = cases.get(k) || { s: [0, 0, 0], n: 0 };
+    c.s[0] += L[0]; c.s[1] += L[1]; c.s[2] += L[2]; c.n++; cases.set(k, c);
+  }
+  const pts = [...cases.values()].map((c) => ({ lab: [c.s[0] / c.n, c.s[1] / c.n, c.s[2] / c.n], n: c.n }));
+  if (!pts.length) return cands.slice(0, max);
+  const total = pts.reduce((t, q) => t + q.n, 0), seuil = Math.max(2, total * 0.002);
+  // 2) les familles : la plus présente, puis celle qui réduit le plus l'écart total
+  const centres = [pts.reduce((m, q) => (q.n > m.n ? q : m)).lab.slice()];
+  const ecart = pts.map((q) => d2(q.lab, centres[0]));
+  // candidates : les teintes assez présentes ; pour une photo en dégradé (aucune ne l'est), les plus présentes
+  let graines = pts.filter((q) => q.n >= seuil);
+  if (graines.length < max * 3) graines = [...pts].sort((x, y) => y.n - x.n).slice(0, Math.max(max * 3, 400));
+  while (centres.length < max) {
+    let meilleur = null, gain = 0;
+    for (const g of graines) {
+      let s = 0;
+      pts.forEach((q, i) => { const d = d2(q.lab, g.lab); if (d < ecart[i]) s += q.n * (ecart[i] - d); });
+      if (s > gain) { gain = s; meilleur = g; }
+    }
+    if (!meilleur) break;
+    centres.push(meilleur.lab.slice());
+    pts.forEach((q, i) => { ecart[i] = Math.min(ecart[i], d2(q.lab, meilleur.lab)); });
+  }
+  // 3) on affine (chaque famille se recentre sur ses couleurs)
+  for (let it = 0; it < 6; it++) {
+    const som = centres.map(() => [0, 0, 0, 0]);
+    for (const q of pts) {
+      let b = 0, bd = Infinity;
+      centres.forEach((c, k) => { const d = d2(q.lab, c); if (d < bd) { bd = d; b = k; } });
+      som[b][0] += q.lab[0] * q.n; som[b][1] += q.lab[1] * q.n; som[b][2] += q.lab[2] * q.n; som[b][3] += q.n;
+    }
+    som.forEach((s, k) => { if (s[3]) centres[k] = [s[0] / s[3], s[1] / s[3], s[2] / s[3]]; });
+  }
+  // 4) chaque famille prend la référence autorisée la plus proche (sans doublon)
+  const pris = [];
+  for (const c of centres) {
+    let b = -1, bd = Infinity;
+    for (const k of cands) { if (pris.includes(k)) continue; const d = d2(c, labs[k]); if (d < bd) { bd = d; b = k; } }
+    if (b >= 0) pris.push(b);
+  }
+  return pris;
+}
+
 function convertirImage(img, surf, cadre, max, tramage, transp, palette) {
   // 1) image posée dans la surface : sa partie utile (cadre.boite), à la taille voulue
   //    (cadre.zoom, 1 = entière et la plus grande possible), décalée de cadre.dx / cadre.dy pas
@@ -452,7 +512,15 @@ function convertirImage(img, surf, cadre, max, tramage, transp, palette) {
   const nb = new Array(palette.length).fill(0);
   for (let i = 0; i < n; i++) if (!vide[i]) nb[plusProche(rgbLab([rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2]]), labs, tous)]++;
   let autorises = tous.filter((i) => nb[i] > 0);
-  if (max > 0 && autorises.length > max) autorises = autorises.sort((a, b) => nb[b] - nb[a]).slice(0, max);
+  if (max > 0 && autorises.length > max) {
+    // l'image d'origine, réduite SANS lissage : on ne voit que ses vraies couleurs, pas les mélanges des bords
+    const ks = Math.min(1, 360 / Math.max(b.w, b.h)), ech2 = document.createElement('canvas');
+    ech2.width = Math.max(1, Math.round(b.w * ks)); ech2.height = Math.max(1, Math.round(b.h * ks));
+    const g2 = ech2.getContext('2d', { willReadFrequently: true });
+    g2.imageSmoothingEnabled = false;
+    g2.drawImage(img, b.x, b.y, b.w, b.h, 0, 0, ech2.width, ech2.height);
+    autorises = couleursDistinctes(g2.getImageData(0, 0, ech2.width, ech2.height).data, labs, tous, max);
+  }
 
   // 4) attribution ; tramage = erreur répartie sur les voisins pas encore traités
   const ordreP = [...Array(n).keys()].sort((a, b) => (surf.picots[a].y - surf.picots[b].y) || (surf.picots[a].x - surf.picots[b].x));
