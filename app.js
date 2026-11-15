@@ -559,21 +559,32 @@ function ouvrirListe() {
   sauverMaintenant();
   const dlg = $('#dlgOuvrir'), ul = $('#listeProjets');
   ul.innerHTML = '';
-  for (const m of Object.values(lire(CLE.projets, {})).sort((a, b) => b.modifie - a.modifie)) {
+  // seulement les motifs commencés (au moins une perle), le plus récent d'abord, avec leur image
+  const tous = Object.values(lire(CLE.projets, {})).sort((a, b) => b.modifie - a.modifie);
+  const commences = tous.filter((m) => Array.isArray(m.cases) && m.cases.some((v) => v >= 0));
+  for (const m of commences) {
     const li = document.createElement('li');
     const date = new Date(m.modifie).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { dateStyle: 'short', timeStyle: 'short' });
-    li.innerHTML = `<span><b>${echap(m.nom)}</b><br><small>${echap(formatParId(m.format).nom)} · ${date}</small></span>`;
-    const bt = (txt, fn, off) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = txt; b.disabled = !!off; b.onclick = fn; li.appendChild(b); };
-    bt(m.id === P.id ? 'Ouvert' : 'Ouvrir', () => { charger(m); dlg.close(); }, m.id === P.id);
-    bt('Dupliquer', () => { const c = JSON.parse(JSON.stringify(m)); c.id = nouvelId(); c.nom = m.nom + ' (copie)'; charger(c); sauverMaintenant(); dlg.close(); });
-    bt('Supprimer', async () => {
+    const nb = m.cases.filter((v) => v >= 0).length;
+    const ouvrir = document.createElement('button');
+    ouvrir.type = 'button'; ouvrir.className = 'projet-ouvrir' + (m.id === P.id ? ' actif' : '');
+    ouvrir.innerHTML = `<canvas width="1" height="1"></canvas><span><b>${echap(m.nom)}</b><small>${nb} perle${nb > 1 ? 's' : ''} · ${date}</small><em>${m.id === P.id ? 'Déjà ouvert' : 'Toucher pour le rouvrir'}</em></span>`;
+    try { vignette(ouvrir.querySelector('canvas'), { surf: construireSurface(formatParId(m.format), m.cfg || {}), cases: m.cases, couleurs: m.couleurs }, 72); } catch (e) { /* plaque introuvable : pas d'image */ }
+    ouvrir.onclick = () => { if (m.id !== P.id) charger(m); dlg.close(); };
+    li.appendChild(ouvrir);
+    const actions2 = document.createElement('span'); actions2.className = 'projet-actions';
+    const bt = (txt, titre, fn) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = txt; b.title = titre; b.onclick = fn; actions2.appendChild(b); };
+    bt('Copie', 'Faire une copie de ce motif', () => { const c = JSON.parse(JSON.stringify(m)); c.id = nouvelId(); c.nom = m.nom + ' (copie)'; charger(c); sauverMaintenant(); dlg.close(); });
+    bt('🗑', 'Supprimer ce motif', async () => {
       if (!(await confirmer(`Supprimer définitivement « ${m.nom} » de ce navigateur ? Un fichier exporté n'est pas touché.`, 'Supprimer'))) return;
       const ps = lire(CLE.projets, {}); delete ps[m.id]; ecrire(CLE.projets, ps);
       if (m.id === P.id) charger(creerMotif(t('Mon motif'), 'midi-carre-grand', {}, 'hama-midi'));
       li.remove();
     });
+    li.appendChild(actions2);
     ul.appendChild(li);
   }
+  if (!commences.length) ul.innerHTML = '<li class="vide">Tu n’as encore aucun motif commencé.</li>';
   dlg.showModal();
 }
 function telecharger(nom, contenu, type) {

@@ -22,7 +22,7 @@
         <button id="btnFichier" aria-haspopup="true" aria-expanded="false">Fichier ▾</button>
         <div class="menu-liste" id="menuFichier" hidden>
           <button data-action="nouveau">Nouveau motif</button>
-          <button data-action="ouvrir">Ouvrir…</button>
+          <button data-action="ouvrir">📂 Mes motifs…</button>
           <button data-action="enregistrer">Enregistrer <small>Ctrl+S</small></button>
           <hr>
           <button data-action="exporter">Exporter un fichier <small>(sauvegarde)</small></button>
@@ -166,6 +166,7 @@
 <dialog id="dlgOuvrir">
   <form method="dialog">
     <h3>Mes motifs enregistrés</h3>
+    <p class="note">Les motifs que tu as commencés. Touche-en un pour le rouvrir et continuer.</p>
     <ul id="listeProjets" class="liste-projets"></ul>
     <p class="note">Ils sont rangés dans ce navigateur. « Exporter fichier » de temps en temps : c'est ta vraie sauvegarde.</p>
     <menu><button value="fermer">Fermer</button></menu>

@@ -347,6 +347,12 @@ function ecrirePhrase(ajout = false) {
     <menu><button value="annuler" formnovalidate>Annuler</button><button value="ok" class="principal" id="phCreer">${ajout ? 'Choisir où le poser' : 'Créer le motif'}</button></menu>
   </form>`;
   document.body.appendChild(dlg);
+  // sur téléphone, l'aperçu remonte juste sous le choix des pièces (sinon il est tout en bas, après les couleurs)
+  if (window.matchMedia('(max-width: 900px)').matches) {
+    const apercu = dlg.querySelector('.phrase-apercu');
+    const repere = ajout ? (dlg.querySelector('#phReliefBloc') || dlg.querySelector('#phTaille')) : dlg.querySelector('#phMode');
+    if (apercu && repere) { repere.after(apercu); apercu.classList.add('apercu-haut'); }
+  }
   const maj = () => {
     dlg.querySelectorAll('#phMode [data-v]').forEach((b) => b.classList.toggle('choisie', b.dataset.v === etat.mode));
     dlg.querySelectorAll('#phJeux [data-v], #phFamilles [data-v]').forEach((b) => b.classList.toggle('choisie', b.dataset.v === etat.couleur));

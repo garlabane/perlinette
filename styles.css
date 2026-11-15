@@ -1355,3 +1355,27 @@ body.tactile .onglets-liste { --larg-plus: 52px; }
 .touche-rond.long::after { border-color: #f4c95d; clip-path: inset(0 0 0 0); animation: touche-anneau .33s linear forwards; }
 @keyframes touche-anneau { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: scale(1); } }
 .touche-rond.fin { transform: scale(1.6); opacity: 0; transition: transform .4s ease-out, opacity .4s ease-out; }
+
+/* « ← Accueil » : en haut des fenêtres ouvertes depuis l'écran d'accueil */
+.retour-accueil { display: inline-flex; align-items: center; gap: 4px; margin: 0 0 8px; padding: 6px 12px; min-height: 36px; border: 1px solid var(--bord); border-radius: 999px; background: var(--panneau); color: var(--prune); font-weight: 600; font-size: 14px; cursor: pointer; }
+body.tactile .retour-accueil { min-height: 44px; padding: 8px 16px; font-size: 16px; }
+/* aperçu du mot remonté sous le choix des pièces, sur téléphone */
+.phrase .apercu-haut { margin: 10px 0 6px; padding: 8px; border: 1px solid var(--bord); border-radius: 12px; background: #fff; text-align: center; }
+.phrase .apercu-haut canvas { max-width: 100%; height: auto; }
+
+/* « Mes motifs enregistrés » : une carte par motif commencé, avec son image */
+.liste-projets { max-height: 60vh; }
+.liste-projets li { gap: 6px; padding: 6px 0; }
+.projet-ouvrir { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; padding: 8px 10px; border: 1px solid var(--bord); border-radius: 12px; background: var(--panneau); cursor: pointer; }
+.projet-ouvrir canvas { width: 64px; height: 64px; object-fit: contain; flex: none; border-radius: 6px; background: #fff; }
+.projet-ouvrir span { display: flex; flex-direction: column; min-width: 0; }
+.projet-ouvrir b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projet-ouvrir small { color: var(--doux); }
+.projet-ouvrir em { font-style: normal; font-size: 13px; color: var(--prune); font-weight: 600; margin-top: 2px; }
+.projet-ouvrir.actif { border-color: var(--prune); }
+.projet-actions { display: flex; flex-direction: column; gap: 4px; }
+.projet-actions button { min-height: 32px; padding: 4px 10px; font-size: 13px; }
+.liste-projets li.vide { color: var(--doux); padding: 12px 0; }
+
+.liste-projets li .projet-actions { flex: none; }
+.projet-actions button { width: auto; }

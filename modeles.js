@@ -267,7 +267,7 @@ function majModeles() {
       if (m.caractere && typeof lettresDepuisModele === 'function') lettresDepuisModele(motif, m);
       charger(motif); sauverMaintenant();
       $('#dlgModeles').close();
-      message(`« ${m.nom} » ouvert sur la plaque ${pose.fmt.nom}. Il est enregistré dans « Ouvrir ».`, 4000);
+      message(`« ${m.nom} » ouvert sur la plaque ${pose.fmt.nom}. Il est enregistré dans « Mes motifs ».`, 4000);
       // avec mes perles : tableau de correspondance ; « Annuler » ramène les couleurs du modèle
       if (mesPerles) await adapterMotifOuvert('biblio', `« ${m.nom} » avec mes perles`, 'Chaque couleur du modèle reçoit ta perle la plus proche. Tu peux changer une ligne avant d’appliquer ; « Annuler » ramène ensuite les couleurs du modèle.');
     };

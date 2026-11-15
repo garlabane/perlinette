@@ -47,7 +47,7 @@ function ouvrirAccueil() {
     <h3>Que veux-tu faire ?</h3>
     <div class="accueil-choix">${ACCUEIL_CHOIX.map((c) => `<button type="button" data-choix="${c.id}">
       <span class="accueil-icone" aria-hidden="true">${c.icone}</span><span class="accueil-texte"><b>${echap(c.titre)}</b><small>${echap(typeof c.texte === 'function' ? c.texte() : c.texte)}</small></span></button>`).join('')}</div>
-    ${nbMotifs ? `<button type="button" class="accueil-reprendre" data-choix="ouvrir">📂 Reprendre un de mes motifs <small>(${nbMotifs})</small></button>` : ''}
+    ${nbMotifs ? `<button type="button" class="accueil-reprendre" data-choix="ouvrir">📂 Continuer un de mes motifs <small>${nbMotifs > 1 ? `(${nbMotifs} commencés)` : '(1 commencé)'}</small></button>` : ''}
     ${INVITE_INSTALLER ? '<button type="button" class="accueil-reprendre" id="accueilInstaller">📲 Installer Perlinette sur cet appareil <small>(icône, plein écran, sans Internet)</small></button>' : ''}
     ${!INVITE_INSTALLER && typeof EN_LIGNE !== 'undefined' && EN_LIGNE && surIos() && !dejaInstallee() ? '<p class="note">📲 Pour l’avoir comme une appli : touche « Partager », puis « Sur l’écran d’accueil ».</p>' : ''}
     <p class="note">${typeof EN_LIGNE !== 'undefined' && EN_LIGNE
@@ -59,7 +59,9 @@ function ouvrirAccueil() {
     const choix = b.dataset.choix;
     dlg.close();
     if (choix === 'dessiner') { commencerADessiner(); return; }
+    const avant = etatMotif();
     if (actions[choix]) actions[choix]();
+    setTimeout(() => brancherRetourAccueil(avant), 0);
   }));
   brancherBoutonsLangue(dlg);
   const installer = dlg.querySelector('#accueilInstaller');
@@ -67,6 +69,32 @@ function ouvrirAccueil() {
   // le rappel « pense à exporter » de la version en ligne est dit ici : inutile de le redire après
   if (typeof EN_LIGNE !== 'undefined' && EN_LIGNE) { const m = lire(CLE_MAJ, {}); if (!m.rappelWeb) ecrire(CLE_MAJ, { ...m, rappelWeb: Date.now() }); }
   dlg.showModal();
+}
+
+// Une fenêtre ouverte depuis l'accueil (modèles, image, prénom, mes motifs) : un bouton « ← Accueil » en haut,
+// et si on la ferme sans rien créer (Fermer, Annuler, Échap), on revient à l'accueil au lieu d'une grille vide.
+function etatMotif() { return typeof P !== 'undefined' && P ? P.id + ':' + P.cases.join(',') : ''; }
+function brancherRetourAccueil(avant) {
+  const ouvertes = [...document.querySelectorAll('dialog[open]')].filter((d) => d.id !== 'dlgAccueil');
+  const fen = ouvertes[ouvertes.length - 1];
+  if (!fen) return;
+  const form = fen.querySelector('form') || fen;
+  let bouton = fen.querySelector('.retour-accueil');
+  if (!bouton) {
+    bouton = document.createElement('button');
+    bouton.type = 'button'; bouton.className = 'retour-accueil';
+    bouton.textContent = '← Accueil';
+    form.prepend(bouton);
+  }
+  let versAccueil = false;
+  bouton.onclick = () => { versAccueil = true; fen.close(); };
+  fen.addEventListener('close', () => {
+    bouton.remove(); // la même fenêtre ouverte depuis un menu n'a pas ce bouton
+    setTimeout(() => {
+      if ([...document.querySelectorAll('dialog[open]')].length) return; // une autre fenêtre a pris le relais
+      if (versAccueil || etatMotif() === avant) ouvrirAccueil();          // rien n'a été créé : retour au départ
+    }, 60);
+  }, { once: true });
 }
 
 // « Dessiner » : sur petit écran, on agrandit pour que le doigt vise bien une perle
