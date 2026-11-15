@@ -5,11 +5,17 @@
 // Sur un téléphone, c'est le chemin le plus court vers un modèle, une photo ou un prénom.
 
 const ACCUEIL_CHOIX = [
-  { id: 'modeles', icone: '🧩', titre: 'Choisir un modèle', texte: 'Plus de 500 motifs prêts à repasser' },
+  { id: 'modeles', icone: '🧩', titre: 'Choisir un modèle', texte: () => `Plus de ${nbModelesArrondi()} motifs prêts à repasser` },
   { id: 'image', icone: '📷', titre: 'Transformer une image', texte: 'Une photo ou un dessin devient un motif' },
   { id: 'mot', icone: '🔤', titre: 'Écrire un prénom', texte: 'Des lettres épaisses, sur le moins de plaques possible' },
   { id: 'dessiner', icone: '🎨', titre: 'Dessiner', texte: 'Perle par perle, sur une plaque vide' },
 ];
+
+// le nombre de modèles de la bibliothèque (sans les lettres), arrondi à la centaine en dessous
+function nbModelesArrondi() {
+  const n = (typeof MODELES !== 'undefined' ? MODELES : []).filter((m) => !/^(Alphabet|Accents)/.test(m.theme || '')).length;
+  return Math.max(100, Math.floor(n / 100) * 100);
+}
 
 // installer Perlinette sur l'écran d'accueil (proposé par le navigateur quand c'est possible)
 let INVITE_INSTALLER = null;
@@ -28,16 +34,26 @@ function ouvrirAccueil() {
   if (dlg.open) return;
   const nbMotifs = Object.values(lire(CLE.projets, {})).filter((m) => Array.isArray(m.cases) && m.cases.some((v) => v >= 0)).length;
   dlg.innerHTML = `<form method="dialog">
+    <div class="accueil-intro">
+      <p class="accueil-quoi" translate="no">${LANGUE === 'en'
+    ? '<b>Perlinette</b> helps you make <b>fuse bead</b> designs <small>(Hama, Perler, Artkal)</small>'
+    : '<b>Perlinette</b>, c’est pour faire des <b>perles à repasser</b> <small>(Hama, Perler, Artkal)</small>'}</p>
+      <ol class="accueil-etapes">
+        <li><span aria-hidden="true">🧩</span>Tu choisis ou tu crées un motif</li>
+        <li><span aria-hidden="true">🖨️</span>Tu imprimes le patron en taille réelle</li>
+        <li><span aria-hidden="true">✨</span>Tu le glisses sous ta plaque, tu poses les perles et tu repasses</li>
+      </ol>
+    </div>
     <h3>Que veux-tu faire ?</h3>
     <div class="accueil-choix">${ACCUEIL_CHOIX.map((c) => `<button type="button" data-choix="${c.id}">
-      <span class="accueil-icone" aria-hidden="true">${c.icone}</span><span class="accueil-texte"><b>${echap(c.titre)}</b><small>${echap(c.texte)}</small></span></button>`).join('')}</div>
+      <span class="accueil-icone" aria-hidden="true">${c.icone}</span><span class="accueil-texte"><b>${echap(c.titre)}</b><small>${echap(typeof c.texte === 'function' ? c.texte() : c.texte)}</small></span></button>`).join('')}</div>
     ${nbMotifs ? `<button type="button" class="accueil-reprendre" data-choix="ouvrir">📂 Reprendre un de mes motifs <small>(${nbMotifs})</small></button>` : ''}
     ${INVITE_INSTALLER ? '<button type="button" class="accueil-reprendre" id="accueilInstaller">📲 Installer Perlinette sur cet appareil <small>(icône, plein écran, sans Internet)</small></button>' : ''}
     ${!INVITE_INSTALLER && typeof EN_LIGNE !== 'undefined' && EN_LIGNE && surIos() && !dejaInstallee() ? '<p class="note">📲 Pour l’avoir comme une appli : touche « Partager », puis « Sur l’écran d’accueil ».</p>' : ''}
     <p class="note">${typeof EN_LIGNE !== 'undefined' && EN_LIGNE
       ? 'Tes motifs sont enregistrés tout seuls dans ce navigateur, sur cet appareil : rien n’est envoyé sur Internet. Pense à les exporter de temps en temps (menu Fichier).'
       : 'Tes motifs sont enregistrés tout seuls. Tu retrouves cet écran en touchant le logo Perlinette.'}</p>
-    <p class="note accueil-cafe">Perlinette est gratuite. <a href="https://buymeacoffee.com/garlabane" target="_blank" rel="noopener">☕ M’offrir un café</a></p>
+    <p class="note accueil-cafe"><button type="button" class="lien bouton-langue" translate="no"></button> · Perlinette est gratuite. <a href="https://buymeacoffee.com/garlabane" target="_blank" rel="noopener">☕ M’offrir un café</a></p>
   </form>`;
   dlg.querySelectorAll('[data-choix]').forEach((b) => (b.onclick = () => {
     const choix = b.dataset.choix;
@@ -45,6 +61,7 @@ function ouvrirAccueil() {
     if (choix === 'dessiner') { commencerADessiner(); return; }
     if (actions[choix]) actions[choix]();
   }));
+  brancherBoutonsLangue(dlg);
   const installer = dlg.querySelector('#accueilInstaller');
   if (installer) installer.onclick = async () => { const inv = INVITE_INSTALLER; INVITE_INSTALLER = null; installer.remove(); try { await inv.prompt(); } catch (e) { /* refusé */ } };
   // le rappel « pense à exporter » de la version en ligne est dit ici : inutile de le redire après

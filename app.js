@@ -243,7 +243,7 @@ function comptes() {
 }
 function majInfos() {
   const f = formatParId(P.format), nb = SURF.plaques.length;
-  const cm = (v) => (v * P.pas / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+  const cm = (v) => (v * P.pas / 10).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 1 });
   $('#nomProjet').textContent = P.nom;
   $('#infoPlaque').innerHTML = `${echap(f.nom)}${nb > 1 ? ` × ${nb} (${P.cfg.cols || 1} × ${P.cfg.rangs || 1})` : ''}<br>
     ${SURF.picots.length} picots · ${cm(SURF.larg)} × ${cm(SURF.haut)} cm (écart ${String(P.pas).replace('.', ',')} mm)<br>
@@ -470,7 +470,7 @@ function ouvrirPlaque(nouveau) {
     $('#tailleLibre').hidden = !fm.libre;
     $('#notePlaque').textContent = fm.type === 'rond' ? 'Picots en anneaux concentriques, déduits du nombre officiel : pose ta plaque sur une impression pour vérifier.' : (fm.type === 'perso' ? 'Plaque que tu as dessinée.' : '');
     const s = construireSurface(fm, { w: +f.w.value, h: +f.h.value, cols: +f.cols.value, rangs: +f.rangs.value });
-    const pas = GAMMES[fm.gamme]?.pas || 5, cm = (v) => (v * pas / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+    const pas = GAMMES[fm.gamme]?.pas || 5, cm = (v) => (v * pas / 10).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 1 });
     $('#totalPlaque').textContent = `${s.plaques.length} plaque(s), ${s.picots.length} picots, ${cm(s.larg)} × ${cm(s.haut)} cm.` + (!nouveau ? ' Le dessin est conservé à sa place (en haut à gauche).' : '');
   };
   [f.format, f.w, f.h, f.cols, f.rangs].forEach((el) => (el.oninput = el.onchange = maj));
@@ -560,7 +560,7 @@ function ouvrirListe() {
   ul.innerHTML = '';
   for (const m of Object.values(lire(CLE.projets, {})).sort((a, b) => b.modifie - a.modifie)) {
     const li = document.createElement('li');
-    const date = new Date(m.modifie).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+    const date = new Date(m.modifie).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { dateStyle: 'short', timeStyle: 'short' });
     li.innerHTML = `<span><b>${echap(m.nom)}</b><br><small>${echap(formatParId(m.format).nom)} · ${date}</small></span>`;
     const bt = (txt, fn, off) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = txt; b.disabled = !!off; b.onclick = fn; li.appendChild(b); };
     bt(m.id === P.id ? 'Ouvert' : 'Ouvrir', () => { charger(m); dlg.close(); }, m.id === P.id);

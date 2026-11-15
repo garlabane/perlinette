@@ -101,7 +101,7 @@ function lignesBiblio() {
     }
   }
   if (choix === 'tout' || choix === 'perso') for (const c of b.perso) lignes.push({ ...c, cle: 'perso|' + c.id, a: true, perso: true });
-  return lignes.filter((c) => (!q || (c.code + ' ' + c.nom + ' ' + c.marque).toLowerCase().includes(q)) && (!$('#biblioSeules').checked || c.a));
+  return lignes.filter((c) => (!q || (c.code + ' ' + c.nom + ' ' + (c.nomOfficiel || '') + ' ' + c.marque).toLowerCase().includes(q)) && (!$('#biblioSeules').checked || c.a));
 }
 function cocherVisibles(oui) {
   const b = biblio();

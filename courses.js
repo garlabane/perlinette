@@ -5,7 +5,7 @@
 // un sachet de 1000 perles Midi unies à environ 2,49 €.
 
 const COURSES_DEFAUT = { taille: 1000, prix: 2.49, marge: 10 };
-const eur = (v) => v.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+const eur = (v) => v.toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { style: 'currency', currency: 'EUR' });
 
 function reglagesCourses() {
   const r = reglages.courses || {};

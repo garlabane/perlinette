@@ -82,3 +82,10 @@ function franciserMotif(m) {
     if (ref) { c.nomOfficiel = ref.nomOfficiel; c.nom = ref.nom; }
   }
 }
+
+// en anglais : chaque nom français de couleur s'affiche avec le nom officiel (celui du sachet)
+if (typeof LANGUE !== 'undefined' && LANGUE === 'en') {
+  const noms = {};
+  for (const p of PALETTES_FUSIBLES) for (const c of p.couleurs) if (c.nomOfficiel && !(c.nom in noms)) noms[c.nom] = c.nomOfficiel;
+  ajouterTraductions(noms);
+}

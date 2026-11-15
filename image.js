@@ -121,7 +121,7 @@ function ouvrirImage(ajout = false) {
   $('#imgTri').onchange = majRefs;
   $('#imgCherche').oninput = majRefs;
   // « tout cocher / décocher » agit sur les couleurs affichées (recherche comprise)
-  const visibles = () => couleursDesPalettes(refs.palettes).filter((c) => { const q = $('#imgCherche').value.trim().toLowerCase(); return !q || (c.code + ' ' + c.nom + ' ' + c.marque).toLowerCase().includes(q); });
+  const visibles = () => couleursDesPalettes(refs.palettes).filter((c) => { const q = $('#imgCherche').value.trim().toLowerCase(); return !q || (c.code + ' ' + c.nom + ' ' + (c.nomOfficiel || '') + ' ' + c.marque).toLowerCase().includes(q); });
   $('#imgTout').onclick = () => { for (const c of visibles()) refs.exclues.delete(c.cle); retenirRefs(refs); majRefs(); relancer(); };
   $('#imgRien').onclick = () => { for (const c of visibles()) refs.exclues.add(c.cle); retenirRefs(refs); majRefs(); relancer(); };
 
@@ -340,7 +340,7 @@ function majUtilisees() {
 }
 function calculerImage(f, palette) {
   const info = $('#infoImage'), apercu = $('#apercuImage'), surf = surfaceImage.surf;
-  const cm = (v) => (v * (GAMMES[surfaceImage.format.gamme]?.pas || 5) / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+  const cm = (v) => (v * (GAMMES[surfaceImage.format.gamme]?.pas || 5) / 10).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 1 });
   const taille = `${surf.plaques.length} plaque(s) · ${surf.picots.length} picots · ${cm(surf.larg)} × ${cm(surf.haut)} cm`;
   resultatImage = null;
   apercu.width = 0; apercu.height = 0;

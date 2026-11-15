@@ -259,7 +259,7 @@ function majModeles() {
     carte.insertAdjacentHTML('beforeend', `<b>${echap(m.nom)}</b><small>${nb} perles · ${pose.couleurs.length} couleurs</small><small class="soudure ${soud.ok ? 'ok' : 'pb'}">${echap(texteSoudure(soud))}</small>`
       + (nAppr ? `<small class="approchee">≈ ${nAppr} couleur${nAppr > 1 ? 's' : ''} approchée${nAppr > 1 ? 's' : ''}</small>` : ''));
     carte.onclick = async () => {
-      const motif = creerMotif(`${m.nom} (${theme})`, plaque, m.assemblage || {}, NUANCIER_GAMME[pose.fmt.gamme] || 'hama-midi');
+      const motif = creerMotif(`${t(m.nom)} (${t(theme)})`, plaque, m.assemblage || {}, NUANCIER_GAMME[pose.fmt.gamme] || 'hama-midi');
       motif.cases = pose.cases; motif.couleurs = pose.couleurs;
       if (m.caractere && typeof lettresDepuisModele === 'function') lettresDepuisModele(motif, m);
       charger(motif); sauverMaintenant();

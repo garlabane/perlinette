@@ -1,7 +1,8 @@
 {
-  "version": "1.15.1",
+  "version": "1.16.0",
   "date": "2026-11-15",
   "nouveautes": [
-    "Instagram : « Enregistrer dans mes photos » met les 5 images dans la galerie du téléphone (ou appui long sur une image)"
+    "Perlinette parle anglais : elle s'affiche en anglais si ton navigateur n'est pas en français (bouton « English / Français » pour choisir)",
+    "L'accueil explique tout de suite à quoi sert Perlinette : les perles à repasser, en 3 étapes"
   ]
 }

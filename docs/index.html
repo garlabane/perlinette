@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Perlinette — motifs de perles à repasser</title>
 <meta name="description" content="Perlinette : créer, préparer et imprimer à taille réelle des motifs de perles à repasser (Hama, Perler, Artkal). Gratuit, en français, sans installation.">
+<link rel="alternate" hreflang="fr" href="https://garlabane.github.io/perlinette/">
+<link rel="alternate" hreflang="en" href="https://garlabane.github.io/perlinette/en/">
+<link rel="alternate" hreflang="x-default" href="https://garlabane.github.io/perlinette/en/">
+<script>
+// navigateur réglé dans une autre langue que le français → la page en anglais (sauf choix fait à la main)
+(function () {
+  try {
+    var l = localStorage.getItem('perlinette-langue');
+    var nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'fr';
+    if (l === 'en' || (!l && !/^fr\b/i.test(nav) && !/[?&]lang=fr/.test(location.search))) location.replace('en/' + location.hash);
+  } catch (e) { /* on reste en français */ }
+})();
+</script>
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -20,6 +33,7 @@
       <a href="app/">Essayer en ligne</a>
       <a href="#telecharger">Installer</a>
       <a href="https://github.com/garlabane/perlinette">Code source</a>
+      <a href="en/" lang="en" onclick="try{localStorage.setItem('perlinette-langue','en')}catch(e){}">🇬🇧 English</a>
     </nav>
   </div>
 </header>
@@ -101,7 +115,7 @@
     <div class="vitrine inverse">
       <div>
         <h3>Des modèles prêts à repasser</h3>
-        <p><b>Plus de 400 modèles</b> dessinés perle par perle, chacun pensé pour sa plaque : très simples pour la Maxi des petits, travaillés pour le grand carré, détaillés pour la Mini. Animaux, fruits et légumes, gourmandises, mode, plage, camping, monuments, musique, école, sport, fêtes, kawaii, mandalas… Tous vérifiés : ils se soudent d'un seul tenant.</p>
+        <p><b>Plus de 700 modèles</b> dessinés perle par perle, chacun pensé pour sa plaque : très simples pour la Maxi des petits, travaillés pour le grand carré, détaillés pour la Mini. Animaux, fruits et légumes, gourmandises, mode, plage, camping, monuments, musique, école, sport, fêtes, kawaii, mandalas… Tous vérifiés : ils se soudent d'un seul tenant.</p>
       </div>
       <img class="capture" src="captures/modeles.jpg" alt="La bibliothèque de modèles : dix motifs d'Halloween pour la plaque ronde">
     </div>
@@ -110,7 +124,6 @@
         <h3>Imprimer à taille réelle</h3>
         <p>Pose ta plaque transparente directement sur la feuille. L'aperçu montre chaque page avant d'imprimer :</p>
         <ul>
-          <li>logo et titre en haut de page (le logo Perlinette ou le tien) ;</li>
           <li>légende des couleurs de chaque feuille ;</li>
           <li>en haut de chaque feuille, une miniature du motif repassé, pour voir le résultat d'un coup d'œil ;</li>
           <li>plusieurs petites plaques sur une même feuille quand elles tiennent ;</li>

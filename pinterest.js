@@ -66,7 +66,7 @@ function infosMotif() {
   for (const v of P.cases) if (v >= 0) nb[v]++;
   const util = P.couleurs.map((c, i) => ({ c, n: nb[i] })).filter((u) => u.n > 0).sort((a, b) => b.n - a.n);
   const perles = util.reduce((t, u) => t + u.n, 0);
-  const cm = (v) => (v * P.pas / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+  const cm = (v) => (v * P.pas / 10).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 1 });
   return { util, perles, taille: `${cm(SURF.larg)} × ${cm(SURF.haut)} cm`, plaques: SURF.plaques.length, forme: formatParId(P.format).nom };
 }
 

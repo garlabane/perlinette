@@ -18,7 +18,7 @@ mkdirSync(sortie, { recursive: true });
 const nav = await chromium.launch({ channel: 'chrome' });
 const page = await nav.newPage({ viewport: { width: 1200, height: 900 } });
 page.on('pageerror', (e) => console.log('erreur de page :', e.message));
-await page.goto(pathToFileURL(resolve(site, 'app', 'index.html')).href);
+await page.goto(pathToFileURL(resolve(site, 'app', 'index.html')).href + '?lang=fr'); // les épingles et les pages restent en français
 await page.waitForFunction(() => typeof epingleDeModele === 'function' && typeof MODELES !== 'undefined' && MODELES.length > 100);
 // la fiche de chaque modèle : nom, thème, plaque, perles, couleurs
 const AVIS = await page.evaluate(() => (typeof AVIS_THEMES === 'object' ? AVIS_THEMES : {}));
@@ -132,6 +132,6 @@ writeFileSync(resolve(site, 'modeles', 'index.html'), tete(`${ok.length} modèle
 </section>` + pied);
 // plan du site, pour les moteurs de recherche
 writeFileSync(resolve(site, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`
-  + [SITE, adresseG, ...ok.map((f) => `${SITE}modeles/${f.slug}/`)].map((a) => `<url><loc>${a}</loc></url>`).join('\n') + '\n</urlset>\n');
+  + [SITE, `${SITE}en/`, adresseG, ...ok.map((f) => `${SITE}modeles/${f.slug}/`)].map((a) => `<url><loc>${a}</loc></url>`).join('\n') + '\n</urlset>\n');
 console.log(`${ok.length} pages de modèles, ${themes.length} thèmes`);
 if (faits < 100) process.exit(1);

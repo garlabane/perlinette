@@ -284,7 +284,7 @@ function ouvrirImpression() {
     dlg.querySelectorAll('#ipPasChoix [data-v]').forEach((b) => b.classList.toggle('actif', +b.dataset.v === o.pas));
     rendu = preparerPages(o);
     $d('#ipPages').innerHTML = rendu.svgs.map((s, k) => `<div class="impr-page ${rendu.orient}" title="Page ${k + 1}">${s}</div>`).join('');
-    const cm = (v) => (v / 10).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+    const cm = (v) => (v / 10).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 1 });
     $d('#ipInfo').innerHTML = `<b>${rendu.svgs.length} feuille${rendu.svgs.length > 1 ? 's' : ''}</b> A4 en ${rendu.orient}`
       + (multi ? ` · jusqu'à ${rendu.parFeuille} plaque${rendu.parFeuille > 1 ? 's' : ''} par feuille` : '')
       + ` · plaque de ${cm(rendu.lw)} × ${cm(rendu.lh)} cm à taille réelle.`

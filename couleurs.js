@@ -54,7 +54,7 @@ function majCouleurs() {
     const st = typeof stockDe === 'function' ? stockDe(c) : null, manque = st !== null && n[i] > st;
     el.title = `${marqueDe(c)}${st !== null ? ` — en stock : ${st}` : ''}${manque ? ` — il en manque ${n[i] - st}` : ''} — clic : choisir, double-clic : modifier`;
     el.className += reglages.symboles ? '' : ' sans-sym';
-    el.title = `${c.nom}${c.nomOfficiel && c.nomOfficiel !== c.nom ? ' — « ' + c.nomOfficiel + ' » sur le sachet' : ''} · ${el.title}`;
+    el.title = `${c.nom}${LANGUE === 'fr' && c.nomOfficiel && c.nomOfficiel !== c.nom ? ' — « ' + c.nomOfficiel + ' » sur le sachet' : ''} · ${el.title}`;
     el.innerHTML = `<span class="pastille" style="background:${c.hex}"></span>${reglages.symboles ? `<span class="sym">${SYMBOLES[i % SYMBOLES.length]}</span>` : ''}
       <span class="lib">${echap(c.nom)} <small>${echap(c.code || '')}</small></span><span class="nb${manque ? ' manque' : ''}">${manque ? '⚠ ' : ''}${n[i] || ''}</span>`;
     el.onclick = () => { S.couleur = i; if (S.outil === 'gomme' || S.outil === 'pipette') choisirOutil('crayon'); majCouleurs(); };
@@ -99,7 +99,7 @@ function dessinerNuancier(boite, liste, opts) {
     }
     const el = document.createElement(opts.cocher ? 'label' : 'button');
     el.className = 'nu-puce';
-    el.title = `${c.marque} ${c.code} ${c.nom}`;
+    el.title = `${c.marque} ${c.code} ${t(c.nom)}`;
     if (!opts.cocher) el.type = 'button';
     const coche = opts.cocher ? opts.cocher(c.cle) : false;
     el.innerHTML = `${opts.cocher ? `<input type="checkbox" ${coche ? 'checked' : ''}>` : ''}<i style="background:${c.hex}"></i><b>${echap(c.code)}</b> ${echap(c.nom)}`;
