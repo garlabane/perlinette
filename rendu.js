@@ -125,7 +125,7 @@ function ouvrirRendu() {
   f.addEventListener('submit', (e) => {
     if (e.submitter?.value !== 'png') return;
     e.preventDefault();
-    toileRendu.toBlob((b) => { telecharger(nomFichier(' - repasse.png'), b); message('Rendu enregistré dans Téléchargements.'); });
+    signerImage(toileRendu).then((c) => c.toBlob((b) => { telecharger(nomFichier(' - repasse.png'), b); message('Rendu enregistré dans Téléchargements.'); }));
   });
   dlg.addEventListener('close', () => dlg.remove());
   document.body.appendChild(dlg);

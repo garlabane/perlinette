@@ -22,7 +22,7 @@ const ancre = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().re
 const TEXTES = {
   fr: {
     lang: 'fr', locale: 'fr_FR', dossierPins: 'epingles', dossierPages: 'modeles', racineSite: '',
-    nav: (r) => `<a href="${r}modeles/">Modèles</a><a href="${r}tutoriels.html">Tutoriels</a><a href="${r}app/">Ouvrir Perlinette</a><a href="${r}en/patterns/" lang="en">🇬🇧 English</a>`,
+    nav: (r) => `<a href="${r}modeles/">Modèles</a><a href="${r}tutoriels.html">Tutoriels</a><a href="${r}app/">Ouvrir Perlinette</a><a href="${r}en/patterns/" lang="en"><svg class="drapeau" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="2"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg> English</a>`,
     titre: (f) => `${f.nom} en perles à repasser — modèle gratuit (${f.theme})`,
     description: (f) => `Modèle « ${f.nom} » pour perles à repasser Hama : ${f.perles} perles, ${f.couleurs} couleurs, ${f.taille}, sur ${f.plaque}. À ouvrir dans Perlinette pour l'imprimer en taille réelle avec le guide des couleurs. Gratuit, sans compte.`,
     pin: (f) => `${f.nom} en perles à repasser : ${f.perles} perles, ${f.couleurs} couleurs. Modèle gratuit à imprimer en taille réelle avec Perlinette. #perlesàrepasser #hama #perler #fusebeads #pixelart #DIY`,
@@ -40,7 +40,7 @@ const TEXTES = {
   },
   en: {
     lang: 'en', locale: 'en_US', dossierPins: 'en/pins', dossierPages: 'en/patterns', racineSite: 'en/',
-    nav: (r) => `<a href="${r}en/patterns/">Patterns</a><a href="${r}en/">About</a><a href="${r}app/?lang=en">Open Perlinette</a><a href="${r}modeles/" lang="fr">🇫🇷 Français</a>`,
+    nav: (r) => `<a href="${r}en/patterns/">Patterns</a><a href="${r}en/">About</a><a href="${r}app/?lang=en">Open Perlinette</a><a href="${r}modeles/" lang="fr"><svg class="drapeau" viewBox="0 0 3 2" aria-hidden="true"><rect width="1" height="2" fill="#002654"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#CE1126"/></svg> Français</a>`,
     titre: (f) => `${f.nom} fuse bead pattern — free (${f.theme})`,
     description: (f) => `Free “${f.nom}” fuse bead pattern (Hama, Perler, Artkal): ${f.perles} beads, ${f.couleurs} colors, ${f.pouces} in (${f.taille}), on a ${f.plaque} pegboard. Open it in Perlinette to print it at actual size (A4 or US Letter) with the color guide. Free, no account needed.`,
     pin: (f) => `${f.nom} fuse bead pattern: ${f.perles} beads, ${f.couleurs} colors. Free pattern to print at actual size with Perlinette. #perlerbeads #hamabeads #fusebeads #perlerbeadpatterns #pixelart #DIY`,

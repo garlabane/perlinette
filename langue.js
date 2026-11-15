@@ -173,10 +173,14 @@ function demarrerTraduction() {
   }
 }
 
+// drapeaux dessinés (les émojis de drapeaux ne s'affichent pas sous Windows)
+const DRAPEAU_FR = '<svg class="drapeau" viewBox="0 0 3 2" aria-hidden="true"><rect width="1" height="2" fill="#002654"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#CE1126"/></svg>';
+const DRAPEAU_UK = '<svg class="drapeau" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="2"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>';
 // les boutons « English / Français » (menu Fichier, accueil) : ils montrent l'autre langue
 function brancherBoutonsLangue(racine = document) {
   racine.querySelectorAll('.bouton-langue').forEach((b) => {
-    b.textContent = LANGUE === 'fr' ? '🇬🇧 English' : '🇫🇷 Français';
+    b.innerHTML = LANGUE === 'fr' ? `${DRAPEAU_UK}<span>English</span>` : `${DRAPEAU_FR}<span>Français</span>`;
+    b.title = LANGUE === 'fr' ? 'English' : 'Français';
     b.lang = LANGUE === 'fr' ? 'en' : 'fr';
     b.onclick = (e) => { e.preventDefault(); changerLangue(LANGUE === 'fr' ? 'en' : 'fr'); };
   });

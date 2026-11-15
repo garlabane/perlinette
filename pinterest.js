@@ -127,7 +127,7 @@ async function epinglePng() { const c = await epingleCanvas(); return new Promis
 // lien = l'adresse qui contient tout le motif (lien-motif.js) ; on l'ajoute si la description reste sous la limite de Pinterest
 function descriptionPinAnglais(lien) {
   const I = infosMotif(), nom = t(P.nom), pouces = I.tailleMm.map((v) => (v / 25.4).toFixed(1)).join(' × ');
-  const tags = '\n#perlerbeads #hamabeads #fusebeads #perlerbeadpatterns #pixelart #DIY';
+  const tags = '\n#perlinetteapp #perlerbeads #hamabeads #fusebeads #perlerbeadpatterns #pixelart #DIY';
   const court = `${nom}: a fuse bead pattern (${I.perles} beads, ${I.util.length} colors, ${pouces} in), to print at actual size. Make it in Perlinette, free and no account needed: ${lien}`;
   if (lien && court.length + tags.length <= 790) return court + tags;
   return `${nom}${(reglages.auteur || '').trim() ? ', created by ' + reglages.auteur.trim() : ''}: a fuse bead pattern with ${I.perles} beads and ${I.util.length} colors (${pouces} in). `
@@ -135,7 +135,7 @@ function descriptionPinAnglais(lien) {
 }
 function descriptionPin(lien) {
   if (LANGUE === 'en') return descriptionPinAnglais(lien);
-  const I = infosMotif(), tags = '\n#perlesàrepasser #hama #perler #fusebeads #pixelart #DIY';
+  const I = infosMotif(), tags = '\n#perlinetteapp #perlesàrepasser #hama #perler #fusebeads #pixelart #DIY';
   // avec le lien du motif : texte court, pour rester sous la limite de Pinterest (800 caractères)
   const court = `${P.nom} : motif de perles à repasser (${I.perles} perles, ${I.util.length} couleurs, ${I.taille}), à imprimer en taille réelle. Refais-le dans Perlinette, gratuit et sans compte : ${lien}`;
   if (lien && court.length + tags.length <= 790) return court + tags;
@@ -155,7 +155,7 @@ async function partagerPinterest() {
     // et la page ouvre le modèle dans Perlinette
     const adresse = 'https://www.pinterest.com/pin/create/button/?url=' + e(SITE_PERLINETTE + 'modeles/' + s + '/')
       + '&media=' + e(SITE_PERLINETTE + 'epingles/' + s + '.jpg')
-      + '&description=' + e(`${mod.nom} en perles à repasser : ${I.perles} perles, ${I.util.length} couleurs. Modèle gratuit à imprimer en taille réelle avec Perlinette. #perlesàrepasser #hama #perler #fusebeads #pixelart #DIY`);
+      + '&description=' + e(`${mod.nom} en perles à repasser : ${I.perles} perles, ${I.util.length} couleurs. Modèle gratuit à imprimer en taille réelle avec Perlinette. #perlinetteapp #perlesàrepasser #hama #perler #fusebeads #pixelart #DIY`);
     window.open(adresse, '_blank', 'noopener');
     message('Pinterest s’ouvre : choisis ton tableau. Le lien vers Perlinette est déjà mis.', 6000);
     return;

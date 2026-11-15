@@ -1301,3 +1301,42 @@ body.tactile .bulle-options { padding-top: 42px; }
 @media (min-width: 1281px) { body:not(.tablette):not(.enfant) #app { grid-template-columns: 136px minmax(0, 1fr) 300px; } }
 @media (min-width: 901px) and (max-width: 1280px) { body:not(.tablette):not(.enfant) #app { grid-template-columns: 136px minmax(0, 1fr) 264px; } }
 .grille-outils > button span { overflow-wrap: normal; word-break: keep-all; }
+
+/* drapeaux de langue */
+.bouton-langue { display: inline-flex; align-items: center; gap: 8px; }
+.drapeau { width: 22px; height: 15px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.15); flex: 0 0 auto; display: inline-block; vertical-align: middle; }
+.bouton-langue.drapeau-seul { padding: 0 8px; min-height: 34px; justify-content: center; }
+.bouton-langue.drapeau-seul span { display: none; }
+.bouton-langue.drapeau-seul .drapeau { width: 26px; height: 18px; }
+body.tablette .bouton-langue.drapeau-seul { min-height: 50px; min-width: 50px; border-radius: 12px; }
+@media (max-width: 600px) { .barre .bouton-langue.drapeau-seul { display: none; } }
+body.enfant .barre .bouton-langue.drapeau-seul { display: none; }
+.accueil-cafe .bouton-langue .drapeau { width: 18px; height: 12px; }
+
+/* onglets des motifs : ils rétrécissent au lieu de déborder, sans barre de défilement ; « ▾ » liste tout */
+.onglets { scrollbar-width: none; }
+.onglets::-webkit-scrollbar { display: none; }
+.onglet { flex: 0 1 200px; min-width: 84px; }
+.onglet-nom { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.onglets-liste, .onglet-plus { position: sticky; right: 0; z-index: 1; }
+.onglets-liste { flex: none; height: 32px; padding: 0 10px; border: 1px solid var(--bord); border-bottom: none; border-radius: 9px 9px 0 0; background: var(--panneau); color: var(--prune); font-weight: 600; font-size: 13px; box-shadow: -8px 0 8px var(--fond); }
+.onglet-plus { background: var(--fond); }
+body.tactile .onglets-liste { height: 44px; padding: 0 14px; }
+/* place réservée à la barre de zoom dans la rangée des onglets (ordinateur) */
+:root { --reserve-zoom: 0px; }
+@media (min-width: 1281px) { body:not(.tablette):not(.enfant) { --reserve-zoom: 330px; } }
+@media (min-width: 901px) and (max-width: 1280px) { body:not(.tablette):not(.enfant) { --reserve-zoom: 150px; } body:not(.tablette):not(.enfant) .zoom-barre #zoomValeur, body:not(.tablette):not(.enfant) .zoom-barre #btnSymboles { display: none; } }
+@media (min-width: 901px) { body:not(.tablette):not(.enfant) .onglets { padding-right: var(--reserve-zoom); } body:not(.tablette):not(.enfant) .onglets-liste, body:not(.tablette):not(.enfant) .onglet-plus { right: var(--reserve-zoom); } }
+
+/* À propos */
+dialog.apropos { max-width: 520px; }
+.apropos-texte h3 { margin: 0 0 10px; }
+.apropos-texte p { margin: 0 0 10px; line-height: 1.5; }
+dialog.apropos menu { align-items: center; }
+dialog.apropos .bouton-lien { margin-right: auto; color: var(--prune); text-decoration: none; font-weight: 600; padding: 6px 4px; }
+.accueil-cafe .lien-apropos { background: none; border: 0; padding: 0; min-height: 0; font: inherit; color: var(--prune); text-decoration: underline; cursor: pointer; }
+
+/* À propos : le bouton café bien visible */
+dialog.apropos menu { justify-content: flex-end; gap: 10px; }
+.bouton-cafe { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 999px; background: #FFDD00; color: #1a1a1a; font-weight: 700; text-decoration: none; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+@media (hover: hover) { .bouton-cafe:hover { filter: brightness(.95); } }

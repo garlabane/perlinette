@@ -603,7 +603,7 @@ $('#fichierProjet').onchange = async (e) => {
     message(`« ${m.nom} » importé.`);
   } catch (err) { avertir("Ce fichier n'est pas un motif lisible."); }
 };
-function exporterPng() { toile.toBlob((b) => telecharger(nomFichier('.png'), b)); }
+async function exporterPng() { (await signerImage(toile)).toBlob((b) => telecharger(nomFichier('.png'), b)); }
 
 // ---------- démarrage ----------
 function demarrer() {

@@ -68,4 +68,30 @@ function dessinerOnglets() {
   plus.type = 'button'; plus.className = 'onglet-plus'; plus.textContent = '+'; plus.title = 'Nouveau motif dans un nouvel onglet';
   plus.onclick = () => ouvrirPlaque(true);
   barre.appendChild(plus);
+  // trop d'onglets pour la largeur (même rétrécis) : un bouton « ▾ » les liste tous, sans barre de défilement
+  requestAnimationFrame(() => {
+    if (barre.scrollWidth <= barre.clientWidth + 2) return;
+    const liste = document.createElement('button');
+    liste.type = 'button'; liste.className = 'onglets-liste'; liste.title = 'Tous les motifs ouverts';
+    liste.textContent = `▾ ${ONGLETS.length}`;
+    liste.onclick = (e) => {
+      e.stopPropagation();
+      if (typeof ouvrirBulle !== 'function') return;
+      const ps = lire(CLE.projets, {});
+      const b = ouvrirBulle(liste, ONGLETS.map((id) => {
+        const m = id === P.id ? P : ps[id];
+        return `<button type="button" data-onglet-id="${id}"${id === P.id ? ' class="actif"' : ''}><span>${echap((m && m.nom) || 'Motif')}</span></button>`;
+      }).join(''));
+      b.querySelectorAll('[data-onglet-id]').forEach((x) => (x.onclick = () => { const id = x.dataset.ongletId; if (id !== P.id) charger(lire(CLE.projets, {})[id]); }));
+    };
+    barre.insertBefore(liste, plus);
+    // l'onglet en cours reste visible
+    barre.querySelector('.onglet.actif')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  });
 }
+// la molette fait défiler les onglets de côté (la barre de défilement est masquée)
+document.getElementById('onglets')?.addEventListener('wheel', (e) => {
+  const b = e.currentTarget;
+  if (b.scrollWidth <= b.clientWidth || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+  e.preventDefault(); b.scrollLeft += e.deltaY;
+}, { passive: false });

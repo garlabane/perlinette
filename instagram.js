@@ -186,6 +186,8 @@ async function carrouselInsta(ctx = contexteInsta()) {
 // le 5e mot-dièse : le sujet du modèle (thème), sinon le pixel art
 const DIESES_THEMES = { 'Noël': '#noel', 'Halloween': '#halloween', 'Pâques': '#paques', 'Animaux': '#animaux', 'Kawaii': '#kawaii', 'Princesses': '#princesse',
   'Mandalas': '#mandala', 'Fruits et légumes': '#fruits', 'Gourmandises': '#gourmandise', 'Saisons': '#saisons', 'Course de karts': '#kart', 'Véhicules': '#voitures' };
+// Instagram n'accepte plus que 5 mots-dièse par publication : on dédoublonne et on coupe à 5 (#perlinetteapp toujours en tête)
+function cinqDieses(liste) { return [...new Set(liste.filter(Boolean).map((d) => d.toLowerCase()))].slice(0, 5).join(' '); }
 function igDiese(theme) { return DIESES_THEMES[theme] || '#pixelart'; }
 // mots-dièse en anglais (version anglaise) : ceux que cherchent les créateurs anglophones
 const HASHTAGS_THEMES = { 'Noël': '#christmascrafts', 'Halloween': '#halloweencrafts', 'Pâques': '#eastercrafts', 'Animaux': '#cuteanimals', 'Kawaii': '#kawaii',
@@ -212,8 +214,9 @@ function texteInstaAnglais(ctx) {
     '',
     'What colors would you make it in? 💬',
     '📸 If you make it, tag me: I share your creations!',
+    auteurPartage() ? `✨ Pattern by ${auteurPartage()}, made with Perlinette` : '✨ Made with Perlinette',
     '',
-    `#perlerbeads #hamabeads #fusebeads #perlerbeadpatterns ${HASHTAGS_THEMES[ctx.theme] || '#pixelart'}`,
+    cinqDieses(['#perlinetteapp', '#perlerbeads', '#fusebeads', '#perlerbeadpatterns', HASHTAGS_THEMES[ctx.theme] || '#pixelart']),
   ];
   return lignes.filter((l, k, tb) => l !== '' || tb[k - 1] !== '').join('\n');
 }
@@ -243,8 +246,9 @@ function texteInsta(ctx = contexteInsta()) {
     AVIS_THEMES[ctx.theme] ? '' : null,
     'Et toi, tu le ferais dans quelles couleurs ? 💬',
     '📸 Si tu le fais, identifie-moi : je partage vos créations !',
+    auteurPartage() ? `✨ Motif de ${auteurPartage()}, fait avec Perlinette` : '✨ Fait avec Perlinette',
     '',
-    `#perlesarepasser #perleshama #hamabeads #perlerbeads ${igDiese(ctx.theme)}`,
+    cinqDieses(['#perlinetteapp', '#perlesarepasser', '#hamabeads', '#perlerbeads', igDiese(ctx.theme)]),
   ];
   return lignes.filter((l) => l !== null).filter((l, k, t) => l !== '' || t[k - 1] !== '').join('\n');
 }

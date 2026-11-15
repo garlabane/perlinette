@@ -1,9 +1,10 @@
 {
-  "version": "1.18.3",
+  "version": "1.18.4",
   "date": "2026-11-15",
   "nouveautes": [
-    "Sélection : baguette magique (une touche choisit tout le motif, ou une couleur)",
-    "Une sélection se déplace en la faisant glisser, sans laisser de copie",
-    "Les menus flottants ont un ✕ et se ferment d’un toucher à côté, sans dessiner"
+    "Les images et textes partagés portent la signature Perlinette (#perlinetteapp)",
+    "Un drapeau pour changer de langue, en haut de l’écran",
+    "Les motifs ouverts tiennent tous dans la barre, sans défilement",
+    "Nouveau : « À propos », l’histoire de Perlinette"
   ]
 }

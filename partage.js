@@ -3,10 +3,51 @@
 // (message, mail, AirDrop, imprimante…). Sans menu de partage (ordinateur), le fichier est
 // simplement téléchargé, comme avant.
 
+// ---------- la signature : qu'on reconnaisse Perlinette partout où un motif est partagé ----------
+const MOT_DIESE = '#perlinetteapp';
+const ADRESSE_SITE = 'garlabane.github.io/perlinette';
+function auteurPartage() { return (reglages.auteur || '').trim(); }
+// une ligne à ajouter au bas des textes partagés (listes, messages)
+function signatureTexte() {
+  const au = auteurPartage();
+  return (LANGUE === 'en'
+    ? `\n\n${au ? 'Created by ' + au + ' · ' : ''}Made with Perlinette ✨ ${ADRESSE_SITE} ${MOT_DIESE}`
+    : `\n\n${au ? 'Créé par ' + au + ' · ' : ''}Fait avec Perlinette ✨ ${ADRESSE_SITE} ${MOT_DIESE}`);
+}
+// l'image + un bandeau au bas : logo Perlinette, adresse, auteur et #perlinetteapp
+async function signerImage(src) {
+  const w = src.width, H = Math.round(Math.min(130, Math.max(64, w * 0.1)));
+  const c = document.createElement('canvas'); c.width = w; c.height = src.height + H;
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, w, src.height); g.drawImage(src, 0, 0);
+  g.fillStyle = '#faf6f0'; g.fillRect(0, src.height, w, H);
+  g.fillStyle = '#e9d9c3'; g.fillRect(0, src.height, w, Math.max(2, H * 0.03));
+  const pad = H * 0.3, k = H / 24, taille = H * 0.36, lw = 15 * k + taille * 5, lh = 13 * k;
+  try {
+    const logo = await igSvgImage(pinLogo(0, 0, k, '#6e2f5c', taille), Math.ceil(lw), Math.ceil(lh));
+    g.drawImage(logo, pad, src.height + (H - lh) / 2 + H * 0.02);
+  } catch (e) { /* sans logo : le texte suffit */ }
+  // à droite : l'adresse, puis l'auteur et le mot-dièse (rétrécis si la place manque)
+  const au = auteurPartage(), place = w - lw - pad * 3;
+  const l1 = ADRESSE_SITE, l2 = `${au ? (LANGUE === 'en' ? 'by ' : 'par ') + au + '  ·  ' : ''}${MOT_DIESE}`;
+  let f1 = H * 0.24, f2 = H * 0.21;
+  const police = (px, gras) => `${gras ? 700 : 500} ${px}px "Segoe UI", Inter, system-ui, sans-serif`;
+  g.font = police(f1, true); const m1 = g.measureText(l1).width;
+  g.font = police(f2, false); const m2 = g.measureText(l2).width;
+  const r = Math.min(1, place / Math.max(m1, m2, 1)); f1 *= r; f2 *= r;
+  g.textAlign = 'right'; g.textBaseline = 'alphabetic';
+  if (f1 >= 9) {
+    g.fillStyle = '#6e2f5c'; g.font = police(f1, true); g.fillText(l1, w - pad, src.height + H * 0.47);
+    g.fillStyle = '#8a7380'; g.font = police(f2, false); g.fillText(l2, w - pad, src.height + H * 0.8);
+  }
+  return c;
+}
+
 async function partagerFichiers(fichiers, titre) {
   try {
     if (navigator.canShare && navigator.canShare({ files: fichiers })) {
-      await navigator.share({ files: fichiers, title: titre });
+      const avecTexte = { files: fichiers, title: titre, text: signatureTexte().trim() };
+      await navigator.share(navigator.canShare(avecTexte) ? avecTexte : { files: fichiers, title: titre });
       return true;
     }
   } catch (e) {
@@ -18,7 +59,7 @@ async function partagerFichiers(fichiers, titre) {
 // l'image : le motif tel qu'il est affiché
 async function partagerImage() {
   sauverMaintenant();
-  const blob = await new Promise((r) => toile.toBlob(r, 'image/png'));
+  const blob = await new Promise(async (r) => (await signerImage(toile)).toBlob(r, 'image/png'));
   if (!blob) { avertir('Impossible de créer l’image.'); return; }
   const fichier = new File([blob], nomFichier('.png'), { type: 'image/png' });
   if (await partagerFichiers([fichier], P.nom)) return;
@@ -60,10 +101,10 @@ async function partagerListe() {
   if (!P.cases.some((v) => v >= 0)) { avertir('Ce motif est encore vide.'); return; }
   const liste = listeDesPerles();
   try {
-    if (navigator.share && window.matchMedia('(pointer: coarse)').matches) { await navigator.share({ title: P.nom, text: liste.texte }); return; }
+    if (navigator.share && window.matchMedia('(pointer: coarse)').matches) { await navigator.share({ title: P.nom, text: liste.texte + signatureTexte() }); return; }
   } catch (e) { if (e && e.name === 'AbortError') return; }
   let copie = false;
-  try { await navigator.clipboard.writeText(liste.texte); copie = true; } catch (e) { /* presse-papiers refusé */ }
+  try { await navigator.clipboard.writeText(liste.texte + signatureTexte()); copie = true; } catch (e) { /* presse-papiers refusé */ }
   avertir((copie ? 'Liste copiée : tu peux la coller dans un message ou une note.\n\n' : '') + liste.texte);
 }
 

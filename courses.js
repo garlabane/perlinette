@@ -100,7 +100,7 @@ function ouvrirCourses() {
     retenirCourses(rg); dessiner();
   };
   $('#coursesCopier').onclick = async () => {
-    const texte = texteCourses(lignesCourses());
+    const texte = texteCourses(lignesCourses()) + signatureTexte();
     try { if (navigator.share && window.matchMedia('(pointer: coarse)').matches) { await navigator.share({ title: 'Liste de courses — ' + P.nom, text: texte }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
     let copie = false;
     try { await navigator.clipboard.writeText(texte); copie = true; } catch (e) { /* presse-papiers refusé */ }

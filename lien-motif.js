@@ -93,7 +93,7 @@ async function partagerLien() {
   const lien = await lienDuMotif();
   if (!lien) { avertir('Ce motif est sur une plaque dessinée à la main : envoie-le plutôt avec « Envoyer le motif ».'); return; }
   try {
-    if (navigator.share && window.matchMedia('(pointer: coarse)').matches) { await navigator.share({ title: P.nom, text: `${P.nom}, un motif de perles à repasser à ouvrir dans Perlinette :`, url: lien }); return; }
+    if (navigator.share && window.matchMedia('(pointer: coarse)').matches) { await navigator.share({ title: P.nom, text: `${P.nom}, un motif de perles à repasser à ouvrir dans Perlinette ${MOT_DIESE} :`, url: lien }); return; }
   } catch (e) { if (e && e.name === 'AbortError') return; }
   let copie = false;
   try { await navigator.clipboard.writeText(lien); copie = true; } catch (e) { /* presse-papiers refusé */ }
