@@ -1379,3 +1379,10 @@ body.tactile .retour-accueil { min-height: 44px; padding: 8px 16px; font-size: 1
 
 .liste-projets li .projet-actions { flex: none; }
 .projet-actions button { width: auto; }
+
+/* outil Texte : l'aperçu juste sous le champ (on voit le mot changer en choisissant), le bouton « Placer » toujours visible */
+.panneau-texte .tx-apercu-haut { padding: 6px; border: 1px solid var(--bord); border-radius: 12px; background: #fff; }
+.panneau-texte .tx-apercu-haut canvas { max-height: 120px; width: auto; }
+.panneau-texte .tx-actions { position: sticky; bottom: -14px; margin: 0 -14px -14px; padding: 10px 14px 14px; background: var(--panneau); border-top: 1px solid var(--bord); z-index: 1; }
+.panneau-texte > * { flex-shrink: 0; }   /* dans le panneau qui défile, aucun bloc ne s'écrase (l'aperçu débordait) */
+.panneau-texte .tx-apercu-haut canvas { max-width: 100%; max-height: 120px; width: auto; height: auto; object-fit: contain; }

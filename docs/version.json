@@ -1,9 +1,7 @@
 {
-  "version": "1.18.7",
+  "version": "1.18.8",
   "date": "2026-11-15",
   "nouveautes": [
-    "« ← Accueil » en haut des fenêtres ouvertes depuis l’accueil, et retour à l’accueil si on ferme sans rien choisir",
-    "« Continuer un de mes motifs » : une carte avec l’image de chaque motif commencé",
-    "Écrire un mot sur téléphone : l’aperçu est juste sous le choix des pièces"
+    "Outil Texte : l’aperçu du mot est juste sous le champ, et « Placer sur la plaque » reste visible"
   ]
 }

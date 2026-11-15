@@ -297,13 +297,13 @@ function ouvrirPanneauTexte() {
   p.innerHTML = `
     <div class="tx-haut"><b>Texte</b><small>${echap(st.info)}</small><button type="button" class="tx-fermer" aria-label="Fermer">✕</button></div>
     <input type="text" id="txSaisie" autocomplete="off" autocapitalize="characters" placeholder="Ton texte" maxlength="40">
+    <div class="tx-apercu tx-apercu-haut"><canvas id="txApercu"></canvas><small id="txInfo"></small></div>
     <div class="tx-ligne" id="txTaille">${[['1', 'Petites'], ['2', 'Moyennes'], ['3', 'Grandes']].map(([v, m]) => `<button type="button" data-v="${v}">${m}</button>`).join('')}</div>
     <div class="tx-ligne tx-jeux">${jeux}</div>
     <div class="tx-familles">${fams}</div>
     <div class="tx-ligne" id="txLettres"><button type="button" data-v="soudees">Un mot = une pièce</button><button type="button" data-v="separees">Une pièce par lettre</button></div>
     <div class="tx-contours"><span>Contour</span><button type="button" class="tx-cont" data-v="" title="Sans contour"><i style="background:#fff;border:1px dashed #999"></i></button>${CONTOURS.map((c) => `<button type="button" class="tx-cont" data-v="${c.code}" title="${echap(c.nom)}"><i style="background:${hexDe(c.code)}"></i></button>`).join('')}</div>
     <div class="tx-ligne"><button type="button" id="txRelief">Relief</button></div>
-    <div class="tx-apercu"><canvas id="txApercu"></canvas><small id="txInfo"></small></div>
     <div class="tx-ligne tx-actions"><button type="button" class="tx-fermer">Fermer</button><button type="button" class="principal" id="txPlacer">Placer sur la plaque</button></div>`;
   document.body.appendChild(p);
   const saisie = p.querySelector('#txSaisie'), info = p.querySelector('#txInfo'), cv = p.querySelector('#txApercu');

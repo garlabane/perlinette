@@ -1007,6 +1007,7 @@ const TRAD_EN = {
 "Ourson": "Teddy bear",
 "Ourson dans sa boule de verre": "Teddy bear in a snow globe",
 "Ourson polaire": "Polar bear cub",
+"Outil Texte : l’aperçu du mot est juste sous le champ, et « Placer sur la plaque » reste visible": "Text tool: the word preview sits right under the field, and “Place on the pegboard” stays visible",
 "Outils": "Tools",
 "Ouvert": "Opened",
 "Ouvrir": "Open",
