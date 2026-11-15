@@ -379,7 +379,9 @@ function calculerImage(f, palette) {
   const pl = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
   info.textContent = `${taille} · ${resultatImage.couleurs.length} couleurs · ${nb} perles.${occupe} ` +
     ($('#dlgImage')._noteGris || '') +
-    (versionNette ? `Nettoyage : ${pl(net.changees, 'perle')} ${net.changees > 1 ? 'modifiées' : 'modifiée'}.` : `(Le nettoyage modifierait ${pl(net.changees, 'perle')}.)`);
+    (LANGUE === 'en'
+      ? (versionNette ? `Cleanup: ${net.changees} bead${net.changees > 1 ? 's' : ''} changed.` : `(Cleanup would change ${net.changees} bead${net.changees > 1 ? 's' : ''}.)`)
+      : (versionNette ? `Nettoyage : ${pl(net.changees, 'perle')} ${net.changees > 1 ? 'modifiées' : 'modifiée'}.` : `(Le nettoyage modifierait ${pl(net.changees, 'perle')}.)`));
 }
 
 // Choisir « max » couleurs pour l'image. Avant : les « max » références Hama les plus nombreuses —

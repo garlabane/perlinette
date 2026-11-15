@@ -569,7 +569,7 @@ function ouvrirListe() {
     bt('Supprimer', async () => {
       if (!(await confirmer(`Supprimer définitivement « ${m.nom} » de ce navigateur ? Un fichier exporté n'est pas touché.`, 'Supprimer'))) return;
       const ps = lire(CLE.projets, {}); delete ps[m.id]; ecrire(CLE.projets, ps);
-      if (m.id === P.id) charger(creerMotif('Mon motif', 'midi-carre-grand', {}, 'hama-midi'));
+      if (m.id === P.id) charger(creerMotif(t('Mon motif'), 'midi-carre-grand', {}, 'hama-midi'));
       li.remove();
     });
     ul.appendChild(li);
@@ -610,5 +610,5 @@ function demarrer() {
   const id = lire(CLE.courant, null), projets = lire(CLE.projets, {});
   majZoom();
   $('#optSymboles').checked = reglages.symboles;
-  charger(id && projets[id] ? projets[id] : creerMotif('Mon premier motif', 'midi-carre-grand', {}, 'hama-midi'));
+  charger(id && projets[id] ? projets[id] : creerMotif(t('Mon premier motif'), 'midi-carre-grand', {}, 'hama-midi'));
 }

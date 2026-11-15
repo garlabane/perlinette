@@ -1,10 +1,10 @@
 {
-  "version": "1.18.5",
+  "version": "1.18.6",
   "date": "2026-11-15",
   "nouveautes": [
-    "Import d’image : les petites couleurs (nez, joues) ne disparaissent plus quand on limite les couleurs",
-    "« Montrer mes touches à l’écran » pour filmer une vidéo (Réglages › Disposition)",
-    "Le « + » des onglets est revenu au bout des onglets",
-    "En anglais : les thèmes des modèles sont traduits"
+    "En anglais : le papier US Letter est choisi tout seul aux États-Unis et au Canada",
+    "Le titre imprimé sur les feuilles suit la langue de l’appli",
+    "Fenêtres : « Cancel » en anglais au lieu de « Undo »",
+    "Modèles : les gourmandises « glace » sont bien classées"
   ]
 }

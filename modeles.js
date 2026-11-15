@@ -158,7 +158,7 @@ const FAMILLES_MODELES = ['Boules de Noël', 'Personnages', 'Animaux', 'Sapins e
 const MOTS_FAMILLES = [
   ['Personnages', /(^|[^a-zà-ÿ])(p[eè]re no[eë]l|m[eè]re no[eë]l|lutin|ange|bonhomme|casse-noisette|soldat|princesse|f[ée]e|sorci[eè]re|fant[oô]me|elfe|pirate|robot|momie|vampire|zombie)(?![a-zà-ÿ])/i],
   ['Animaux', /(^|[^a-zà-ÿ])(renne|renard|ours|ourson|hibou|chouette|lapin|chat|chaton|chien|chiot|corgi|panda|pingouin|manchot|phoque|morse|cerf|biche|[ée]cureuil|mulot|souris|oiseau|oiseaux|cardinal|rouge-gorge|harfang|flamant|cygne|oie|canard|poussin|poule|mouton|agneau|cochon|vache|cheval|licorne|dragon|poisson|baleine|dauphin|tortue|grenouille|abeille|papillon|loup|h[ée]risson|koala|lion|tigre|girafe|[ée]l[ée]phant|singe|chauve-souris|araign[ée]e)s?(?![a-zà-ÿ])/i],
-  ['Gourmandises', /biscuit|sabl[ée]|chocolat|sucre d|bonbon|b[uû]che|cupcake|pudding|pain d.[ée]pice|bretzel|macaron|cl[ée]mentine|orange|g[aâ]teau|tarte|glace|beignet|donut|cookie|caf[ée]|th[ée]|mug|tasse|fruit|pomme(?! de pin)|cerise|fraise|citrouille|bonbonni|noix/i],
+  ['Gourmandises', /biscuit|sabl[ée]|chocolat|sucre d|bonbon|b[uû]che|cupcake|pudding|pain d.[ée]pice|bretzel|macaron|cl[ée]mentine|orange|g[aâ]teau|tarte|glace\b|beignet|donut|cookie|caf[ée]|th[ée]|mug|tasse|fruit|pomme(?! de pin)|cerise|fraise|citrouille|bonbonni|noix/i],
   ['Cadeaux et jouets', /cadeau|paquet|jouet|train|tra[iî]neau|toupie|tambour|hotte|luge|ballon|panier|poup[ée]e|peluche/i],
   ['Vêtements et accessoires', /chaussette|moufle|mitaine|bonnet|pull|[ée]charpe|botte|chaussure|patin|ski|manteau|gant|chapeau|lunettes|n(oe|œ|o)ud|cl[ée]|foulard|collier/i],
   ['Maisons et paysages', /maison|chalet|cabane|village|igloo|montagne|lune|soleil|nuage|ch[aâ]teau|[ée]glise/i],

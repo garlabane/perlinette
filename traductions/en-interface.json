@@ -1137,5 +1137,12 @@
  "Import d’image : les petites couleurs (nez, joues) ne disparaissent plus quand on limite les couleurs": "Image import: small colors (nose, cheeks) no longer vanish when you limit the colors",
  "« Montrer mes touches à l’écran » pour filmer une vidéo (Réglages › Disposition)": "“Show my taps on screen” to film a video (Settings › Layout)",
  "Le « + » des onglets est revenu au bout des onglets": "The tab “+” is back at the end of the tabs",
- "En anglais : les thèmes des modèles sont traduits": "In English: pattern themes are translated"
+ "En anglais : les thèmes des modèles sont traduits": "In English: pattern themes are translated",
+ "visibles": "visible",
+ "@mon.compte": "@my.account",
+ "Cleanup: ${x} bead${x} changed.": null,
+ "En anglais : le papier US Letter est choisi tout seul aux États-Unis et au Canada": "In English: US Letter paper is picked automatically in the US and Canada",
+ "Le titre imprimé sur les feuilles suit la langue de l’appli": "The title printed on the sheets follows the app language",
+ "Fenêtres : « Cancel » en anglais au lieu de « Undo »": "Windows: “Cancel” in English instead of “Undo”",
+ "Modèles : les gourmandises « glace » sont bien classées": "Patterns: “ice cream” sweets are sorted correctly"
 }

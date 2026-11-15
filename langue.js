@@ -127,11 +127,16 @@ const ATTRS_TRAD = ['title', 'placeholder', 'aria-label', 'alt', 'data-court']; 
 function horsTraduction(el) {
   return !el || el.closest('script,style,textarea,[translate="no"],[contenteditable="true"]');
 }
+// un texte de la page ; « Annuler » = Undo dans les outils, mais Cancel dans une fenêtre
+function traduireTexteNoeud(x) {
+  const v = x.nodeValue;
+  const tv = v.trim() === 'Annuler' && x.parentElement?.closest('dialog, menu, .tx-actions') ? v.replace('Annuler', 'Cancel') : t(v);
+  if (tv !== v) x.nodeValue = tv;
+}
 function traduireNoeud(n) {
   if (n.nodeType === 3) {
     if (horsTraduction(n.parentElement)) return;
-    const v = n.nodeValue, tv = t(v);
-    if (tv !== v) n.nodeValue = tv;
+    traduireTexteNoeud(n);
     return;
   }
   if (n.nodeType !== 1 || horsTraduction(n)) return;
@@ -146,7 +151,7 @@ function traduireNoeud(n) {
     if (x.nodeType === 1) {
       for (const a of ATTRS_TRAD) if (x.hasAttribute(a)) { const v = x.getAttribute(a), tv = t(v); if (tv !== v) x.setAttribute(a, tv); }
       if (x.tagName === 'INPUT' && /^(button|submit)$/.test(x.type) && x.value) { const tv = t(x.value); if (tv !== x.value) x.value = tv; }
-    } else { const v = x.nodeValue, tv = t(v); if (tv !== v) x.nodeValue = tv; }
+    } else traduireTexteNoeud(x);
   }
 }
 

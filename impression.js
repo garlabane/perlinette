@@ -14,7 +14,7 @@ const FORMATS_PAPIER = {
 // par défaut : Letter dans les pays qui l'utilisent (d'après la langue du navigateur), A4 ailleurs
 function papierParDefaut() {
   const l = (navigator.languages && navigator.languages[0]) || navigator.language || '';
-  return /-(US|CA|MX|PH|CL|CO|VE|GT|CR|PA|DO|PR|SV|NI|HN|BO|BZ)/i.test(l) ? 'letter' : 'a4';
+  return /-(US|CA|MX|PH|CL|CO|VE|GT|CR|PA|DO|PR|SV|NI|HN|BO|BZ)\b/i.test(l) ? 'letter' : 'a4';
 }
 function papierChoisi() { return FORMATS_PAPIER[reglages.papier] ? reglages.papier : papierParDefaut(); }
 // les mesures en pouces, à côté des cm, pour la version anglaise

@@ -38,7 +38,7 @@ function fermerOnglet(id) {
   if (id === P.id) {
     const projets = lire(CLE.projets, {}), suivant = ONGLETS[Math.min(k, ONGLETS.length - 1)];
     if (suivant && projets[suivant]) charger(projets[suivant]);
-    else charger(creerMotif('Mon motif', 'midi-carre-grand', {}, 'hama-midi'));
+    else charger(creerMotif(t('Mon motif'), 'midi-carre-grand', {}, 'hama-midi'));
   } else dessinerOnglets();
   message('Onglet fermé. Le motif reste dans Fichier › Ouvrir.', 3000);
 }
