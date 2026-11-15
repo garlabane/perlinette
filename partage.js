@@ -52,9 +52,9 @@ function listeDesPerles() {
     if (stock !== null && stock !== undefined) {
       if (stock < n) { manque++; fin = ` — j'en ai ${stock}, il en manque ${n - stock}`; } else fin = ` — j'en ai ${stock}`;
     }
-    return `${n} × ${c.nom || ''}${c.code ? ' (' + c.code + ')' : ''}${fin}`;
+    return `${n} × ${nomCouleur(c)}${c.code ? ' (' + c.code + ')' : ''}${fin}`;
   });
-  return { texte: [`${P.nom} — ${total} perles, ${lignes.length} couleurs`, '', ...texte].join('\n'), nbCouleurs: lignes.length, manque };
+  return { texte: t([`${P.nom} — ${total} perles, ${lignes.length} couleurs`, '', ...texte].join('\n')), nbCouleurs: lignes.length, manque };
 }
 async function partagerListe() {
   if (!P.cases.some((v) => v >= 0)) { avertir('Ce motif est encore vide.'); return; }

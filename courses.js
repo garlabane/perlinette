@@ -4,8 +4,9 @@
 // Les prix sont indicatifs et modifiables (réglages retenus) ; ils partent de ce qu'on voit en magasin :
 // un sachet de 1000 perles Midi unies à environ 2,49 €.
 
-const COURSES_DEFAUT = { taille: 1000, prix: 2.49, marge: 10 };
-const eur = (v) => v.toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { style: 'currency', currency: 'EUR' });
+// en anglais (États-Unis) : un sachet de 1000 Perler uni à 3,69 $ sur perler.com (vu le 15/11/2026), en dollars
+const COURSES_DEFAUT = { taille: 1000, prix: LANGUE === 'en' ? 3.69 : 2.49, marge: 10 };
+const eur = (v) => v.toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { style: 'currency', currency: LANGUE === 'en' ? 'USD' : 'EUR' });
 
 function reglagesCourses() {
   const r = reglages.courses || {};
@@ -42,11 +43,11 @@ function texteCourses(lignes) {
   const out = [`Liste de courses — ${P.nom}`, `${lignes.reduce((t, l) => t + l.n, 0)} perles, ${lignes.length} couleurs (marge de ${r.marge} % pour les perles perdues ou ratées)`, ''];
   if (achat.length) {
     out.push('À acheter :');
-    for (const l of achat) out.push(`• ${l.sachets} × sachet de ${r.taille} — ${l.c.nom || ''}${l.c.code ? ' (' + l.c.code + ')' : ''} — il faut ${l.besoin} perles${l.stock ? `, j'en ai ${l.stock}` : ''} — ${eur(l.cout)}`);
+    for (const l of achat) out.push(`• ${l.sachets} × sachet de ${r.taille} — ${nomCouleur(l.c)}${l.c.code ? ' (' + l.c.code + ')' : ''} — il faut ${l.besoin} perles${l.stock ? `, j'en ai ${l.stock}` : ''} — ${eur(l.cout)}`);
     out.push('', `Total : ${sachets} sachet${sachets > 1 ? 's' : ''}, environ ${eur(total)}`);
   } else out.push('Rien à acheter : tout est déjà dans « Mes perles ».');
-  if (deja.length && achat.length) { out.push('', 'Déjà à la maison :'); for (const l of deja) out.push(`• ${l.c.nom || ''}${l.c.code ? ' (' + l.c.code + ')' : ''} — ${l.besoin} perles`); }
-  return out.join('\n');
+  if (deja.length && achat.length) { out.push('', 'Déjà à la maison :'); for (const l of deja) out.push(`• ${nomCouleur(l.c)}${l.c.code ? ' (' + l.c.code + ')' : ''} — ${l.besoin} perles`); }
+  return t(out.join('\n'));
 }
 
 function ouvrirCourses() {
@@ -58,11 +59,13 @@ function ouvrirCourses() {
       <p class="note" id="coursesRes"></p>
       <div class="courses-reglages">
         <label>Perles par sachet <input id="coursesTaille" type="number" min="100" step="100"></label>
-        <label>Prix du sachet (€) <input id="coursesPrix" type="number" min="0" step="0.01"></label>
+        <label>Prix du sachet (${LANGUE === 'en' ? '$' : '€'}) <input id="coursesPrix" type="number" min="0" step="0.01"></label>
         <label>Marge (%) <input id="coursesMarge" type="number" min="0" max="50" step="5" title="Perles en plus, pour celles qui tombent ou qu'on rate"></label>
       </div>
       <div class="courses-table"><table id="coursesTable"></table></div>
-      <p class="note">Prix indicatifs (sachet de 1000 Midi uni vu à environ 2,49 € en magasin) : tu peux les corriger, par couleur aussi. Les perles déjà dans « Mes perles » sont retirées.</p>
+      <p class="note" translate="no">${LANGUE === 'en'
+    ? 'Approximate prices (a bag of 1,000 solid-color Perler beads is about $3.69 on perler.com, around $6 in stores): you can change them, per color too. Beads already in “My beads” are left out.'
+    : 'Prix indicatifs (sachet de 1000 Midi uni vu à environ 2,49 € en magasin) : tu peux les corriger, par couleur aussi. Les perles déjà dans « Mes perles » sont retirées.'}</p>
       <menu>
         <button type="button" id="coursesCopier">Partager / copier la liste</button>
         <button value="ok" class="principal">Fermer</button>

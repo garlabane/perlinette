@@ -1,8 +1,8 @@
 {
-  "version": "1.16.0",
+  "version": "1.17.0",
   "date": "2026-11-15",
   "nouveautes": [
-    "Perlinette parle anglais : elle s'affiche en anglais si ton navigateur n'est pas en français (bouton « English / Français » pour choisir)",
-    "L'accueil explique tout de suite à quoi sert Perlinette : les perles à repasser, en 3 étapes"
+    "Impression : choix du papier A4 ou Letter (format américain)",
+    "Version anglaise : tailles en pouces, liste de courses en dollars, Instagram et Pinterest en anglais, et tous les modèles en anglais sur le site"
   ]
 }

@@ -6,7 +6,19 @@
 //  • sur chaque plaque, flèches vers les plaques voisines ; légende des couleurs par feuille ;
 //  • en-tête avec logo (Perlinette, le tien, ou aucun) et titre ; règle de contrôle 5 cm.
 
-const FORMAT_A4 = { portrait: { w: 210, h: 297 }, paysage: { w: 297, h: 210 } };
+// formats de papier : A4 (Europe…) ou Letter (États-Unis, Canada, Mexique…)
+const FORMATS_PAPIER = {
+  a4: { nom: 'A4', css: 'A4', portrait: { w: 210, h: 297 }, paysage: { w: 297, h: 210 } },
+  letter: { nom: 'Letter', css: 'letter', portrait: { w: 215.9, h: 279.4 }, paysage: { w: 279.4, h: 215.9 } },
+};
+// par défaut : Letter dans les pays qui l'utilisent (d'après la langue du navigateur), A4 ailleurs
+function papierParDefaut() {
+  const l = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+  return /-(US|CA|MX|PH|CL|CO|VE|GT|CR|PA|DO|PR|SV|NI|HN|BO|BZ)/i.test(l) ? 'letter' : 'a4';
+}
+function papierChoisi() { return FORMATS_PAPIER[reglages.papier] ? reglages.papier : papierParDefaut(); }
+// les mesures en pouces, à côté des cm, pour la version anglaise
+function enPouces(mmv) { return (mmv / 25.4).toLocaleString('en-US', { maximumFractionDigits: 2 }); }
 const BORD = 10, ENTETE = 24, PIED = 14, AUTOUR_X = 7, AUTOUR_Y = 6; // mm
 const CLE_LOGO = 'perlesrep.logo';
 function mm(v) { return +(+v).toFixed(3); }
@@ -66,9 +78,13 @@ function svgEntete(page, o, titre, sousTitre) {
 }
 function svgPied(page, num, total) {
   const y = page.h - 8;
-  let s = `<line x1="${BORD}" y1="${y}" x2="${BORD + 50}" y2="${y}" stroke="#222" stroke-width="0.35"/>`;
-  for (let t = 0; t <= 5; t++) s += `<line x1="${BORD + t * 10}" y1="${y - (t % 5 ? 1.2 : 2)}" x2="${BORD + t * 10}" y2="${y}" stroke="#222" stroke-width="0.3"/>`;
-  s += `<text x="${BORD + 54}" y="${y}" font-size="2.6" fill="#555" dominant-baseline="central">Ce trait doit mesurer 5 cm. Sinon, réimprime en « Taille réelle / 100 % ».</text>`;
+  // règle de contrôle : 5 cm (graduée tous les cm), ou 2 pouces (tous les ½ pouce) en anglais
+  const pouces = LANGUE === 'en', L = pouces ? 50.8 : 50, pas = pouces ? 12.7 : 10, n = Math.round(L / pas);
+  let s = `<line x1="${BORD}" y1="${y}" x2="${mm(BORD + L)}" y2="${y}" stroke="#222" stroke-width="0.35"/>`;
+  for (let t = 0; t <= n; t++) s += `<line x1="${mm(BORD + t * pas)}" y1="${y - (t % (pouces ? 2 : 5) ? 1.2 : 2)}" x2="${mm(BORD + t * pas)}" y2="${y}" stroke="#222" stroke-width="0.3"/>`;
+  s += `<text x="${mm(BORD + L + 4)}" y="${y}" font-size="2.6" fill="#555" dominant-baseline="central">${pouces
+    ? 'This line must measure 2 inches. If not, reprint at “Actual size / 100%”.'
+    : 'Ce trait doit mesurer 5 cm. Sinon, réimprime en « Taille réelle / 100 % ».'}</text>`;
   s += `<text x="${page.w - BORD}" y="${y}" font-size="2.8" fill="#555" text-anchor="end" dominant-baseline="central">page ${num} / ${total}</text>`;
   return s;
 }
@@ -140,12 +156,13 @@ function preparerPages(o) {
   const zone = (page) => ({ x: BORD, y: ENTETE + 4, w: page.w - 2 * BORD, h: page.h - ENTETE - 4 - PIED });
   const capacite = (page) => ({ c: Math.floor(zone(page).w / celW), r: Math.floor(zone(page).h / celH) });
   // orientation : celle qui met le plus de plaques par feuille (ou celle qui va à la plaque)
+  const papier = papierChoisi();
   let orient = lw > lh ? 'paysage' : 'portrait';
   if (o.regrouper && total > 1) {
-    const cp = capacite(FORMAT_A4.portrait), cl = capacite(FORMAT_A4.paysage);
+    const cp = capacite(FORMATS_PAPIER[papier].portrait), cl = capacite(FORMATS_PAPIER[papier].paysage);
     if (cl.c * cl.r > cp.c * cp.r) orient = 'paysage'; else if (cp.c * cp.r > 0) orient = 'portrait';
   }
-  const page = FORMAT_A4[orient], Z = zone(page), cap = capacite(page);
+  const page = FORMATS_PAPIER[papier][orient], Z = zone(page), cap = capacite(page);
   o._repasse = o.repasse ? svgRepasse(page.w - BORD - 17, 4.5, 17) : ''; // miniature calculée une fois pour toutes les pages
   const parFeuille = o.regrouper ? Math.max(1, cap.c * Math.max(1, cap.r)) : 1;
   const depasse = lw > Z.w + 0.01 || lh > Z.h + 0.01;
@@ -221,7 +238,7 @@ function preparerPages(o) {
   }
   // assemblage des pages complètes (en-tête + corps + pied)
   const svgs = pages.map((p, k) => `<svg xmlns="http://www.w3.org/2000/svg" width="${page.w}mm" height="${page.h}mm" viewBox="0 0 ${page.w} ${page.h}">`
-    + `<rect width="${page.w}" height="${page.h}" fill="#fff"/>` + svgEntete(page, o, p.titre, p.sousTitre) + p.corps + svgPied(page, k + 1, pages.length) + '</svg>');
+    + `<rect width="${page.w}" height="${page.h}" fill="#fff"/>` + svgEntete(page, o, p.titre, p.sousTitre) + p.corps + svgPied(page, k + 1, pages.length) + '</svg>').map(traduireSvg); // en anglais, les textes des feuilles (le PDF ne passe pas par l'écran)
   return { svgs, orient, page, parFeuille, depasse, lw, lh, Z };
 }
 
@@ -235,6 +252,8 @@ function ouvrirImpression() {
     <div class="impr-grille">
       <div class="impr-options">
         <p id="ipInfo" class="note"></p>
+        <h4>Papier</h4>
+        <div class="segment" id="ipPapier"><button type="button" data-p="a4">A4</button><button type="button" data-p="letter">Letter <small>(US)</small></button></div>
         <h4 class="impr-titre-perles">Perles</h4>
         <div class="impr-cases">
         <label class="case"><input type="checkbox" id="ipCouleurs"> <span>En couleur <small>(sinon : à colorier)</small></span></label>
@@ -251,6 +270,7 @@ function ouvrirImpression() {
         <div class="impr-pas">
           <div class="segment" id="ipPasChoix"><button type="button" data-v="5">Midi<small> 5 mm</small></button><button type="button" data-v="2.5">Mini<small> 2,5</small></button><button type="button" data-v="10">Maxi<small> 10</small></button></div>
           <label class="impr-pas-autre">ou <input id="ipPas" type="number" min="1" max="20" step="0.05" inputmode="decimal"> mm</label>
+          <label class="impr-pas-autre" ${LANGUE === 'en' ? '' : 'hidden'}>= <input id="ipPasPouces" type="number" min="0.04" max="0.8" step="0.001" inputmode="decimal"> in <small>(10 pegs)</small></label>
         </div>
         <p class="note">Si le patron imprimé ne tombe pas juste sur ta plaque : mesure 10 picots, divise par 10, et tape le résultat.</p>
         <div id="ipMulti">
@@ -285,14 +305,25 @@ function ouvrirImpression() {
     rendu = preparerPages(o);
     $d('#ipPages').innerHTML = rendu.svgs.map((s, k) => `<div class="impr-page ${rendu.orient}" title="Page ${k + 1}">${s}</div>`).join('');
     const cm = (v) => (v / 10).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 1 });
-    $d('#ipInfo').innerHTML = `<b>${rendu.svgs.length} feuille${rendu.svgs.length > 1 ? 's' : ''}</b> A4 en ${rendu.orient}`
-      + (multi ? ` · jusqu'à ${rendu.parFeuille} plaque${rendu.parFeuille > 1 ? 's' : ''} par feuille` : '')
-      + ` · plaque de ${cm(rendu.lw)} × ${cm(rendu.lh)} cm à taille réelle.`
-      + (rendu.depasse ? ` <b style="color:#a33">La plaque dépasse la zone imprimable d'un A4 : ses bords seront coupés.</b>` : '');
+    const nomP = FORMATS_PAPIER[papierChoisi()].nom;
+    dlg.querySelectorAll('#ipPapier [data-p]').forEach((b) => b.classList.toggle('actif', b.dataset.p === papierChoisi()));
+    $d('#ipPasPouces').value = enPouces(o.pas * 10);
+    const nf = rendu.svgs.length, pf = rendu.parFeuille;
+    $d('#ipInfo').innerHTML = (LANGUE === 'en'
+      // en anglais : les pouces d'abord, les cm entre parenthèses
+      ? `<b>${nf} ${nomP} sheet${nf > 1 ? 's' : ''}</b>, ${t(rendu.orient)}${multi ? ` · up to ${pf} pegboard${pf > 1 ? 's' : ''} per sheet` : ''}`
+        + ` · ${enPouces(rendu.lw)} × ${enPouces(rendu.lh)} in pegboard (${cm(rendu.lw)} × ${cm(rendu.lh)} cm) at actual size.`
+      : `<b>${nf} feuille${nf > 1 ? 's' : ''}</b> ${nomP} en ${rendu.orient}`
+        + (multi ? ` · jusqu'à ${pf} plaque${pf > 1 ? 's' : ''} par feuille` : '')
+        + ` · plaque de ${cm(rendu.lw)} × ${cm(rendu.lh)} cm à taille réelle.`)
+      + (rendu.depasse ? ` <b style="color:#a33">La plaque dépasse la zone imprimable de la feuille : ses bords seront coupés.</b>` : '');
   };
   let minuterie = null;
   dlg.querySelectorAll('.impr-options input, .impr-options select').forEach((el) => (el.oninput = el.onchange = () => { clearTimeout(minuterie); minuterie = setTimeout(maj, 120); }));
   dlg.querySelectorAll('#ipPasChoix [data-v]').forEach((b) => (b.onclick = () => { $d('#ipPas').value = b.dataset.v; maj(); }));
+  dlg.querySelectorAll('#ipPapier [data-p]').forEach((b) => (b.onclick = () => { reglages.papier = b.dataset.p; ecrire(CLE.reglages, reglages); maj(); }));
+  // en pouces : la longueur de 10 picots (plus facile à mesurer qu'un seul écart)
+  $d('#ipPasPouces').oninput = () => { const v = parseFloat($d('#ipPasPouces').value); if (v > 0) { $d('#ipPas').value = +(v * 25.4 / 10).toFixed(3); clearTimeout(minuterie); minuterie = setTimeout(() => { const f = document.activeElement; maj(); f && f.focus(); }, 400); } };
   dlg.addEventListener('close', () => {
     if (dlg.returnValue === 'ok' || dlg.returnValue === 'pdf') {
       lireOptions();
@@ -312,7 +343,7 @@ function imprimerPages(r) {
   $('#impression').innerHTML = r.svgs.map((s) => `<div class="a4-feuille" style="width:${r.page.w}mm;height:${r.page.h}mm">${s}</div>`).join('');
   let st = $('#styleA4');
   if (!st) { st = document.createElement('style'); st.id = 'styleA4'; document.head.appendChild(st); }
-  st.textContent = `@page { size: A4 ${r.orient === 'paysage' ? 'landscape' : 'portrait'}; margin: 0; }`;
+  st.textContent = `@page { size: ${FORMATS_PAPIER[papierChoisi()].css} ${r.orient === 'paysage' ? 'landscape' : 'portrait'}; margin: 0; }`;
   const nettoyer = () => { st.textContent = ''; window.removeEventListener('afterprint', nettoyer); };
   window.addEventListener('afterprint', nettoyer);
   setTimeout(() => window.print(), 50);

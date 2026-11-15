@@ -85,7 +85,7 @@ async function proposerPdf(r) {
   const fichier = new File([blob], nomFichier('.pdf'), { type: 'application/pdf' });
   const n = r.svgs.length, ko = Math.max(1, Math.round(blob.size / 1024));
   const peutPartager = !!(navigator.canShare && navigator.canShare({ files: [fichier] }));
-  dlg.querySelector('#pdfEtat').textContent = `Ton PDF est prêt : ${n} feuille${n > 1 ? 's' : ''} A4, ${ko > 1024 ? (ko / 1024).toFixed(1).replace('.', ',') + ' Mo' : ko + ' Ko'}. Imprimé à 100 % (sans « ajuster à la page »), il est à taille réelle.`;
+  dlg.querySelector('#pdfEtat').textContent = `Ton PDF est prêt : ${n} feuille${n > 1 ? 's' : ''} ${FORMATS_PAPIER[papierChoisi()].nom}, ${ko > 1024 ? (ko / 1024).toFixed(1).replace('.', ',') + ' Mo' : ko + ' Ko'}. Imprimé à 100 % (sans « ajuster à la page »), il est à taille réelle.`;
   const boutons = dlg.querySelector('#pdfBoutons');
   boutons.hidden = false;
   boutons.innerHTML = `<button value="fermer">Fermer</button>

@@ -67,12 +67,12 @@ function infosMotif() {
   const util = P.couleurs.map((c, i) => ({ c, n: nb[i] })).filter((u) => u.n > 0).sort((a, b) => b.n - a.n);
   const perles = util.reduce((t, u) => t + u.n, 0);
   const cm = (v) => (v * P.pas / 10).toLocaleString(LANGUE === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 1 });
-  return { util, perles, taille: `${cm(SURF.larg)} × ${cm(SURF.haut)} cm`, plaques: SURF.plaques.length, forme: formatParId(P.format).nom };
+  return { util, perles, taille: `${cm(SURF.larg)} × ${cm(SURF.haut)} cm`, tailleMm: [SURF.larg * P.pas, SURF.haut * P.pas], plaques: SURF.plaques.length, forme: formatParId(P.format).nom };
 }
 
 function epingleSvg() {
   const I = infosMotif(), W = PIN.w, H = PIN.h, FEN = arrondirFenetre(pinFenetre());
-  const titre = pinLignes((P.nom || 'Mon motif').trim(), 22);
+  const titre = pinLignes(t((P.nom || 'Mon motif').trim()), 22);
   let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`
     + `<rect width="${W}" height="${H}" fill="${PIN.ivoire}"/>`
     + pinLogo(150, 56, 5.6, PIN.prune, 42)
@@ -99,7 +99,7 @@ function epingleSvg() {
   // « créé par » : le compte de la personne, sous le motif ; la marque Perlinette reste dans le bandeau
   const auteur = (reglages.auteur || '').trim();
   if (auteur) s += `<text x="${xm}" y="${yc + 124}" font-size="34" font-weight="700" fill="${PIN.prune}" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">créé par ${echap(auteur.slice(0, 40))}</text>`;
-  s += `<text x="${xm}" y="${yc + 76}" font-size="36" fill="#6b5a66" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">${I.perles} perles · ${I.util.length} couleurs · ${echap(I.taille)}</text>`;
+  s += `<text x="${xm}" y="${yc + 76}" font-size="36" fill="#6b5a66" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">${I.perles} perles · ${I.util.length} couleurs · ${echap(LANGUE === 'en' ? I.tailleMm.map((v) => (v / 25.4).toFixed(1)).join(' × ') + ' in' : I.taille)}</text>`;
   // bandeau de marque : jamais rogné, lisible en miniature
   const hb = 250, yb = H - hb;
   s += `<rect y="${yb}" width="${W}" height="${hb}" fill="${PIN.prune}"/>`
@@ -110,7 +110,7 @@ function epingleSvg() {
   const code = codeEpingle(FEN, titre.length > 1);
   if (code) s += svgCodeEpingle(code, yb, PIN.champagne, PIN.prune)
     + `<text x="${CODE_PIN.x + CODE_PIN.cols * CODE_PIN.c / 2}" y="${yb + 240}" font-size="17" fill="${PIN.champagne}" text-anchor="middle" font-family="Segoe UI, Inter, system-ui, sans-serif">à importer dans Perlinette</text>`;
-  return s + '</svg>';
+  return traduireSvg(s + '</svg>');
 }
 
 async function epingleCanvas() {
@@ -125,7 +125,16 @@ async function epingleCanvas() {
 async function epinglePng() { const c = await epingleCanvas(); return new Promise((r) => c.toBlob(r, 'image/png')); }
 
 // lien = l'adresse qui contient tout le motif (lien-motif.js) ; on l'ajoute si la description reste sous la limite de Pinterest
+function descriptionPinAnglais(lien) {
+  const I = infosMotif(), nom = t(P.nom), pouces = I.tailleMm.map((v) => (v / 25.4).toFixed(1)).join(' × ');
+  const tags = '\n#perlerbeads #hamabeads #fusebeads #perlerbeadpatterns #pixelart #DIY';
+  const court = `${nom}: a fuse bead pattern (${I.perles} beads, ${I.util.length} colors, ${pouces} in), to print at actual size. Make it in Perlinette, free and no account needed: ${lien}`;
+  if (lien && court.length + tags.length <= 790) return court + tags;
+  return `${nom}${(reglages.auteur || '').trim() ? ', created by ' + reglages.auteur.trim() : ''}: a fuse bead pattern with ${I.perles} beads and ${I.util.length} colors (${pouces} in). `
+    + `Print it at actual size (A4 or US Letter) with the color guide. Made with Perlinette, free and no account needed: ${LIEN_PERLINETTE}` + tags + ' #crafts #kidscrafts';
+}
 function descriptionPin(lien) {
+  if (LANGUE === 'en') return descriptionPinAnglais(lien);
   const I = infosMotif(), tags = '\n#perlesàrepasser #hama #perler #fusebeads #pixelart #DIY';
   // avec le lien du motif : texte court, pour rester sous la limite de Pinterest (800 caractères)
   const court = `${P.nom} : motif de perles à repasser (${I.perles} perles, ${I.util.length} couleurs, ${I.taille}), à imprimer en taille réelle. Refais-le dans Perlinette, gratuit et sans compte : ${lien}`;

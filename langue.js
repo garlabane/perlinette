@@ -75,8 +75,14 @@ function traduireTexte(s) {
     }
     // un texte fait de plusieurs morceaux (« Grand carré 29 × 29 — 841 picots ») : morceau par morceau
     // (on coupe d'abord aux grands séparateurs, puis, dans chaque morceau, aux plus petits)
+    // « Nom du modèle (Thème) » : le nom et la parenthèse finale, chacun de son côté
+    const fin = r === s && /^(.+) \(([^()]+)\)$/.exec(s);
+    if (fin) {
+      const a = traduireTexte(fin[1]), b = traduireTexte(fin[2]);
+      if (a !== fin[1] || b !== fin[2]) r = `${a} (${b})`;
+    }
     if (r === s) {
-      for (const sep of [/(\n+)/, /( — | · | – | → )/, /(\. |: |, )/, /( \(|\))/]) {
+      for (const sep of [/(\n+)/, /( — | · | – | → | › )/, /(\. |: |, )/, /( \(|\))/]) {
         const parts = s.split(sep);
         if (parts.length < 3 || parts.length > 80) continue;
         const fait = parts.map((p, i) => {
@@ -102,6 +108,18 @@ function t(s) {
   if (!coeur) return str;
   const tr = traduireTexte(coeur);
   return tr === coeur ? str : str.replace(coeur, tr);
+}
+
+// le nom d'une couleur à afficher : en anglais, le nom officiel (celui du sachet)
+function nomCouleur(c) { return !c ? '' : LANGUE === 'en' ? (c.nomOfficiel || t(c.nom || '')) : (c.nom || ''); }
+
+// les textes d'une image SVG fabriquée en texte (épingle, feuilles du PDF) : elle ne passe pas
+// par l'écran, on la traduit donc avant de la dessiner
+function traduireSvg(svg) {
+  if (LANGUE === 'fr' || !svg) return svg;
+  const dec = (x) => x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+  const enc = (x) => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return svg.replace(/(<(?:text|tspan)\b[^>]*>)([^<]+)(?=<)/g, (m, balise, txt) => { const tr = t(dec(txt)); return tr === dec(txt) ? m : balise + enc(tr); });
 }
 
 // ---------- traduction de la page, au fil de l'eau ----------

@@ -187,7 +187,38 @@ async function carrouselInsta(ctx = contexteInsta()) {
 const DIESES_THEMES = { 'Noël': '#noel', 'Halloween': '#halloween', 'Pâques': '#paques', 'Animaux': '#animaux', 'Kawaii': '#kawaii', 'Princesses': '#princesse',
   'Mandalas': '#mandala', 'Fruits et légumes': '#fruits', 'Gourmandises': '#gourmandise', 'Saisons': '#saisons', 'Course de karts': '#kart', 'Véhicules': '#voitures' };
 function igDiese(theme) { return DIESES_THEMES[theme] || '#pixelart'; }
+// mots-dièse en anglais (version anglaise) : ceux que cherchent les créateurs anglophones
+const HASHTAGS_THEMES = { 'Noël': '#christmascrafts', 'Halloween': '#halloweencrafts', 'Pâques': '#eastercrafts', 'Animaux': '#cuteanimals', 'Kawaii': '#kawaii',
+  'Princesses': '#princess', 'Mandalas': '#mandala', 'Fruits et légumes': '#fruit', 'Gourmandises': '#sweets', 'Saisons': '#seasons', 'Course de karts': '#kart', 'Véhicules': '#cars' };
+function texteInstaAnglais(ctx) {
+  const I = infosMotif(), nom = t(ctx.nom);
+  const minutes = Math.max(10, Math.round(I.perles / 18 / 5) * 5);
+  const couleurs = I.util.slice(0, 6).map((u) => (u.c.nomOfficiel || t(u.c.nom)).toLowerCase()).join(', ');
+  const pouces = (I.tailleMm || []).map((v) => (v / 25.4).toFixed(1)).join(' × ');
+  const lignes = [
+    `${nom} in fuse beads ✨ Free pattern!`,
+    '',
+    `📏 ${t(I.forme)}${I.plaques > 1 ? ` (${I.plaques} pegboards)` : ''} · ${I.perles} beads · ${pouces ? pouces + ' in' : I.taille}`,
+    `🎨 ${I.util.length} Hama Midi colors: ${couleurs}${I.util.length > 6 ? '…' : ''}`,
+    `⏱️ About ${minutes} minutes to place the beads`,
+    '',
+    '👉 Swipe to see the before/after, the pattern, the bead list and the ironing.',
+    '🔖 Save this post so you can find it again.',
+    '💌 Send it to someone who loves beads!',
+    '',
+    '🖨️ The free pattern, to print at actual size (no account needed):',
+    '👉 garlabane.github.io/perlinette (link in bio)',
+    ctx.chemin ? `then Patterns › ${t(ctx.theme)} › “${nom}”.` : 'You can also make your own designs there, for free.',
+    '',
+    'What colors would you make it in? 💬',
+    '📸 If you make it, tag me: I share your creations!',
+    '',
+    `#perlerbeads #hamabeads #fusebeads #perlerbeadpatterns ${HASHTAGS_THEMES[ctx.theme] || '#pixelart'}`,
+  ];
+  return lignes.filter((l, k, tb) => l !== '' || tb[k - 1] !== '').join('\n');
+}
 function texteInsta(ctx = contexteInsta()) {
+  if (LANGUE === 'en') return texteInstaAnglais(ctx);
   // règles Instagram récentes : 5 mots-dièse au plus ; les partages en message et les enregistrements comptent le plus ;
   // un lien n'est cliquable dans la légende qu'avec un abonnement payant : on l'écrit lisible, et il est cliquable en bio
   const I = infosMotif(), nom = ctx.nom;
