@@ -58,7 +58,16 @@ Voir [CREDITS.md](CREDITS.md) (nuanciers, sources des plaques, marques).
 
 ## Licence
 
-Perlinette est un logiciel libre, sous licence [GNU AGPL v3](LICENSE).
+Perlinette est **gratuite et son code est ouvert**, sous licence [PolyForm Shield 1.0.0](LICENSE) :
+tout le monde peut l'utiliser, la modifier et proposer des contributions ([CONTRIBUTING.md](CONTRIBUTING.md)),
+mais personne ne peut la reprendre pour en faire un produit concurrent (une appli payante, un abonnement…).
+
+- **Les modèles fournis** (dossier `modeles/`) sont sous [CC BY 4.0](LICENSE-MODELES.md) : tu peux les utiliser
+  et même les vendre, en citant Perlinette avec un lien vers https://garlabane.github.io/perlinette/
+  (sauf le thème « Princesses », fan art à usage privé uniquement).
+- **Les patrons que tu crées toi-même avec Perlinette t'appartiennent** : tu peux les vendre, les partager, en faire ce que tu veux.
+
+Jusqu'à la version 1.18.6, Perlinette était publiée sous licence GNU AGPL v3.
 © 2026 Sophie Garguilo.
 
 ## Soutenir
