@@ -1,9 +1,9 @@
 {
-  "version": "1.18.1",
+  "version": "1.18.2",
   "date": "2026-11-15",
   "nouveautes": [
-    "Panneau des couleurs réorganisé : la couleur en cours en grand, la liste au centre, la plaque et l’aperçu en bas",
-    "Texte : lettres soudées ou séparées, choix du contour, tous les jeux de couleurs",
-    "Menu ☰ plus léger, en trois colonnes"
+    "Nouvel outil Contour : ajouter ou retirer un anneau de perles autour du dessin, couche par couche",
+    "Importer une image : l’aperçu reste visible pendant qu’on règle le nettoyage",
+    "Plus de confort : textes plus lisibles, zoom dans la rangée des onglets, plaque entièrement visible"
   ]
 }

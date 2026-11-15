@@ -27,6 +27,11 @@ function fermerMenusBureau(sauf) {
     m.querySelector('.ouvre-menu').setAttribute('aria-expanded', 'false');
   });
 }
+// la hauteur de l'en-tête, pour placer la barre de zoom dans la rangée des onglets (styles.css)
+function majHautBarre() { const b = document.querySelector('.barre'); if (b) document.documentElement.style.setProperty('--haut-barre', b.offsetHeight + 'px'); }
+window.addEventListener('resize', majHautBarre);
+setTimeout(majHautBarre, 0);
+
 (function construireEnteteBureau() {
   const nav = document.querySelector('.barre nav');
   if (!nav || $('#menuCreer')) return;

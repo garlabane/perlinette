@@ -253,30 +253,31 @@
           <label class="case"><input type="checkbox" name="n_soudure"> Retirer les perles seules (elles tomberaient)</label>
           <p class="note">Compare les deux versions au-dessus de l'aperçu, et garde celle que tu préfères.</p>
         </details>
+        <details class="pli" id="imgPliRefs" data-onglet="refs" open>
+          <summary>Références autorisées <small id="nbRefs"></small></summary>
+          <label>Utiliser
+            <select id="imgSource">
+              <option value="biblio">Mes perles (ma bibliothèque)</option>
+              <option value="classique">Hama Midi, gamme classique (le plus fidèle)</option>
+              <option value="manuel">Un choix fait ici</option>
+            </select>
+          </label>
+          <p class="note" id="imgNoteBiblio"></p>
+          <div id="refsManuel">
+          <div class="nu-outils" id="imgMarques"></div>
+          <div class="nu-outils">
+            <select id="imgTri" title="Classer par"></select>
+            <input id="imgCherche" type="search" placeholder="Chercher (réf. ou nom)…">
+            <button type="button" id="imgTout">Tout cocher</button>
+            <button type="button" id="imgRien">Tout décocher</button>
+          </div>
+          <div id="imgRefs" class="nu-liste petite"></div>
+          <p class="note">Décoche les couleurs à ne pas utiliser. Ce choix est retenu pour la prochaine fois.</p>
+          </div>
+        </details>
       </div>
     </div>
-    <details class="pli" id="imgPliRefs" data-onglet="refs" open>
-      <summary>Références autorisées <small id="nbRefs"></small></summary>
-      <label>Utiliser
-        <select id="imgSource">
-          <option value="biblio">Mes perles (ma bibliothèque)</option>
-          <option value="classique">Hama Midi, gamme classique (le plus fidèle)</option>
-          <option value="manuel">Un choix fait ici</option>
-        </select>
-      </label>
-      <p class="note" id="imgNoteBiblio"></p>
-      <div id="refsManuel">
-      <div class="nu-outils" id="imgMarques"></div>
-      <div class="nu-outils">
-        <select id="imgTri" title="Classer par"></select>
-        <input id="imgCherche" type="search" placeholder="Chercher (réf. ou nom)…">
-        <button type="button" id="imgTout">Tout cocher</button>
-        <button type="button" id="imgRien">Tout décocher</button>
-      </div>
-      <div id="imgRefs" class="nu-liste petite"></div>
-      <p class="note">Décoche les couleurs à ne pas utiliser. Ce choix est retenu pour la prochaine fois.</p>
-      </div>
-    </details>
+
     <menu>
       <button value="annuler" formnovalidate>Annuler</button>
       <button value="ok" class="principal">Créer le motif</button>
@@ -366,6 +367,7 @@
 <script src="pose.js"></script>
 <script src="repasser.js"></script>
 <script src="accueil.js"></script>
+<script src="contour.js"></script>
 <script src="tablette.js"></script>
 <script src="panneau.js"></script>
 <script>demarrer();</script>

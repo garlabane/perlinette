@@ -1246,3 +1246,33 @@ body.menu-ouvert .barre nav .menu-bureau { display: none !important; }
 body.tablette:not(.tiroir-ouvert) .coul-encours, body.tablette:not(.tiroir-ouvert) .coul-entete { display: none !important; }
 body.tablette.tiroir-ouvert .coul-entete .coul-ajout, body.tablette.tiroir-ouvert .coul-entete .coul-plus { width: 44px; height: 44px; }
 .bulle-options .bulle-sep { height: 1px; background: var(--bord); margin: 4px 6px; }
+
+/* ===== Importer une image (ordinateur) : l'aperçu reste à l'écran pendant qu'on règle la colonne de droite ===== */
+@media (min-width: 901px) {
+  #dlgImage .img-grille { align-items: start; }
+  #dlgImage .img-grille .apercu { position: sticky; top: -18px; z-index: 2; align-self: start; background: var(--panneau); padding-top: 4px; }
+  #dlgImage #apercuImage { max-height: calc(100dvh - 260px); width: auto; max-width: 100%; }
+}
+
+/* ===== Lot C : confort sur ordinateur ===== */
+/* des libellés lisibles (12 px au moins) */
+@media (min-width: 901px) {
+  body:not(.tablette) .outils button span { font-size: 12px; line-height: 1.15; }
+  body:not(.tablette) .coul .lib small, body:not(.tablette) .coul .nb { font-size: 12px; }
+  body:not(.tablette) .cote .note, body:not(.tablette) #infoPlaque { font-size: 12.5px; }
+  body:not(.tablette) .segment button { font-size: 13px; }
+}
+/* la barre de zoom monte dans la rangée des onglets : elle ne recouvre plus le bas de la plaque */
+@media (min-width: 901px) {
+  body:not(.tablette):not(.enfant) .zoom-barre { top: calc(var(--haut-barre, 54px) + 6px); bottom: auto; padding: 2px; box-shadow: none; }
+  body:not(.tablette):not(.enfant) .zoom-barre button { min-height: 28px; padding: 2px 8px; }
+  body:not(.tablette):not(.enfant) .onglets { padding-right: 330px; }
+}
+/* aperçu du repassage : les 4 boutons sur une ligne, même dans un panneau étroit */
+.cote #segFusion { flex-wrap: wrap; }
+.cote #segFusion .note { flex: 1 1 100%; }
+.cote #segFusion button { flex: 1 1 0; min-width: 0; padding-left: 2px; padding-right: 2px; }
+@media (min-width: 901px) { #dlgImage #apercuImage { max-height: calc(100dvh - 330px); } }
+
+/* bulle Contour : la couleur qui sera utilisée */
+.bulle-options .bulle-perle { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); vertical-align: -1px; margin: 0 4px 0 2px; }

@@ -52,6 +52,9 @@ const ICO = {
   plus: '<path d="M5 12h.01M12 12h.01M19 12h.01"/><path d="M4 12a1 1 0 1 0 2 0 1 1 0 1 0-2 0M11 12a1 1 0 1 0 2 0 1 1 0 1 0-2 0M18 12a1 1 0 1 0 2 0 1 1 0 1 0-2 0"/>',
   texte: '<path class="f" d="M5 5h14v4H5z"/><path d="M5 8V5h14v3M12 5v14M9 19h6"/>',
   ajout: '<path d="M12 5v14M5 12h14"/>',
+  contour: '<path class="f" d="M8 8h8v8H8z"/><path d="M8 8h8v8H8zM4 4h16v16H4z"/>',
+  contourPlus: '<path class="f" d="M9 9h6v6H9z"/><path d="M9 9h6v6H9zM4 4h16v16H4zM19 1v4M17 3h4"/>',
+  contourMoins: '<path class="f" d="M9 9h6v6H9z"/><path d="M9 9h6v6H9zM4 4h16v16H4" stroke-dasharray="2 2.5"/><path d="M17 3h4"/>',
 };
 const svgIco = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICO[k]}</svg>`;
 const svgDe = (sel) => { const s = document.querySelector(`.outils ${sel} svg`); return s ? s.outerHTML : ''; };
@@ -97,7 +100,8 @@ function construireOutilsCommuns() {
   const forme = TB_FORMES.some(([o]) => o === reglages.forme) ? reglages.forme : 'rect';
   grille.querySelector('[data-outil="ellipse"]').insertAdjacentHTML('afterend',
     `<button class="outil a-options" data-outil="${forme}" data-options="formes" title="Formes : ligne, rectangle, cercle — clique encore pour choisir (L, Q, O)">${svgForme(forme)}<span>Formes</span></button>`
-    + `<button class="a-options" data-options="texte" title="Texte : écrire sur la plaque (T)">${svgIco('texte')}<span>Texte</span></button>`);
+    + `<button class="a-options" data-options="texte" title="Texte : écrire sur la plaque (T)">${svgIco('texte')}<span>Texte</span></button>`
+    + `<button class="a-options" data-options="contour" title="Contour : ajouter un anneau de perles autour du dessin, ou retirer le plus extérieur">${svgIco('contour')}<span>Contour</span></button>`);
   TB_FORMES.forEach(([o]) => grille.querySelector(`.outil[data-outil="${o}"]:not([data-options])`)?.classList.add('forme-seule'));
   // « + Couleur » ouvre la palette en éventail (le nuancier complet reste au bout)
   const plusC = $('.cote .ligne-boutons [data-action="ajouterCouleur"]');
@@ -172,6 +176,8 @@ function contenuOptions(type) {
   if (type === 'plus') return [
     ['data-outil="remplacer"', svgDe('[data-outil="remplacer"]'), 'Remplacer'],
     ['data-outil="lettre"', svgDe('[data-outil="lettre"]'), 'Couleur lettre'],
+    ['data-action="contourPlus"', svgIco('contourPlus'), 'Ajouter un contour'],
+    ['data-action="contourMoins"', svgIco('contourMoins'), 'Retirer le contour'],
     ['data-action="miroirH"', svgDe('[data-action="miroirH"]'), 'Miroir ↔'],
     ['data-action="miroirV"', svgDe('[data-action="miroirV"]'), 'Miroir ↕'],
     ['data-action="ajuster"', svgDe('[data-action="ajuster"]'), 'Tout voir'],
@@ -179,6 +185,12 @@ function contenuOptions(type) {
     ['data-action="versPlaque"', svgDe('[data-action="versPlaque"]'), 'Créer une plaque'],
     ['data-action="vider" class="danger"', svgDe('[data-action="vider"]'), 'Tout effacer'],
   ].map(([a, i, m]) => ligneBulle(a, i, m)).join('');
+  if (type === 'contour') {
+    const c = P.couleurs[S.couleur];
+    return `<div class="bulle-titre">Contour, couche par couche</div>`
+      + ligneBulle('data-action="contourPlus"', svgIco('contourPlus'), `Ajouter un contour <small>${c ? `<i class="bulle-perle" style="background:${c.hex}"></i>${echap(nomCouleur(c))}` : ''}</small>`)
+      + ligneBulle('data-action="contourMoins"', svgIco('contourMoins'), 'Retirer le contour extérieur');
+  }
   if (type === 'texte') {
     const t0 = reglages.texteTaille || '1';
     return `<div class="bulle-titre">Taille des lettres <small>${echap(styleLettres().info)}</small></div>`

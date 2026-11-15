@@ -442,7 +442,7 @@ function zoomer(sens, cx, cy) { zoomA(reglages.zoom * (sens > 0 ? 1.25 : 0.8), c
 function zoomAjuster() {
   const zone = $('#zone');
   const reserve = window.matchMedia('(max-width: 900px)').matches ? 76 : 100; // marges + boutons des côtés (moins de marge sur petit écran)
-  const ong = document.body.classList.contains('tablette') ? ($('#onglets')?.offsetHeight || 0) : 0; // tablette : onglets plus hauts, au doigt
+  const ong = window.matchMedia('(max-width: 900px)').matches ? 0 : ($('#onglets')?.offsetHeight || 0); // la rangée des onglets prend aussi de la hauteur
   const z = Math.min((zone.clientWidth - reserve - 2 * MARGE) / SURF.larg, (zone.clientHeight - reserve - ong - 2 * MARGE) / SURF.haut);
   zoomA(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z)));
   zone.scrollLeft = 0; zone.scrollTop = 0;
