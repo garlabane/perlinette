@@ -1276,3 +1276,28 @@ body.tablette.tiroir-ouvert .coul-entete .coul-ajout, body.tablette.tiroir-ouver
 
 /* bulle Contour : la couleur qui sera utilisée */
 .bulle-options .bulle-perle { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); vertical-align: -1px; margin: 0 4px 0 2px; }
+
+/* barre de sélection : la façon de sélectionner (zone, baguette, même couleur) */
+.barre-sel .sel-modes { display: inline-flex; gap: 2px; padding: 2px; margin-right: 6px; border: 1px solid var(--bord); border-radius: 9px; background: #fff; }
+.barre-sel .sel-modes button { border: none; background: none; white-space: nowrap; }
+.barre-sel .sel-modes button.actif { background: var(--prune); color: #fff; }
+@media (max-width: 700px) { .barre-sel { flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 16px); } }
+body.tactile .barre-sel { flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 24px); }
+/* barres de défilement masquées sur la plaque et la liste des couleurs (on défile à la molette, aux doigts, avec Déplacer) */
+#zone, #listeCouleurs { scrollbar-width: none; }
+#zone::-webkit-scrollbar, #listeCouleurs::-webkit-scrollbar { display: none; }
+
+/* le ✕ des bulles */
+.bulle-options { padding-top: 34px; }
+.bulle-options > .bulle-fermer { position: absolute; top: 4px; right: 4px; width: 32px; height: 32px; min-height: 0; padding: 0; justify-content: center; border-radius: 50%; font-size: 15px; color: var(--doux); border: 1px solid transparent; }
+.bulle-options > .bulle-fermer:hover { background: var(--prune-clair); color: var(--prune); }
+body.tactile .bulle-options > .bulle-fermer { width: 40px; height: 40px; }
+body.tactile .bulle-options { padding-top: 42px; }
+/* colonne d outils : elle s ajuste à sa largeur, sans barre de défilement (les libellés passent à la ligne) */
+.grille-outils { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grille-outils > button { min-width: 0; }
+.grille-outils > button span { overflow-wrap: anywhere; hyphens: auto; max-width: 100%; }
+@media (min-width: 901px) { .outils { overflow-x: hidden; scrollbar-width: none; } .outils::-webkit-scrollbar { display: none; } }
+@media (min-width: 1281px) { body:not(.tablette):not(.enfant) #app { grid-template-columns: 136px minmax(0, 1fr) 300px; } }
+@media (min-width: 901px) and (max-width: 1280px) { body:not(.tablette):not(.enfant) #app { grid-template-columns: 136px minmax(0, 1fr) 264px; } }
+.grille-outils > button span { overflow-wrap: normal; word-break: keep-all; }

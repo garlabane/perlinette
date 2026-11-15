@@ -1,9 +1,9 @@
 {
-  "version": "1.18.2",
+  "version": "1.18.3",
   "date": "2026-11-15",
   "nouveautes": [
-    "Nouvel outil Contour : ajouter ou retirer un anneau de perles autour du dessin, couche par couche",
-    "Importer une image : l’aperçu reste visible pendant qu’on règle le nettoyage",
-    "Plus de confort : textes plus lisibles, zoom dans la rangée des onglets, plaque entièrement visible"
+    "Sélection : baguette magique (une touche choisit tout le motif, ou une couleur)",
+    "Une sélection se déplace en la faisant glisser, sans laisser de copie",
+    "Les menus flottants ont un ✕ et se ferment d’un toucher à côté, sans dessiner"
   ]
 }

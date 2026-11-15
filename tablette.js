@@ -144,12 +144,40 @@ function construireRailCouleurs() {
 }
 
 // ---------- les bulles d'options ----------
+// un ✕ en haut à droite de chaque bulle : on voit tout de suite comment la fermer
+function ajouterFermer(b) {
+  if (b.querySelector(':scope > .bulle-fermer')) return;
+  b.insertAdjacentHTML('afterbegin', '<button type="button" class="bulle-fermer" aria-label="Fermer" title="Fermer (Échap)">✕</button>');
+  b.querySelector(':scope > .bulle-fermer').onclick = (e) => { e.stopPropagation(); fermerBulle(); };
+}
+// un toucher à côté d'une bulle ou d'un menu ouvert le ferme… et ne fait rien d'autre
+// (avant, ce même toucher posait aussi une perle sur la plaque)
+document.addEventListener('pointerdown', (e) => {
+  const t = cible(e), fichier = $('#menuFichier');
+  const ouvert = TB.bulle || document.body.classList.contains('menu-ouvert') || (fichier && !fichier.hidden)
+    || document.querySelector('.menu-bureau .menu-liste:not([hidden])');
+  if (!ouvert) return;
+  if (t.closest('.bulle-options, .barre nav, .menu-bureau, #menuFichier, .menu-bouton, #btnFichier, .a-options, dialog, #panneauTexte')) return;
+  fermerBulle();
+  if (typeof fermerMenuMobile === 'function') fermerMenuMobile();
+  if (typeof fermerMenusBureau === 'function') fermerMenusBureau();
+  if (typeof fermerMenu === 'function') fermerMenu();
+  if (t.closest('#zone, .pose')) {
+    e.preventDefault(); e.stopPropagation();
+    // le « clic » qui suit ce toucher ne doit rien déclencher non plus
+    const avaler = (c) => { c.stopPropagation(); c.preventDefault(); };
+    document.addEventListener('click', avaler, { capture: true, once: true });
+    setTimeout(() => document.removeEventListener('click', avaler, true), 700); // pas de clic qui suit : on n'avale rien d'autre
+  }
+}, true);
+
 function fermerBulle() { if (TB.bulle) { TB.bulle.remove(); TB.bulle = null; } }
 function ouvrirBulle(ancre, contenu) {
   fermerBulle();
   const b = document.createElement('div');
   b.className = 'bulle-options'; b.setAttribute('role', 'menu');
   b.innerHTML = contenu;
+  ajouterFermer(b);
   document.body.appendChild(b);
   const r = ancre.getBoundingClientRect(), w = b.offsetWidth, h = b.offsetHeight, m = 8;
   const aDroite = r.left < window.innerWidth / 2;               // ancre à gauche : la bulle s'ouvre vers la droite
@@ -348,7 +376,7 @@ function ouvrirEventail(ancre) {
   const b = ouvrirBulle(ancre, dessiner(onglet));
   b.classList.add('eventail');
   const brancher = () => {
-    b.querySelectorAll('[data-onglet]').forEach((x) => (x.onclick = () => { b.innerHTML = dessiner(x.dataset.onglet); brancher(); }));
+    b.querySelectorAll('[data-onglet]').forEach((x) => (x.onclick = () => { b.innerHTML = dessiner(x.dataset.onglet); ajouterFermer(b); brancher(); }));
     b.querySelectorAll('.eventail-perle').forEach((x) => (x.onclick = () => {
       const c = listes[TB.ongletPalette]()[+x.dataset.i];
       ajouterAuMotif({ code: c.code, nom: c.nom, nomOfficiel: c.nomOfficiel, hex: c.hex, marque: c.marque });
