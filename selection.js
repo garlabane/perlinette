@@ -339,6 +339,9 @@ barreSel.addEventListener('click', (e) => {
   if (m) {
     SEL.mode = m.dataset.modeSel; reglages.selMode = SEL.mode; ecrire(CLE.reglages, reglages);
     SEL.coin = null; toile.classList.remove('attente');
+    // nouvelle façon de choisir : on repart de zéro, sinon toucher une perle déjà choisie la déplacerait
+    if (SEL.deplace) finirDeplacement();
+    SEL.ids = null; SEL.rect = null; toutMettreAJour();
     majBarreSel();
     message(SEL.mode === 'zone' ? 'Glisse pour encadrer une zone.' : SEL.mode === 'baguette' ? 'Touche une perle : tout le motif qui se touche est choisi.' : 'Touche une perle : sa couleur, là où elle se touche, est choisie.', 3000);
     return;
@@ -361,7 +364,15 @@ function majBarreSel() {
   barreSel.querySelector('[data-sel="effacer"]').disabled = !aSel;
   barreSel.querySelector('[data-sel="coller"]').disabled = !pp;
   for (const t of ['h', 'v', 'g', 'd']) barreSel.querySelector(`[data-sel="${t}"]`).disabled = !pp && !aSel;
+  placerBarreSel();
 }
+// sur téléphone, la barre se pose en bas, juste au-dessus des couleurs : elle ne cache plus le haut de la plaque
+function placerBarreSel() {
+  const cote = document.querySelector('.cote');
+  if (barreSel.hidden || !matchMedia('(max-width: 600px)').matches || !cote) { barreSel.style.bottom = ''; return; }
+  barreSel.style.bottom = Math.max(8, Math.round(innerHeight - cote.getBoundingClientRect().top + 6)) + 'px';
+}
+addEventListener('resize', placerBarreSel);
 // changer d'outil : on range la sélection
 const choisirOutilSansSel = choisirOutil;
 choisirOutil = function (o) {

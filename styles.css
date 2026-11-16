@@ -496,7 +496,7 @@ body.enfant .barre-sel { display: none !important; }
   .mod-liste { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .barre [data-action="aide"] { display: none; }
   .grille-outils > [data-outil="lettre"], .grille-outils > [data-outil="ligne"], .grille-outils > [data-outil="rect"],
-  .grille-outils > [data-outil="ellipse"], .grille-outils > [data-outil="selection"], .grille-outils > [data-outil="remplacer"],
+  .grille-outils > [data-outil="ellipse"], .grille-outils > [data-outil="remplacer"],
   .grille-outils > [data-action="miroirH"], .grille-outils > [data-action="miroirV"], .grille-outils > [data-action="versPlaque"],
   .options-forme { display: none !important; }
 }
@@ -1386,3 +1386,12 @@ body.tactile .retour-accueil { min-height: 44px; padding: 8px 16px; font-size: 1
 .panneau-texte .tx-actions { position: sticky; bottom: -14px; margin: 0 -14px -14px; padding: 10px 14px 14px; background: var(--panneau); border-top: 1px solid var(--bord); z-index: 1; }
 .panneau-texte > * { flex-shrink: 0; }   /* dans le panneau qui défile, aucun bloc ne s'écrase (l'aperçu débordait) */
 .panneau-texte .tx-apercu-haut canvas { max-width: 100%; max-height: 120px; width: auto; height: auto; object-fit: contain; }
+/* téléphone : la barre de sélection tient sur une ligne qui défile, en bas au-dessus des couleurs */
+@media (max-width: 600px) {
+  .barre-sel, body.tactile .barre-sel { top: auto; left: 8px; right: 8px; transform: none; max-width: none; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; padding: 5px 6px; gap: 4px; }
+  .barre-sel::-webkit-scrollbar { display: none; }
+  .barre-sel > *, .barre-sel .sel-modes button { flex-shrink: 0; }
+  .barre-sel-titre { display: none; }
+  .barre-sel .sel-modes { margin-right: 2px; }
+  .barre-sel button, body.tactile .barre-sel button { min-height: 40px; min-width: 40px; padding: 3px 9px; font-size: 14px; }
+}
