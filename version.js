@@ -5,7 +5,7 @@
 //    version plus récente existe, un bandeau discret le dit (rien n'est téléchargé tout seul) ;
 //  • sans Internet, rien ne se passe. Le bandeau se ferme, et ne revient pas pour la même version.
 
-const VERSION = '1.18.9';
+const VERSION = '1.18.10';
 const URL_VERSION = 'https://garlabane.github.io/perlinette/version.json';
 const URL_TELECHARGER = 'https://github.com/garlabane/perlinette/archive/refs/heads/main.zip';
 const CLE_MAJ = 'perlesrep.maj';
@@ -92,3 +92,37 @@ else setTimeout(() => verifierMaj(), 1500);
 if (!EN_LIGNE) window.addEventListener('load', () => {
   const s = document.createElement('script'); s.src = 'modeles-perso/outils.js'; s.onerror = () => s.remove(); document.head.appendChild(s);
 });
+
+// ---------- Actualiser ----------
+// Ouverte depuis l'écran d'accueil d'un téléphone, Perlinette n'a plus de barre d'adresse, donc
+// plus de bouton « rafraîchir » (et tirer la page vers le bas est coupé pour ne pas bouger la plaque).
+// Fichier › « Actualiser Perlinette » recharge la page, après avoir rangé le motif en cours.
+function actualiserPerlinette() {
+  try { if (typeof sauverMaintenant === 'function') sauverMaintenant(); } catch (e) { /* on recharge quand même */ }
+  location.reload();
+}
+if (typeof actions !== 'undefined') actions.actualiser = actualiserPerlinette;
+
+// Version en ligne : quand on revient sur Perlinette (appli rouverte, téléphone rallumé), on regarde
+// si une nouvelle version a été publiée ; si oui, un bandeau propose d'actualiser d'une touche.
+async function verifierEnLigne() {
+  if (!EN_LIGNE || $('#bandeauMaj')) return;
+  try {
+    const r = await fetch(URL_VERSION + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const info = await r.json();
+    if (!versionPlusRecente(info.version, VERSION)) return;
+    const b = document.createElement('div');
+    b.id = 'bandeauMaj'; b.className = 'bandeau-maj'; b.setAttribute('role', 'status');
+    b.innerHTML = `<span>✨ <b>Perlinette ${echap(info.version)}</b> est arrivée.</span>
+      <button type="button" class="maj-dl maj-actualiser">Actualiser</button>
+      <button type="button" class="maj-fermer" aria-label="Fermer">×</button>`;
+    b.querySelector('.maj-actualiser').onclick = actualiserPerlinette;
+    b.querySelector('.maj-fermer').onclick = () => b.remove();
+    document.body.appendChild(b);
+  } catch (e) { /* pas d'Internet : rien */ }
+}
+if (EN_LIGNE) {
+  setTimeout(verifierEnLigne, 3000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') verifierEnLigne(); });
+}

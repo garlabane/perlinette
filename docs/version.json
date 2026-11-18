@@ -1,8 +1,9 @@
 {
-  "version": "1.18.9",
-  "date": "2026-11-16",
+  "version": "1.18.10",
+  "date": "2026-11-18",
   "nouveautes": [
-    "Sur téléphone, l’outil Sélection est de retour (zone, baguette, même couleur), avec sa barre en bas au-dessus des couleurs",
-    "Changer de façon de sélectionner repart d’une sélection vide"
+    "Fichier › « Actualiser Perlinette » : pour recharger l’appli ouverte depuis l’écran d’accueil du téléphone",
+    "Une nouvelle version publiée ? Un bandeau propose « Actualiser » d’une touche",
+    "Sur iPhone, les outils du bas ne sont plus collés à la barre de geste qui fait sortir de l’appli"
   ]
 }
