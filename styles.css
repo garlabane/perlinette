@@ -1395,3 +1395,18 @@ body.tactile .retour-accueil { min-height: 44px; padding: 8px 16px; font-size: 1
   .barre-sel .sel-modes { margin-right: 2px; }
   .barre-sel button, body.tactile .barre-sel button { min-height: 40px; min-width: 40px; padding: 3px 9px; font-size: 14px; }
 }
+
+/* ===== Calque : l'image de départ en transparence sur la plaque (écran seulement) ===== */
+.calque { position: absolute; pointer-events: none; image-rendering: auto; z-index: 1; border-radius: 2px; }
+.barre-calque { position: relative; width: max-content; margin: 0 0 8px; z-index: 5; display: flex; align-items: center; gap: 6px; background: var(--panneau); border: 1px solid var(--bord); border-radius: 12px; padding: 4px 6px; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+.barre-calque button { min-height: 36px; padding: 3px 10px; border-radius: 8px; font-size: 14px; white-space: nowrap; }
+.barre-calque .calque-bascule.actif { background: var(--prune); color: #fff; border-color: var(--prune); }
+.barre-calque .calque-opacite { width: 96px; accent-color: var(--prune); }
+.barre-calque .calque-retirer { min-width: 36px; padding: 3px 6px; }
+body.tactile .barre-calque button { min-height: 44px; }
+@media print { .calque, .barre-calque { display: none !important; } }
+.calque-verif-couche { position: absolute; pointer-events: none; z-index: 2; }
+.barre-calque .calque-verif.actif { background: #e0245e; color: #fff; border-color: #e0245e; }
+.barre-calque .calque-compte { font-size: 13px; font-weight: 700; color: #b0174a; white-space: nowrap; }
+@media (max-width: 600px) { .barre-calque { flex-wrap: wrap; max-width: calc(100vw - 32px); } .barre-calque .calque-opacite { width: 80px; } }
+@media print { .calque-verif-couche { display: none !important; } }

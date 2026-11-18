@@ -7,6 +7,7 @@ let imageChargee = null, resultatImage = null, surfaceImage = null, nomImage = n
 // placement de l'image sur les plaques : taille (1 = image entière, la plus grande possible),
 // décalage en pas, et la partie utile de l'image (sans ses bords vides)
 let cadreImage = { zoom: 1, dx: 0, dy: 0 }, boiteImage = null;
+let cadreDuCalque = null; // la place exacte de l'image sur la plaque, pour le calque (calque.js)
 const borner = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // La partie utile d'une image : sans ses bords transparents (ou d'une couleur unie).
@@ -262,6 +263,8 @@ function ouvrirImage(ajout = false) {
     P.couleurs = resultatImage.couleurs;
     S.couleur = 0;
     fini();
+    // l'image de départ reste disponible en calque, à l'écran seulement (calque.js)
+    if (typeof garderCalque === 'function' && cadreDuCalque) garderCalque(imageChargee, surf, cadreDuCalque);
   };
   dlg.returnValue = '';
   dlg.showModal();
@@ -347,6 +350,7 @@ function calculerImage(f, palette) {
   if (!imageChargee) { info.textContent = taille + '. Choisis une image pour voir le motif ici.'; return; }
   if (!palette.length) { info.textContent = 'Aucune référence autorisée : coche au moins une couleur.'; return; }
   const brut = convertirImage(imageChargee, surf, { ...cadreImage, boite: boiteUtile(f.rogner.checked), gris: reglages.teintesImage === 'gris' }, +f.max.value || 0, f.tramage.checked, f.transp.value === '1', palette);
+  cadreDuCalque = { ...cadreImage, boite: boiteUtile(f.rogner.checked) };
   { const d = $('#dlgImage'); d._tous = d._tous || new Map(); for (const c of palette) d._tous.set(cleCouleur(c), c); }
   const optN = Object.fromEntries(Object.keys(NETTOYAGE_DEFAUT).map((k) => [k, f['n_' + k].checked]));
   const net = nettoyerImage(surf, brut, optN);

@@ -1,9 +1,8 @@
 {
-  "version": "1.18.10",
+  "version": "1.19.0",
   "date": "2026-11-18",
   "nouveautes": [
-    "Fichier › « Actualiser Perlinette » : pour recharger l’appli ouverte depuis l’écran d’accueil du téléphone",
-    "Une nouvelle version publiée ? Un bandeau propose « Actualiser » d’une touche",
-    "Sur iPhone, les outils du bas ne sont plus collés à la barre de geste qui fait sortir de l’appli"
+    "Calque : l’image importée reste en transparence sur la plaque pour corriger les perles (à l’écran seulement, rien ne s’imprime)",
+    "« À vérifier » entoure les perles qui s’écartent de l’image, et « Tout corriger » les remet d’un geste"
   ]
 }
