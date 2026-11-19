@@ -154,7 +154,7 @@ function vignette(canvas, pose, taille) {
 const AVIS_THEMES = { Princesses: 'Fan art non officiel, pour un usage strictement privé : toute utilisation commerciale (vente des modèles, des patrons ou des créations en perles) est interdite.' };
 
 // Familles pour classer les modèles d'un thème, d'après leur nom (mots-clés) ; « Autres » sinon.
-const FAMILLES_MODELES = ['Boules de Noël', 'Personnages', 'Animaux', 'Sapins et décorations', 'Gourmandises', 'Cadeaux et jouets', 'Vêtements et accessoires', 'Maisons et paysages', 'Autres'];
+const FAMILLES_MODELES = ['Boules de Noël', 'Personnages', 'Fleurs', 'Kawaii', 'Animaux', 'Sapins et décorations', 'Gourmandises', 'Cadeaux et jouets', 'Vêtements et accessoires', 'Maisons et paysages', 'Ciel et nature', 'Fêtes et saisons', 'Motifs', 'Objets', 'Autres'];
 const MOTS_FAMILLES = [
   ['Personnages', /(^|[^a-zà-ÿ])(p[eè]re no[eë]l|m[eè]re no[eë]l|lutin|ange|bonhomme|casse-noisette|soldat|princesse|f[ée]e|sorci[eè]re|fant[oô]me|elfe|pirate|robot|momie|vampire|zombie)(?![a-zà-ÿ])/i],
   ['Animaux', /(^|[^a-zà-ÿ])(renne|renard|ours|ourson|hibou|chouette|lapin|chat|chaton|chien|chiot|corgi|panda|pingouin|manchot|phoque|morse|cerf|biche|[ée]cureuil|mulot|souris|oiseau|oiseaux|cardinal|rouge-gorge|harfang|flamant|cygne|oie|canard|poussin|poule|mouton|agneau|cochon|vache|cheval|licorne|dragon|poisson|baleine|dauphin|tortue|grenouille|abeille|papillon|loup|h[ée]risson|koala|lion|tigre|girafe|[ée]l[ée]phant|singe|chauve-souris|araign[ée]e)s?(?![a-zà-ÿ])/i],
@@ -167,6 +167,7 @@ const MOTS_FAMILLES = [
 // la famille du PREMIER mot reconnu dans le nom : « Boule renne » est une décoration, « Renne en chaussettes » un animal,
 // « Botte du Père Noël » un vêtement
 function familleModele(m) {
+  if (m.famille) return m.famille; // famille donnée par le modèle lui-même (cadres photo…)
   // toutes les boules ensemble (« Boule renne », « Renard dans sa boule de verre »…), mais pas « Boule-chat » ni « Mouton-boule »
   if (/(^|\s)boules?(\s|$)/i.test(m.nom)) return 'Boules de Noël';
   let best = 'Autres', pos = Infinity;

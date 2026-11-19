@@ -1,8 +1,8 @@
 {
-  "version": "1.19.0",
-  "date": "2026-11-18",
+  "version": "1.20.0",
+  "date": "2026-11-19",
   "nouveautes": [
-    "Calque : l’image importée reste en transparence sur la plaque pour corriger les perles (à l’écran seulement, rien ne s’imprime)",
-    "« À vérifier » entoure les perles qui s’écartent de l’image, et « Tout corriger » les remet d’un geste"
+    "Nouveau thème « Cadres photo » : 82 cadres à glisser autour d’une photo (identité, Instax mini, carrée, 9 × 13, 10 × 15)",
+    "Des fleurs, des cadres kawaii pour les petits, des animaux… rangés par familles, tous vérifiés pour se souder d’un seul tenant"
   ]
 }
